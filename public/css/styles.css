@@ -23,3 +23,10 @@
 .archive-item {
   margin-left: 5px;
 }
+
+.tag {
+    background-color: #919191;
+    color: #fff !important;
+    margin-right: 5px;
+    padding: 0 5px;
+}
