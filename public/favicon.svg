@@ -15,7 +15,10 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="favicon.svg">
+   sodipodi:docname="favicon.svg"
+   inkscape:export-filename="C:\Users\Sid Burn\Documents\Visual Studio 2015\Projects\sidburn.github.io\public\favicon.png"
+   inkscape:export-xdpi="200.35001"
+   inkscape:export-ydpi="200.35001">
   <defs
      id="defs4" />
   <sodipodi:namedview
@@ -26,7 +29,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.7"
-     inkscape:cx="387.14286"
+     inkscape:cx="75.000003"
      inkscape:cy="502.95506"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -44,7 +47,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -54,7 +57,7 @@
      id="layer1">
     <g
        id="g3348"
-       transform="matrix(1.5481613,0,0,1,60.869152,-75.241501)"
+       transform="matrix(1.5483152,0,0,0.90449442,60.851882,-9.0347012)"
        style="fill:#800080">
       <text
          transform="scale(1.0164624,0.9838042)"
@@ -83,7 +86,7 @@
     </g>
     <g
        id="g3362"
-       transform="matrix(0.40712766,0,0,0.36051285,207.06383,390.9573)"
+       transform="matrix(0.40716813,0,0,0.32608186,207.06109,412.63951)"
        style="fill:#800080">
       <text
          transform="scale(0.60817169,1.6442725)"
