@@ -2,6 +2,7 @@
 \---  
 layout: post  
 title: "Exceptions are Evil"
+tags: [exceptions,null,option]
 \---
 *)
 

@@ -2,6 +2,7 @@
 \---  
 layout: post  
 title: Understanding Immutability and Pure Functions (for OOP)
+tags: [immutability]
 \---
 *)
 

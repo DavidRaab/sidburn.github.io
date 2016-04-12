@@ -2,6 +2,7 @@
 \---  
 layout: post  
 title: "From mutable loops to immutable folds"
+tags: [immutability,list,fold]
 \---
 *)
 
