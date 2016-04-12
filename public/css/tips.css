@@ -76,10 +76,6 @@ table.pre, pre.fssnip, pre {
   max-width: none;
 }
 
-table.pre .snippet {
-    border: 0px;
-}
-
 pre.fssnip code {
   font: 9pt 'Droid Sans Mono',consolas,monospace;
 }
@@ -92,10 +88,12 @@ table.pre pre {
 table.pre td {
   padding:0px;
   white-space:normal;
-  margin:0px;
+  margin: 0px;
+  border: 0px;
 }
 table.pre td.lines {
-  width:30px;
+  width: 30px;
+  border: 0px;
 }
 
 /*--------------------------------------------------------------------------
