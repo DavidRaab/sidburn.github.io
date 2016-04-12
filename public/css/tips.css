@@ -14,9 +14,9 @@ span.e { color:#EA8675; }
 /* identifiers --- and styles for more specific identifier types */
 span.i { color:#d1d1d1; }
 /* type or module */
-span.t { color:#43AEC6; }
+span.t { color:#FF8B00; }
 /* function */
-span.f { color:#FF8B00; }
+span.f { color:#af75c1; }
 /* DU case or active pattern */
 span.p { color:#BDD615; }
 
@@ -25,7 +25,7 @@ span.k { color:#FAB11D; }
 /* comment */
 span.c { color:#808080; }
 /* operators */
-span.o { color:#af75c1; }
+span.o { color:#d1d1d1; }
 /* numbers */
 span.n { color:#96C71D; }
 /* line number */
@@ -75,6 +75,11 @@ table.pre, pre.fssnip, pre {
   color:#d1d1d1;
   max-width: none;
 }
+
+table.pre snippet {
+    border: 0px;
+}
+
 pre.fssnip code {
   font: 9pt 'Droid Sans Mono',consolas,monospace;
 }
