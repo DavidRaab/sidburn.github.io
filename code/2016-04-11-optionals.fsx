@@ -2,12 +2,12 @@
 \---  
 layout: post  
 title: Optionals
-tags: [null,option]
+tags: ["null",option]
 \---
 *)
 
 (**
-In this blog I want to talk about *Optionals* more deeply. I already wrote
+In this post I want to talk about *Optionals* more deeply. I already wrote
 [about null]({% post_url 2016-03-20-null-is-evil %}), but I noticed that it is still
 not immediately clear on why *Optionals* are better. Instead of focusing why `null`
 is bad, this time I want to focus why *Optionals* are good. For this purpose I also wrote

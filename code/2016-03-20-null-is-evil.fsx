@@ -2,7 +2,7 @@
 \---  
 layout: post  
 title: null is Evil
-tags: [null,option]
+tags: ["null",option]
 \---
 *)
 
