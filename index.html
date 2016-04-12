@@ -11,10 +11,12 @@ title: Home
         {{ post.title }}
       </a>
     </h1>
-    <span class="post-date">
-        {{ post.date | date_to_long_string }}
+    
+    <div class="post-header">
+        <span class="post-date">{{ post.date | date_to_long_string }}</span>
+        {% include post-tags.html %}
         <a href="{{ site.baseurl }}{{ post.url }}#disqus_thread">comments</a>
-    </span>
+    </div>
     
     {{ post.content | strip_html | truncatewords: 50 }}
     
