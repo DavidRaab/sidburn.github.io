@@ -76,7 +76,7 @@ table.pre, pre.fssnip, pre {
   max-width: none;
 }
 
-table.pre snippet {
+table.pre .snippet {
     border: 0px;
 }
 
