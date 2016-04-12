@@ -4,31 +4,34 @@
   Formatting for F# code snippets 
 /*--------------------------------------------------------------------------*/
 
-/* identifier */
+/* strings --- and stlyes for other string related formats */
+span.s { color:#E0E268; }
+/* printf formatters */
+span.pf { color:#E0C57F; }
+/* escaped chars */
+span.e { color:#EA8675; }
+
+/* identifiers --- and styles for more specific identifier types */
 span.i { color:#d1d1d1; }
-/* string */
-span.s { color:#EF5555; }
+/* type or module */
+span.t { color:#43AEC6; }
+/* function */
+span.f { color:#FF8B00; }
+/* DU case or active pattern */
+span.p { color:#BDD615; }
+
 /* keywords */
-span.k { color:#4e98dc; }
+span.k { color:#FAB11D; }
 /* comment */
-span.c { color:#00B30C; }
+span.c { color:#808080; }
 /* operators */
 span.o { color:#af75c1; }
 /* numbers */
 span.n { color:#96C71D; }
 /* line number */
 span.l { color:#80b0b0; }
-/* patterns */
-span.p { color:#BDD615; }
-/* types */
-span.t { color:#FF8B00; }
-/* functions */
-span.f { color:#04D4E6; }
-/* string percent-format */
-span.pf { color:#af75c1; }
-/* string escape */
-span.e { color:#af75c1; }
-
+/* mutable var or ref cell */
+span.v { color:#ff0000; }
 /* inactive code */
 span.inactive { color:#808080; }
 /* preprocessor */
@@ -36,8 +39,9 @@ span.prep { color:#af75c1; }
 /* fsi output */
 span.fsi { color:#808080; }
 
+
 /* omitted */
-span.omitted { 
+span.omitted {
 	background:#3c4e52;
   border-radius:5px;
 	color:#808080;
@@ -56,8 +60,7 @@ table.pre pre {
   padding:0px;
   margin:0px;
   border:none;
-  border:1px solid #212d30; 
-} 
+}
 table.pre, pre.fssnip, pre {
   line-height:13pt;
   border:1px solid #d8d8d8;
@@ -69,14 +72,17 @@ table.pre, pre.fssnip, pre {
   background-color:#212d30;
   padding:10px;
   border-radius:5px;
-  color:#d1d1d1;  
+  color:#d1d1d1;
+  max-width: none;
+}
+pre.fssnip code {
+  font: 9pt 'Droid Sans Mono',consolas,monospace;
 }
 table.pre pre {
   padding:0px;
   margin:0px;
   border-radius:0px;
   width: 100%;
-  border:1px solid #212d30; 
 }
 table.pre td {
   padding:0px;
@@ -87,19 +93,7 @@ table.pre td.lines {
   width:30px;
 }
 
-td {
-    border:1px solid #212d30; 
-}
-
-td.snippet {
-   border:1px solid #212d30; 
-}
-
-td.lines {
-   border:1px solid #212d30; 
-}
-
-/*-------------------------------------------------------------------------- 
+/*--------------------------------------------------------------------------
   Formatting for page & standard document content
 /*--------------------------------------------------------------------------*/
 
@@ -167,7 +161,7 @@ td.title, thead {
 #main li { font-size: 11pt; margin: 5px 0px 5px 0px; }
 #main strong { font-weight:700; }
 
-/*-------------------------------------------------------------------------- 
+/*--------------------------------------------------------------------------
   Formatting for API reference
 /*--------------------------------------------------------------------------*/
 
@@ -212,14 +206,14 @@ h5 a, h5 a:hover, h5 a:focus,
 h6 a, h6 a:hover, h6 a:focus { color : inherit; text-decoration : inherit; outline:none }
 */
 
-/*-------------------------------------------------------------------------- 
-  Additional formatting for the homepage 
+/*--------------------------------------------------------------------------
+  Additional formatting for the homepage
 /*--------------------------------------------------------------------------*/
 
-#nuget { 
+#nuget {
   margin-top:20px;
-  font-size: 11pt; 
-  padding:20px; 
+  font-size: 11pt;
+  padding:20px;
 }
 
 #nuget pre {
