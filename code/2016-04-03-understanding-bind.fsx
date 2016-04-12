@@ -1,6 +1,6 @@
 (**
-\---  
-layout: post  
+\---
+layout: post
 title: "Understanding bind"
 tags: [functor,applicative,monad,option,cps]
 \---

@@ -1,6 +1,6 @@
 (**
-\---  
-layout: post  
+\---
+layout: post
 title: "Understanding map"
 tags: [functor,list,option]
 \---

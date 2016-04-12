@@ -1,6 +1,6 @@
 (**
-\---  
-layout: post  
+\---
+layout: post
 title: "Applicative Functors"
 tags: [functor,applicative,option]
 \---

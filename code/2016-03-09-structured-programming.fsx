@@ -1,13 +1,13 @@
 (**
-\---  
-layout: post  
+\---
+layout: post
 title: Structured Programming
 date: 2016-03-09 00:00:00
+tags: [structured]
 \---
 *)
 
 (**
-
 Back in 1968 Edsger W. Dijkstra wrote an open letter named "Go To Statement Considered Harmful". As already suggested from
 the title, the very idea was to raise consciousness that the `goto` statement is more harmful then helpful. From
 today view we would expect that this idea catches fire really fast, but it didn't. It took quite a long time. Even during 

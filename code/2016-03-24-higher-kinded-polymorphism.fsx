@@ -1,6 +1,6 @@
 (**
-\---  
-layout: post  
+\---
+layout: post
 title: "Higher-kinded Polymorphism: What is it, why you want it"
 tags: [polymorphism]
 \---

@@ -1,8 +1,8 @@
 (**
-\---  
-layout: post  
+\---
+layout: post
 title: Understanding Immutability and Pure Functions (for OOP)
-tags: [immutability]
+tags: [immutability,oop]
 \---
 *)
 

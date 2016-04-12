@@ -1,6 +1,6 @@
 (**
-\---  
-layout: post  
+\---
+layout: post
 title: null is Evil
 tags: ["null",option]
 \---

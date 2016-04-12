@@ -1,6 +1,6 @@
 (**
-\---  
-layout: post  
+\---
+layout: post
 title: FSharp.Formatting example
 published: false
 \---
