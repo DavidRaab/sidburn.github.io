@@ -7,17 +7,27 @@
 /* identifier */
 span.i { color:#d1d1d1; }
 /* string */
-span.s { color:#d4b43c; }
+span.s { color:#EF5555; }
 /* keywords */
 span.k { color:#4e98dc; }
 /* comment */
-span.c { color:#96C71D; }
+span.c { color:#00B30C; }
 /* operators */
 span.o { color:#af75c1; }
 /* numbers */
 span.n { color:#96C71D; }
 /* line number */
 span.l { color:#80b0b0; }
+/* patterns */
+span.p { color:#BDD615; }
+/* types */
+span.t { color:#FF8B00; }
+/* functions */
+span.f { color:#04D4E6; }
+/* string percent-format */
+span.pf { color:#af75c1; }
+/* string escape */
+span.e { color:#af75c1; }
 
 /* inactive code */
 span.inactive { color:#808080; }
@@ -193,12 +203,14 @@ td.title, thead {
   Links 
 /*--------------------------------------------------------------------------*/
 
+/*
 h1 a, h1 a:hover, h1 a:focus,
 h2 a, h2 a:hover, h2 a:focus,
 h3 a, h3 a:hover, h3 a:focus,
 h4 a, h4 a:hover, h4 a:focus,
 h5 a, h5 a:hover, h5 a:focus,
 h6 a, h6 a:hover, h6 a:focus { color : inherit; text-decoration : inherit; outline:none }
+*/
 
 /*-------------------------------------------------------------------------- 
   Additional formatting for the homepage 

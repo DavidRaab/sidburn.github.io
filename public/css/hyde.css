@@ -57,7 +57,7 @@ html {
   text-align: center;
   padding: 2rem 1rem;
   color: rgba(255,255,255,.5);
-  background-color: #202020;
+  background-color: #343131;
 }
 @media (min-width: 48em) {
   .sidebar {
@@ -72,7 +72,7 @@ html {
 
 /* Sidebar links */
 .sidebar a {
-  color: #fff;
+  color: #b3b3b3;
 }
 
 /* About section */
