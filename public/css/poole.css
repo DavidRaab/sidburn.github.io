@@ -365,10 +365,6 @@ tbody tr:nth-child(odd) th {
 .related h2 {
   margin-bottom: 0;
 }
-.related-posts {
-  padding-left: 0;
-  list-style: none;
-}
 .related-posts h3 {
   margin-top: 0;
   margin-bottom: 0;
