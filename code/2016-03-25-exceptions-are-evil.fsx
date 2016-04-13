@@ -3,6 +3,8 @@
 layout: post
 title: "Exceptions are Evil"
 tags: [exceptions,"null",option]
+description: "Explains why Exceptions are evil"
+keywords: programming, f#, error, null, exception
 \---
 *)
 

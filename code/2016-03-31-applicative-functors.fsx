@@ -3,6 +3,8 @@
 layout: post
 title: "Applicative Functors"
 tags: [functor,applicative,option]
+description: "Explains Applicative Functors with the option type"
+keywords: f#, fsharp, functor, applicative, option, null
 \---
 *)
 

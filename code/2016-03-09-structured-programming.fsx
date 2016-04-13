@@ -4,6 +4,8 @@ layout: post
 title: Structured Programming
 date: 2016-03-09 00:00:00
 tags: [structured]
+description: "Explains the idea behind Structured Programming and how they apply to Functional Programming"
+keywords: programming, functional, structured, goto
 \---
 *)
 

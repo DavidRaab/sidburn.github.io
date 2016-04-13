@@ -3,6 +3,8 @@
 layout: post
 title: Introduction to F#
 date: 2016-03-10 00:00:00
+description: "Gives an introduction to F# for C# developers"
+keywords: f#, fsharp, c#, csharp, introduction, beginner
 \---
 *)
 

@@ -3,6 +3,8 @@
 layout: post
 title: Optionals
 tags: ["null",option]
+description: "Describes Optionals as an alternative to null"
+keywords: f#, fsharp, functional, option, null
 \---
 *)
 

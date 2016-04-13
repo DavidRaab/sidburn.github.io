@@ -3,6 +3,8 @@
 layout: post
 title: "Understanding bind"
 tags: [functor,applicative,monad,option,cps]
+description: "Gives an introduction to the bind function"
+keywords: f#, fsharp, bind, monad, continuation, cps, option, maybe
 \---
 *)
 

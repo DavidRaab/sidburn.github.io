@@ -3,8 +3,8 @@
 layout: post
 title: "Applicative: Lists"
 tags: [applicative,list]
-keywords: f#, fsharp, list, applicative, functor, functional, programming
 description: Building an Applicative Functor for the list type
+keywords: f#, fsharp, list, applicative, functor, functional, programming
 \---
 *)
 

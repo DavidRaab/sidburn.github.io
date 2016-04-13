@@ -3,6 +3,8 @@
 layout: post
 title: "Higher-kinded Polymorphism: What is it, why you want it"
 tags: [polymorphism]
+description: "Explains Higher-Kinded Polymorphism"
+keywords: f#, fsharp, type classes, polymorphism, higher-kinded
 \---
 *)
 

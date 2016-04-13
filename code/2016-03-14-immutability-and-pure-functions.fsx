@@ -3,6 +3,8 @@
 layout: post
 title: Understanding Immutability and Pure Functions (for OOP)
 tags: [immutability,oop]
+description: "Explains what immutability and pure functions are, and how we design proper immutable objects"
+keywords: f#, fsharp, c#, csharp, programming, immutability, immutable objects, objects, oop, pure, pure functions
 \---
 *)
 

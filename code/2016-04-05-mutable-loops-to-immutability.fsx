@@ -3,6 +3,8 @@
 layout: post
 title: "From mutable loops to immutable folds"
 tags: [immutability,list,fold]
+description: "Explains the shift from imperative loops to more functional folds"
+keywords: f#, fsharp, list, loops, looping, fold, folds, recursion, immutability, data-structures
 \---
 *)
 

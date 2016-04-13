@@ -3,6 +3,8 @@
 layout: post
 title: "Understanding map"
 tags: [functor,list,option]
+description: "Explains the map function and what a Functor is"
+keywords: f#, fsharp, programming, functional, functor, map
 \---
 *)
 

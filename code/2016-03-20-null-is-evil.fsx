@@ -3,6 +3,8 @@
 layout: post
 title: null is Evil
 tags: ["null",option]
+description: "Explains why we consider null as a mistake, and shows alternatives to it"
+keywords: null, mistake, billion-dollar, tony hoare, option, maybe, monad 
 \---
 *)
 
