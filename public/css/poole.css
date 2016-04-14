@@ -61,6 +61,7 @@ html {
 body {
   color: #404040;
   background-color: #fcfcfc;
+  background-image: url(/public/bgnoise.png);
   -webkit-text-size-adjust: 100%;
       -ms-text-size-adjust: 100%;
 }
