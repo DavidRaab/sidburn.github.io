@@ -442,4 +442,8 @@ want to add explicit checking, without losing the benefits of optionals.
 
 In some future blogs I will show you in more detail how *Applicative Functors* and the *Maybe Monad*
 works. So you can build your own constructs !
+
+## Further Reading
+
+* [Null has no type, but Maybe has](http://blog.ploeh.dk/2015/11/13/null-has-no-type-but-maybe-has/)
 *)
