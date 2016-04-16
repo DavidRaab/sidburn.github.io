@@ -491,7 +491,7 @@ create two lists that refers to each other, with <code>apply</code> we then can 
 <td class="snippet"><pre class="fssnip highlighted"><code lang="sql"><span class="k">SELECT</span> p.Name
 <span class="k">FROM</span>   person p, likes l
 <span class="k">WHERE</span>  p.Id = l.PersonId
-<span class="k">WHERE</span>  l.Name = "Tea"
+<span class="k">AND</span>    l.Name = "Tea"
 </code></pre></td></tr></table>
 <p>Sure, most stuff is basically <em>List-Processing</em> at this point, but <code>apply</code> is just another
 functions in a tool-set that opens up some possibilities. And at this point you probably

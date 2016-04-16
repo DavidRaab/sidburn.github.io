@@ -321,7 +321,7 @@ and resembles a SQL-Statement like:
     SELECT p.Name
     FROM   person p, likes l
     WHERE  p.Id = l.PersonId
-    WHERE  l.Name = "Tea"
+    AND    l.Name = "Tea"
 
 Sure, most stuff is basically *List-Processing* at this point, but `apply` is just another
 functions in a tool-set that opens up some possibilities. And at this point you probably
