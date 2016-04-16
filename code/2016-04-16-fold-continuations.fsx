@@ -3,7 +3,7 @@
 layout: post
 title: "Continuations and foldBack"
 tags: [fold,list,cps]
-description: "This article shows how you can implement List.foldBack with a continuation function"
+description: This article shows how you can implement List.foldBack with a continuation function
 keywords: f#, fsharp, fold, continuation, foldback, fold, list
 \---
 *)
