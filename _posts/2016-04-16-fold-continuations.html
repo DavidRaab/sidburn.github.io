@@ -127,8 +127,8 @@ and last but not least <code>1</code>. The general logic how <code>foldBack</cod
 </code></pre></td>
 </tr>
 </table>
-<p>At this point let's focus on our <code>folder</code> function that we pass <code>foldBack</code>. Our <code>folder</code> function
-get the argument x<code>and</code>acc`. At any point in time. What does that values represents exactly?</p>
+<p>At this point let's focus on our <code>f</code> function that we pass <code>foldBack</code>. The <code>f</code> function
+get the argument <code>x</code> and <code>acc</code>. What does those values represents at any point in time exactly?</p>
 <p>As we basically just loop over a data-structure with <code>foldBack</code> it just means <code>x</code> is just
 one element from our list. The interesting thing is what <code>acc</code> contains. <code>acc</code> contains
 the <em>accumulation</em> of everything right from our current element. To be more concrete, let's
@@ -145,14 +145,14 @@ of our accumulation that was right of <code>2</code>. Let's assume we have.</p>
 far it calculated <code>0 + 4 + 3</code>.</p>
 <p>The only problem we have. We cannot go backwards through a list. That was the whole reason why we
 reversed the list before we looped/recurs through it. We only can go from left to right.
-And that is bad. Because we have to start with <code>1</code> and we need to pass an <code>acc</code> to the <code>folder</code>
+And that is bad. Because we have to start with <code>1</code> and we need to pass an <code>acc</code> to the <code>f</code>
 function that we don't have at that point in time!</p>
 <p>Uhm wait! Isn't that exactly what we discussed previously? What do we do if we expect to work
 with a value that we don't have yet? We create a function!</p>
 <h2>Functions as accumulator</h2>
 <p>The basic idea to solve our problem is by using a function that we use as our <em>accumulator</em>.
 We use a function because we need to work with values we don't have yet. Because we have a
-function I use <code>cont</code> (for *Continuation) in our inner <code>loop</code> instead of <code>acc</code>. Let's
+function I use <code>cont</code> (for Continuation) in our inner <code>loop</code> instead of <code>acc</code>. Let's
 first write the basic template to loop through a list first.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
@@ -182,9 +182,9 @@ first write the basic template to loop through a list first.</p>
 </ol>
 <h3>What do we do for every element?</h3>
 <p>At first, we reconsider what we are supposed to do. Our task is to execute the <em>folder</em>
-function that the caller provided us <code>f</code> and pass it the <em>current value</em> and the
+function that the caller provided us as <code>f</code>. We pass this function the <em>current value</em> and the
 <em>right-accumulator</em>. At this point in time we have the current value inside of <code>x</code>,
-but we don't have the <em>right-accumulator</em>. What we now do, we just create a <em>innerFunction</em>
+but we don't have the <em>right-accumulator</em>. What we now do, we just create a <em>inner function</em>
 <code>newCont</code> that at some point in the future will get the <em>right-accumulator</em>, then we also can
 call the <code>f</code> function.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
@@ -218,14 +218,14 @@ from the remaining list <code>[2;3;4]</code>, now we create a new <code>newCont<
 <p>Then this new function is used as our <code>cont</code>. But this behaviour is wrong. We loop through
 our list and on every step we just create a new function that will replace the old function.
 The problem is, we cannot just throw the old <code>cont</code> away, we somehow have to use it. But how?</p>
-<p>Let's look at our <code>f 2 racc</code> call. What does it anyway do and produce as a output? Or better yet,
+<p>Let's look at our <code>f 2 racc</code> call. What does that function return when we call it? Or better yet,
 which values do we have here exactly? Our <code>racc</code> is the <em>right-accumulator</em> that we have in the
 future, in our example this will be <code>[9;16]</code>. When we call <code>f 2 racc</code> we actually call
 <code>f 2 [9;16]</code>. What does our <code>f</code> function in our example? It squares <code>x</code> and add it to the <code>racc</code>.
 So after we do <code>f 2 [9;16]</code> we will get <code>[4;9;16]</code> as a result.</p>
 <p>But wait! Isn't that the <em>right-accumulator</em> that our previous <code>cont</code> needed? Yes, it is! And now
 it becomes more obvious in how we need to use <code>cont</code>. We call <code>f x racc</code>, this then produces a
-value that can be used to call our previous function that we created.</p>
+value that can be used to call our previous function that we passed as <code>cont</code>.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -249,9 +249,9 @@ will produce a value that can be passed to <code>g</code>.</p>
 </code></pre></td>
 </tr>
 </table>
-<p>Here we have the same. The only difference is that this time <code>cont</code> is a function the we created
+<p>Here we have the same. The only difference is that this time <code>cont</code> is a function we created
 inside a function in a previous loop. Let's shorten the example a little bit. In function composition
-we just ended with <code>let compose f g x = g (f x)</code>. Here we now have</p>
+we just ended with <code>let compose f g x = g (f x)</code>. We now shorten our call to:</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
 <td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">newCont</span> <span class="i">racc</span> <span class="o">=</span> <span class="i">cont</span> (<span class="i">f</span> <span class="i">x</span> <span class="i">racc</span>)
@@ -272,8 +272,8 @@ in our example now looks like this:</p>
 </table>
 <p>But we are not done yet, we still have to fill out two missing parts.</p>
 <h3>What do we do after we looped through the list?</h3>
-<p>One remaining part is once we finished our looping. To understand better what we have to do here.
-Let's actually try to understand what we exactly build. In every step we create a new function
+<p>One remaining part is the logic we have to do once we finished our looping. Let's actually try to
+understand what we exactly build. In every step we create a new function
 that expects the <em>right-accumulator</em> with this and the current <code>x</code> we calculate the
 <em>right-accumulator</em> for the previous function. In our first loop we create.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
@@ -297,10 +297,10 @@ the previous <code>cont</code> function. If we expand it fully we basically have
 <span class="l">3: </span>
 <span class="l">4: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">cont1</span> <span class="i">racc</span> <span class="o">=</span> <span class="i">cont</span>  (<span class="i">f</span> <span class="n">1</span> <span class="i">racc</span>)
-<span class="k">let</span> <span class="i">cont2</span> <span class="i">racc</span> <span class="o">=</span> <span class="i">cont1</span> (<span class="i">f</span> <span class="n">2</span> <span class="i">racc</span>)
-<span class="k">let</span> <span class="i">cont3</span> <span class="i">racc</span> <span class="o">=</span> <span class="i">cont2</span> (<span class="i">f</span> <span class="n">3</span> <span class="i">racc</span>)
-<span class="k">let</span> <span class="i">cont4</span> <span class="i">racc</span> <span class="o">=</span> <span class="i">cont3</span> (<span class="i">f</span> <span class="n">4</span> <span class="i">racc</span>)
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">cont1</span> <span class="i">racc</span> <span class="o">=</span> <span class="i">initCont</span> (<span class="i">f</span> <span class="n">1</span> <span class="i">racc</span>)
+<span class="k">let</span> <span class="i">cont2</span> <span class="i">racc</span> <span class="o">=</span> <span class="i">cont1</span>    (<span class="i">f</span> <span class="n">2</span> <span class="i">racc</span>)
+<span class="k">let</span> <span class="i">cont3</span> <span class="i">racc</span> <span class="o">=</span> <span class="i">cont2</span>    (<span class="i">f</span> <span class="n">3</span> <span class="i">racc</span>)
+<span class="k">let</span> <span class="i">cont4</span> <span class="i">racc</span> <span class="o">=</span> <span class="i">cont3</span>    (<span class="i">f</span> <span class="n">4</span> <span class="i">racc</span>)
 </code></pre></td>
 </tr>
 </table>
@@ -327,13 +327,14 @@ inline the whole functions step-by-step. First we inline <code>cont1</code> in o
 </tr>
 </table>
 <p>As we can see. With every loop iteration that we go forward, we build up a function. Every new
-function the we create basically builds the <em>right-accumulator</em> that is need for the <em>previous-step</em>.
+function we create builds the <em>right-accumulator</em> that is needed for the <em>previous-step</em>.
 Once we looped through our whole data-structure, we ended up with a final function. The only thing
-we need to start our function chain is to pass it a <em>right-accumulator</em>.</p>
-<p>But wait, at this point we have the <em>right-accumulator</em>! At the end we have to pass it the
+we need to do, is to start our function by passing it the final <em>right-accumulator</em>.</p>
+<p>And at this point we have the final <em>right-accumulator</em>! At the end we have to pass the
 <em>right-accumulator</em> of our last element. We only have the list <code>[1;2;3;4]</code> so what is the
-<em>right-accumulator</em> of this one? The <em>initial-accumulator</em> that the user passed to <code>foldBack</code>!</p>
-<p>So here is our answer. Once we are at the end of our list we have a function and we need to pass it
+<em>right-accumulator</em> of the last element <code>4</code>? The <em>initial-accumulator</em> that the user passed
+to <code>foldBack</code>!</p>
+<p>So here is our answer. Once we reached the end of our list we have a function and we need to pass it
 the <em>initial-accumulator</em>. Our <em>empty-list case</em> now looks something like that:</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
@@ -388,7 +389,7 @@ return <code>[16]</code></p>
 </code></pre></td>
 </tr>
 </table>
-<p>Now <code>initCont</code> also must be a <em>starting function</em>. But what do we expect it to do? Well nothing.
+<p>Now <code>initCont</code> also must be a <em>function</em>. But what do we expect it to do? Well nothing!
 We just expect it to return it's input as-is. In other words. Our <em>starting function</em> is <code>id</code>. So
 we start our <code>loop</code> with <code>loop id list</code>.</p>
 <h3>All pieces together</h3>
@@ -404,6 +405,12 @@ we start our <code>loop</code> with <code>loop id list</code>.</p>
 <span class="l"> 9: </span>
 <span class="l">10: </span>
 <span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+<span class="l">16: </span>
+<span class="l">17: </span>
 </pre></td>
 <td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs22', 68)" onmouseover="showTip(event, 'fs22', 68)" class="f">foldBack</span> <span onmouseout="hideTip(event, 'fs23', 69)" onmouseover="showTip(event, 'fs23', 69)" class="f">f</span> <span onmouseout="hideTip(event, 'fs24', 70)" onmouseover="showTip(event, 'fs24', 70)" class="i">list</span> (<span onmouseout="hideTip(event, 'fs25', 71)" onmouseover="showTip(event, 'fs25', 71)" class="i">acc</span><span class="o">:</span><span class="o">&#39;</span><span class="i">State</span>) <span class="o">=</span>
     <span class="k">let</span> <span class="k">rec</span> <span onmouseout="hideTip(event, 'fs26', 72)" onmouseover="showTip(event, 'fs26', 72)" class="f">loop</span> <span onmouseout="hideTip(event, 'fs27', 73)" onmouseover="showTip(event, 'fs27', 73)" class="f">cont</span> <span onmouseout="hideTip(event, 'fs24', 74)" onmouseover="showTip(event, 'fs24', 74)" class="i">list</span> <span class="o">=</span>
@@ -416,6 +423,12 @@ we start our <code>loop</code> with <code>loop id list</code>.</p>
 
 <span onmouseout="hideTip(event, 'fs22', 92)" onmouseover="showTip(event, 'fs22', 92)" class="f">foldBack</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs15', 93)" onmouseover="showTip(event, 'fs15', 93)" class="i">x</span> <span onmouseout="hideTip(event, 'fs19', 94)" onmouseover="showTip(event, 'fs19', 94)" class="i">acc</span> <span class="k">-&gt;</span> (<span onmouseout="hideTip(event, 'fs15', 95)" onmouseover="showTip(event, 'fs15', 95)" class="i">x</span><span class="o">*</span><span onmouseout="hideTip(event, 'fs15', 96)" onmouseover="showTip(event, 'fs15', 96)" class="i">x</span>) <span class="o">::</span> <span onmouseout="hideTip(event, 'fs19', 97)" onmouseover="showTip(event, 'fs19', 97)" class="i">acc</span>) [<span class="n">1</span>;<span class="n">2</span>;<span class="n">3</span>;<span class="n">4</span>] []
 <span class="c">// [1; 4; 9; 16]</span>
+
+<span onmouseout="hideTip(event, 'fs22', 98)" onmouseover="showTip(event, 'fs22', 98)" class="f">foldBack</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs15', 99)" onmouseover="showTip(event, 'fs15', 99)" class="i">x</span> <span onmouseout="hideTip(event, 'fs21', 100)" onmouseover="showTip(event, 'fs21', 100)" class="i">acc</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs15', 101)" onmouseover="showTip(event, 'fs15', 101)" class="i">x</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs21', 102)" onmouseover="showTip(event, 'fs21', 102)" class="i">acc</span>) [<span class="n">1..</span><span class="n">10</span>] <span class="n">0</span>
+<span class="c">// 55</span>
+
+<span onmouseout="hideTip(event, 'fs22', 103)" onmouseover="showTip(event, 'fs22', 103)" class="f">foldBack</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs15', 104)" onmouseover="showTip(event, 'fs15', 104)" class="i">x</span> <span onmouseout="hideTip(event, 'fs31', 105)" onmouseover="showTip(event, 'fs31', 105)" class="i">acc</span> <span class="k">-&gt;</span> (<span onmouseout="hideTip(event, 'fs32', 106)" onmouseover="showTip(event, 'fs32', 106)" class="f">string</span> <span onmouseout="hideTip(event, 'fs15', 107)" onmouseover="showTip(event, 'fs15', 107)" class="i">x</span>) <span class="o">+</span> <span onmouseout="hideTip(event, 'fs31', 108)" onmouseover="showTip(event, 'fs31', 108)" class="i">acc</span>) [<span class="n">1..</span><span class="n">10</span>] <span class="s">&quot;&quot;</span>
+<span class="c">// &quot;1234568910&quot;</span>
 </code></pre></td>
 </tr>
 </table>
@@ -436,13 +449,13 @@ first how do you measure "better"? Is it memory-consumption? CPU-time? Understan
 a new intermediate list.</p>
 <p>But using this kind of <em>continuation</em> style isn't quite better. We basically still traverse a
 list twice. We build first a continuation function, and in the end, we have to execute
-it that touches every element again. A <em>continuation function</em> here can result in higher
-memory consumption and could be slower, <em>reversing</em> in the end can really be faster and easier
+it that touches every element again. A <em>continuation function</em> can result in higher
+memory consumption and could be slower, <em>reversing</em> in the end can be faster and easier
 to understand. But if you really care, then do benchmarks on your own.</p>
 <p>But I think we should focus more on <em>readability</em>. <em>Reversing</em> is just quite easier,
 so try to use the obvious solution first if you design things.</p>
-<p>But at this point i also want to mention <em>mutability</em>. In functional programming in general
-we don't care how a function work. Functions are black-boxes. We only care for the input and
+<p>But at this point I also want to mention <em>mutability</em>. In functional programming in general
+we don't care how a function works. Functions are black-boxes. We only care for the input and
 the output of a function. It doesn't matter how it works, as long we have a <em>pure</em> function
 and it expect and returns <em>immutable-data</em> everything is fine. Even if a function uses
 loops, mutation or other kind of stuff. This is absolutely fine!</p>
@@ -483,3 +496,5 @@ different scenarios.</p>
 <div class="tip" id="fs28">val newCont : (&#39;State -&gt; &#39;b)</div>
 <div class="tip" id="fs29">val racc : &#39;State</div>
 <div class="tip" id="fs30">val id : x:&#39;T -&gt; &#39;T<br /><br />Full name: Microsoft.FSharp.Core.Operators.id</div>
+<div class="tip" id="fs31">val acc : string</div>
+<div class="tip" id="fs32">Multiple items<br />val string : value:&#39;T -&gt; string<br /><br />Full name: Microsoft.FSharp.Core.Operators.string<br /><br />--------------------<br />type string = System.String<br /><br />Full name: Microsoft.FSharp.Core.string</div>
