@@ -1,0 +1,485 @@
+---
+layout: post
+title: "Continuations and foldBack"
+tags: [fold,list,cps]
+description: "This article shows how you can implement List.foldBack with a continuation function"
+keywords: f#, fsharp, fold, continuation, foldback, fold, list
+---
+
+<p>In <a href="{% post_url 2016-04-mutable-loops-to-immutability %}">From mutable loops to immutable folds</a>
+we implemented <code>foldBack</code> through <code>rev</code> and <code>fold</code>. In this post I show you how you can implement
+<code>foldBack</code> by using a <em>continuation function</em>.</p>
+<h2>Functions</h2>
+<p>Before we see how to implement <code>foldBack</code>, I want to give you analogy first. This analogy helped
+me in a lot of cases. I hope that this analogy will also help you in better understanding
+the further post, or probably even in other areas in programming in general.</p>
+<h3>Back to the Future</h3>
+<p>One idea how you can view functions is, that you can do stuff now, with things you not
+have yet, but you know you will get them in the future. Sounds weird? Let's go over an
+example that you probably already know. Function composition.</p>
+<p>Usually most definitions of a function that does function composition have three arguments.
+But let's write it with only two arguments. You are given the task to write a function
+that has two functions as the input, and now you should compose them. How do you do that?</p>
+<p>Usually you start with something like</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs2', 2)" onmouseover="showTip(event, 'fs2', 2)" class="f">compose</span> <span onmouseout="hideTip(event, 'fs3', 3)" onmouseover="showTip(event, 'fs3', 3)" class="i">f</span> <span onmouseout="hideTip(event, 'fs4', 4)" onmouseover="showTip(event, 'fs4', 4)" class="i">g</span> <span class="o">=</span>
+    <span class="o">..</span><span class="o">.</span>
+</code></pre></td>
+</tr>
+</table>
+<p>But what comes next? Your task is to execute <code>f</code> and pass the result to <code>g</code>. But how do you execute
+<code>f</code> if you don't a value to execute <code>f</code>? The answer is, you create a function inside <code>compose</code>. This
+function gets the value to execute <code>f</code> sometime in the future.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs5', 5)" onmouseover="showTip(event, 'fs5', 5)" class="f">compose</span> <span onmouseout="hideTip(event, 'fs6', 6)" onmouseover="showTip(event, 'fs6', 6)" class="f">f</span> <span onmouseout="hideTip(event, 'fs7', 7)" onmouseover="showTip(event, 'fs7', 7)" class="f">g</span> <span class="o">=</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs8', 8)" onmouseover="showTip(event, 'fs8', 8)" class="f">innerFunction</span> <span onmouseout="hideTip(event, 'fs9', 9)" onmouseover="showTip(event, 'fs9', 9)" class="i">x</span> <span class="o">=</span>
+        <span class="k">let</span> <span onmouseout="hideTip(event, 'fs10', 10)" onmouseover="showTip(event, 'fs10', 10)" class="i">result</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs6', 11)" onmouseover="showTip(event, 'fs6', 11)" class="f">f</span> <span onmouseout="hideTip(event, 'fs9', 12)" onmouseover="showTip(event, 'fs9', 12)" class="i">x</span>
+        <span onmouseout="hideTip(event, 'fs7', 13)" onmouseover="showTip(event, 'fs7', 13)" class="f">g</span> <span onmouseout="hideTip(event, 'fs10', 14)" onmouseover="showTip(event, 'fs10', 14)" class="i">result</span>
+    <span class="o">..</span><span class="o">.</span>
+</code></pre></td>
+</tr>
+</table>
+<p>But what do you now do with <code>innerFunction</code>? We still don't have a value to execute <code>innerFunction</code>.
+Yes, that's right, because of this, your only option is to return <code>innerFunction</code> from our <code>compose</code>
+function.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs11', 15)" onmouseover="showTip(event, 'fs11', 15)" class="f">compose</span> <span onmouseout="hideTip(event, 'fs6', 16)" onmouseover="showTip(event, 'fs6', 16)" class="f">f</span> <span onmouseout="hideTip(event, 'fs7', 17)" onmouseover="showTip(event, 'fs7', 17)" class="f">g</span> <span class="o">=</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs8', 18)" onmouseover="showTip(event, 'fs8', 18)" class="f">innerFunction</span> <span onmouseout="hideTip(event, 'fs9', 19)" onmouseover="showTip(event, 'fs9', 19)" class="i">x</span> <span class="o">=</span>
+        <span class="k">let</span> <span onmouseout="hideTip(event, 'fs10', 20)" onmouseover="showTip(event, 'fs10', 20)" class="i">result</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs6', 21)" onmouseover="showTip(event, 'fs6', 21)" class="f">f</span> <span onmouseout="hideTip(event, 'fs9', 22)" onmouseover="showTip(event, 'fs9', 22)" class="i">x</span>
+        <span onmouseout="hideTip(event, 'fs7', 23)" onmouseover="showTip(event, 'fs7', 23)" class="f">g</span> <span onmouseout="hideTip(event, 'fs10', 24)" onmouseover="showTip(event, 'fs10', 24)" class="i">result</span>
+    <span onmouseout="hideTip(event, 'fs8', 25)" onmouseover="showTip(event, 'fs8', 25)" class="f">innerFunction</span>
+</code></pre></td>
+</tr>
+</table>
+<p>This is exactly what <code>&gt;&gt;</code> does. It is only the fully expanded version of it. If you want to shorten it.
+As you create a inner function and just return it. You also can just create a lambda directly and return
+it.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs12', 26)" onmouseover="showTip(event, 'fs12', 26)" class="f">compose</span> <span onmouseout="hideTip(event, 'fs6', 27)" onmouseover="showTip(event, 'fs6', 27)" class="f">f</span> <span onmouseout="hideTip(event, 'fs7', 28)" onmouseover="showTip(event, 'fs7', 28)" class="f">g</span> <span class="o">=</span> <span class="k">fun</span> <span onmouseout="hideTip(event, 'fs9', 29)" onmouseover="showTip(event, 'fs9', 29)" class="i">x</span> <span class="k">-&gt;</span>
+    <span onmouseout="hideTip(event, 'fs7', 30)" onmouseover="showTip(event, 'fs7', 30)" class="f">g</span> (<span onmouseout="hideTip(event, 'fs6', 31)" onmouseover="showTip(event, 'fs6', 31)" class="f">f</span> <span onmouseout="hideTip(event, 'fs9', 32)" onmouseover="showTip(event, 'fs9', 32)" class="i">x</span>)
+</code></pre></td>
+</tr>
+</table>
+<p>And because we have <em>Currying</em> and all functions are anyway just functions that returns function,
+you just can add <code>x</code> as a function argument.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs13', 33)" onmouseover="showTip(event, 'fs13', 33)" class="f">compose</span> <span onmouseout="hideTip(event, 'fs6', 34)" onmouseover="showTip(event, 'fs6', 34)" class="f">f</span> <span onmouseout="hideTip(event, 'fs7', 35)" onmouseover="showTip(event, 'fs7', 35)" class="f">g</span> <span onmouseout="hideTip(event, 'fs9', 36)" onmouseover="showTip(event, 'fs9', 36)" class="i">x</span> <span class="o">=</span>
+    <span onmouseout="hideTip(event, 'fs7', 37)" onmouseover="showTip(event, 'fs7', 37)" class="f">g</span> (<span onmouseout="hideTip(event, 'fs6', 38)" onmouseover="showTip(event, 'fs6', 38)" class="f">f</span> <span onmouseout="hideTip(event, 'fs9', 39)" onmouseover="showTip(event, 'fs9', 39)" class="i">x</span>)
+</code></pre></td>
+</tr>
+</table>
+<p>It seems that i only explained <em>function composition</em> but the analogy I explained fits more nicely
+into a lot more use-cases. It doesn't mean you only can execute some kind of functions with a value.
+In general it means you already can work with a value you don't have yet! For example, you also
+could write a function that first does something with <code>x</code> and then pass the result to it to <code>f</code>.</p>
+<p>In general the analogy means. Whenever you need to somehow work with a value you don't have yet.
+You just create a function. So you already can work with the value as if you had it. And you
+can do whatever you want with it. But then instead of returning a result you return a function
+instead. So you expect that someone else in the future gives you a value that starts your execution.</p>
+<p>The general idea is. You already can compose behaviour or functions together without directly
+executing anything. You first compose everything, and you delay the execution as far as possible
+to the future.</p>
+<h2>Rethinking the problem</h2>
+<p>With that idea in-place. Let's look again at <code>foldBack</code> and if we somehow can rethink that
+problem. Let's first focus on the behaviour of <code>foldBack</code> and how it should work <em>logically</em>.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs14', 40)" onmouseover="showTip(event, 'fs14', 40)" class="f">f</span> <span onmouseout="hideTip(event, 'fs15', 41)" onmouseover="showTip(event, 'fs15', 41)" class="i">x</span>     <span class="o">=</span> <span onmouseout="hideTip(event, 'fs15', 42)" onmouseover="showTip(event, 'fs15', 42)" class="i">x</span> <span class="o">*</span> <span onmouseout="hideTip(event, 'fs15', 43)" onmouseover="showTip(event, 'fs15', 43)" class="i">x</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs16', 44)" onmouseover="showTip(event, 'fs16', 44)" class="i">squared</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs17', 45)" onmouseover="showTip(event, 'fs17', 45)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs18', 46)" onmouseover="showTip(event, 'fs18', 46)" class="f">foldBack</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs15', 47)" onmouseover="showTip(event, 'fs15', 47)" class="i">x</span> <span onmouseout="hideTip(event, 'fs19', 48)" onmouseover="showTip(event, 'fs19', 48)" class="i">acc</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs14', 49)" onmouseover="showTip(event, 'fs14', 49)" class="f">f</span> <span onmouseout="hideTip(event, 'fs15', 50)" onmouseover="showTip(event, 'fs15', 50)" class="i">x</span> <span class="o">::</span> <span onmouseout="hideTip(event, 'fs19', 51)" onmouseover="showTip(event, 'fs19', 51)" class="i">acc</span>) [<span class="n">1</span>;<span class="n">2</span>;<span class="n">3</span>;<span class="n">4</span>] []
+</code></pre></td>
+</tr>
+</table>
+<p>The general <em>logic</em> is that we traverse a list backwards. Instead of starting with the initial
+accumulator and fetching <code>1</code> from the last, we start by fetching <code>4</code> from the end. Then <code>3</code>, <code>2</code>
+and last but not least <code>1</code>. The general logic how <code>foldBack</code> works is like that.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+<span class="l">7: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"> <span onmouseout="hideTip(event, 'fs20', 52)" onmouseover="showTip(event, 'fs20', 52)" class="i">list</span>      | <span class="i">acc</span>        | <span class="i">x</span> | (<span class="i">f</span> <span class="i">x</span>) <span class="o">::</span> <span class="i">acc</span> 
+<span class="o">-----------+------------+---+--------------</span>
+ [<span class="n">1</span>;<span class="n">2</span>;<span class="n">3</span>;<span class="n">4</span>] | []         | <span class="n">4</span> | [<span class="n">16</span>]
+   [<span class="n">1</span>;<span class="n">2</span>;<span class="n">3</span>] | [<span class="n">16</span>]       | <span class="n">3</span> | [<span class="n">9</span>;<span class="n">16</span>]
+     [<span class="n">1</span>;<span class="n">2</span>] | [<span class="n">9</span>;<span class="n">16</span>]     | <span class="n">2</span> | [<span class="n">4</span>;<span class="n">9</span>;<span class="n">16</span>]
+       [<span class="n">1</span>] | [<span class="n">4</span>;<span class="n">9</span>;<span class="n">16</span>]   | <span class="n">1</span> | [<span class="n">1</span>;<span class="n">4</span>;<span class="n">9</span>;<span class="n">16</span>]
+        [] | [<span class="n">1</span>;<span class="n">4</span>;<span class="n">9</span>;<span class="n">16</span>] | <span class="k">return</span> <span class="k">-&gt;</span> [<span class="n">1</span>;<span class="n">4</span>;<span class="n">9</span>;<span class="n">16</span>]
+</code></pre></td>
+</tr>
+</table>
+<p>At this point let's focus on our <code>folder</code> function that we pass <code>foldBack</code>. Our <code>folder</code> function
+get the argument x<code>and</code>acc`. At any point in time. What does that values represents exactly?</p>
+<p>As we basically just loop over a data-structure with <code>foldBack</code> it just means <code>x</code> is just
+one element from our list. The interesting thing is what <code>acc</code> contains. <code>acc</code> contains
+the <em>accumulation</em> of everything right from our current element. To be more concrete, let's
+say we reached element <code>2</code>.</p>
+<p>Then <code>x</code> contains <code>2</code>, but <code>acc</code> at this point in time contains <code>[9;16]</code>. It contains the result
+of our accumulation that was right of <code>2</code>. Let's assume we have.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs17', 53)" onmouseover="showTip(event, 'fs17', 53)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs18', 54)" onmouseover="showTip(event, 'fs18', 54)" class="f">foldBack</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs15', 55)" onmouseover="showTip(event, 'fs15', 55)" class="i">x</span> <span onmouseout="hideTip(event, 'fs21', 56)" onmouseover="showTip(event, 'fs21', 56)" class="i">acc</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs15', 57)" onmouseover="showTip(event, 'fs15', 57)" class="i">x</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs21', 58)" onmouseover="showTip(event, 'fs21', 58)" class="i">acc</span>) [<span class="n">1</span>;<span class="n">2</span>;<span class="n">3</span>;<span class="n">4</span>] <span class="n">0</span>
+</code></pre></td>
+</tr>
+</table>
+<p>In that case when we reach <code>2</code> our <code>x</code> is once again <code>2</code> but our <code>acc</code> contains <code>7</code>, because so
+far it calculated <code>0 + 4 + 3</code>.</p>
+<p>The only problem we have. We cannot go backwards through a list. That was the whole reason why we
+reversed the list before we looped/recurs through it. We only can go from left to right.
+And that is bad. Because we have to start with <code>1</code> and we need to pass an <code>acc</code> to the <code>folder</code>
+function that we don't have at that point in time!</p>
+<p>Uhm wait! Isn't that exactly what we discussed previously? What do we do if we expect to work
+with a value that we don't have yet? We create a function!</p>
+<h2>Functions as accumulator</h2>
+<p>The basic idea to solve our problem is by using a function that we use as our <em>accumulator</em>.
+We use a function because we need to work with values we don't have yet. Because we have a
+function I use <code>cont</code> (for *Continuation) in our inner <code>loop</code> instead of <code>acc</code>. Let's
+first write the basic template to loop through a list first.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+<span class="l">7: </span>
+<span class="l">8: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">foldBack</span> <span class="i">f</span> <span onmouseout="hideTip(event, 'fs20', 59)" onmouseover="showTip(event, 'fs20', 59)" class="i">list</span> (<span class="i">acc</span><span class="o">:</span><span class="o">&#39;</span><span class="i">State</span>) <span class="o">=</span>
+    <span class="k">let</span> <span class="k">rec</span> <span class="i">loop</span> <span class="i">cont</span> <span onmouseout="hideTip(event, 'fs20', 60)" onmouseover="showTip(event, 'fs20', 60)" class="i">list</span> <span class="o">=</span>
+        <span class="k">match</span> <span onmouseout="hideTip(event, 'fs20', 61)" onmouseover="showTip(event, 'fs20', 61)" class="i">list</span> <span class="k">with</span>
+        | []      <span class="k">-&gt;</span> <span class="o">??</span><span class="o">?</span>
+        | <span class="i">x</span><span class="o">::</span><span onmouseout="hideTip(event, 'fs20', 62)" onmouseover="showTip(event, 'fs20', 62)" class="i">list</span> <span class="k">-&gt;</span> 
+            <span class="k">let</span> <span class="i">newCont</span> <span class="o">=</span> <span class="o">??</span><span class="o">?</span>
+            <span class="i">loop</span> <span class="i">newCont</span> <span onmouseout="hideTip(event, 'fs20', 63)" onmouseover="showTip(event, 'fs20', 63)" class="i">list</span>
+    <span class="i">loop</span> <span class="o">??</span><span class="o">?</span> <span onmouseout="hideTip(event, 'fs20', 64)" onmouseover="showTip(event, 'fs20', 64)" class="i">list</span>
+</code></pre></td>
+</tr>
+</table>
+<p>So the question we have are.</p>
+<ol>
+<li>What do we do for every element?</li>
+<li>What do we do after we looped through our list?</li>
+<li>With what kind of value do we start our loop?</li>
+</ol>
+<h3>What do we do for every element?</h3>
+<p>At first, we reconsider what we are supposed to do. Our task is to execute the <em>folder</em>
+function that the caller provided us <code>f</code> and pass it the <em>current value</em> and the
+<em>right-accumulator</em>. At this point in time we have the current value inside of <code>x</code>,
+but we don't have the <em>right-accumulator</em>. What we now do, we just create a <em>innerFunction</em>
+<code>newCont</code> that at some point in the future will get the <em>right-accumulator</em>, then we also can
+call the <code>f</code> function.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">newCont</span> <span class="i">racc</span> <span class="o">=</span>
+    <span class="i">f</span> <span class="i">x</span> <span class="i">racc</span>
+</code></pre></td>
+</tr>
+</table>
+<p>But is that right? Let's think what would happen. In our first recursion we get <code>1</code> from
+<code>[1;2;3;4]</code> and save it in <code>x</code>. We then create a function that basically does.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">newCont</span> <span class="i">racc</span> <span class="o">=</span> 
+    <span class="i">f</span> <span class="n">1</span> <span class="i">racc</span>
+</code></pre></td>
+</tr>
+</table>
+<p>We pass that function as <code>cont</code> to the next iteration. In the next recursion we extract <code>2</code>
+from the remaining list <code>[2;3;4]</code>, now we create a new <code>newCont</code> that basically does.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">newCont</span> <span class="i">racc</span> <span class="o">=</span> 
+    <span class="i">f</span> <span class="n">2</span> <span class="i">racc</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Then this new function is used as our <code>cont</code>. But this behaviour is wrong. We loop through
+our list and on every step we just create a new function that will replace the old function.
+The problem is, we cannot just throw the old <code>cont</code> away, we somehow have to use it. But how?</p>
+<p>Let's look at our <code>f 2 racc</code> call. What does it anyway do and produce as a output? Or better yet,
+which values do we have here exactly? Our <code>racc</code> is the <em>right-accumulator</em> that we have in the
+future, in our example this will be <code>[9;16]</code>. When we call <code>f 2 racc</code> we actually call
+<code>f 2 [9;16]</code>. What does our <code>f</code> function in our example? It squares <code>x</code> and add it to the <code>racc</code>.
+So after we do <code>f 2 [9;16]</code> we will get <code>[4;9;16]</code> as a result.</p>
+<p>But wait! Isn't that the <em>right-accumulator</em> that our previous <code>cont</code> needed? Yes, it is! And now
+it becomes more obvious in how we need to use <code>cont</code>. We call <code>f x racc</code>, this then produces a
+value that can be used to call our previous function that we created.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">newCont</span> <span class="i">racc</span> <span class="o">=</span>
+    <span class="k">let</span> <span class="i">res</span> <span class="o">=</span> <span class="i">f</span> <span class="i">x</span> <span class="i">racc</span>
+    <span class="i">cont</span> <span class="i">res</span>
+</code></pre></td>
+</tr>
+</table>
+<p>If that sound hard to follow. Just remember <em>function composition</em> again. What we have hear is
+just this idea! In function composition we call a function <code>f</code> with a value we don't have yet, that
+will produce a value that can be passed to <code>g</code>.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs13', 65)" onmouseover="showTip(event, 'fs13', 65)" class="i">compose</span> <span class="i">f</span> <span class="i">g</span> <span class="o">=</span> <span class="k">fun</span> <span class="i">x</span> <span class="k">-&gt;</span>
+    <span class="k">let</span> <span class="i">res</span> <span class="o">=</span> <span class="i">f</span> <span class="i">x</span>
+    <span class="i">g</span> <span class="i">res</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Here we have the same. The only difference is that this time <code>cont</code> is a function the we created
+inside a function in a previous loop. Let's shorten the example a little bit. In function composition
+we just ended with <code>let compose f g x = g (f x)</code>. Here we now have</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">newCont</span> <span class="i">racc</span> <span class="o">=</span> <span class="i">cont</span> (<span class="i">f</span> <span class="i">x</span> <span class="i">racc</span>)
+</code></pre></td>
+</tr>
+</table>
+<p>Our <code>f</code> function takes two arguments, but otherwise it is the same idea. The whole <em>loop-body</em> part
+in our example now looks like this:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp">| <span class="i">x</span><span class="o">::</span><span onmouseout="hideTip(event, 'fs20', 66)" onmouseover="showTip(event, 'fs20', 66)" class="i">list</span> <span class="k">-&gt;</span> 
+    <span class="k">let</span> <span class="i">newCont</span> <span class="i">racc</span> <span class="o">=</span> <span class="i">cont</span> (<span class="i">f</span> <span class="i">x</span> <span class="i">racc</span>)
+    <span class="i">loop</span> <span class="i">newCont</span> <span onmouseout="hideTip(event, 'fs20', 67)" onmouseover="showTip(event, 'fs20', 67)" class="i">list</span>
+</code></pre></td>
+</tr>
+</table>
+<p>But we are not done yet, we still have to fill out two missing parts.</p>
+<h3>What do we do after we looped through the list?</h3>
+<p>One remaining part is once we finished our looping. To understand better what we have to do here.
+Let's actually try to understand what we exactly build. In every step we create a new function
+that expects the <em>right-accumulator</em> with this and the current <code>x</code> we calculate the
+<em>right-accumulator</em> for the previous function. In our first loop we create.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">cont1</span> <span class="i">racc</span> <span class="o">=</span> <span class="i">initCont</span> (<span class="i">f</span> <span class="n">1</span> <span class="i">racc</span>)
+</code></pre></td>
+</tr>
+</table>
+<p>In our second loop we basically do:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">cont2</span> <span class="i">racc</span> <span class="o">=</span> <span class="i">cont1</span> (<span class="i">f</span> <span class="n">2</span> <span class="i">racc</span>)
+</code></pre></td>
+</tr>
+</table>
+<p>Remember, we create a new function, but we call the previously <code>cont</code>. I used <code>cont1</code> to make
+the relation more clear. Technically every new step now creates a new <code>cont</code> function that calls
+the previous <code>cont</code> function. If we expand it fully we basically have.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">cont1</span> <span class="i">racc</span> <span class="o">=</span> <span class="i">cont</span>  (<span class="i">f</span> <span class="n">1</span> <span class="i">racc</span>)
+<span class="k">let</span> <span class="i">cont2</span> <span class="i">racc</span> <span class="o">=</span> <span class="i">cont1</span> (<span class="i">f</span> <span class="n">2</span> <span class="i">racc</span>)
+<span class="k">let</span> <span class="i">cont3</span> <span class="i">racc</span> <span class="o">=</span> <span class="i">cont2</span> (<span class="i">f</span> <span class="n">3</span> <span class="i">racc</span>)
+<span class="k">let</span> <span class="i">cont4</span> <span class="i">racc</span> <span class="o">=</span> <span class="i">cont3</span> (<span class="i">f</span> <span class="n">4</span> <span class="i">racc</span>)
+</code></pre></td>
+</tr>
+</table>
+<p>Every new function that we create contains the previous function as a closure. Actually let's
+inline the whole functions step-by-step. First we inline <code>cont1</code> in our <code>cont2</code> function, and so on.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">cont2</span> <span class="i">racc</span> <span class="o">=</span> <span class="i">initCont</span> (<span class="i">f</span> <span class="n">1</span> (<span class="i">f</span> <span class="n">2</span> <span class="i">racc</span>))
+</code></pre></td>
+</tr>
+</table>
+<p>then we inline <code>cont2</code> into <code>cont3</code></p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">cont3</span> <span class="i">racc</span> <span class="o">=</span> <span class="i">initCont</span> (<span class="i">f</span> <span class="n">1</span> (<span class="i">f</span> <span class="n">2</span> (<span class="i">f</span> <span class="n">3</span> <span class="i">racc</span>)))
+</code></pre></td>
+</tr>
+</table>
+<p>finally <code>cont3</code> into <code>cont4</code></p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">cont4</span> <span class="i">racc</span> <span class="o">=</span> <span class="i">initCont</span> (<span class="i">f</span> <span class="n">1</span> (<span class="i">f</span> <span class="n">2</span> (<span class="i">f</span> <span class="n">3</span> (<span class="i">f</span> <span class="n">4</span> <span class="i">racc</span>))))
+</code></pre></td>
+</tr>
+</table>
+<p>As we can see. With every loop iteration that we go forward, we build up a function. Every new
+function the we create basically builds the <em>right-accumulator</em> that is need for the <em>previous-step</em>.
+Once we looped through our whole data-structure, we ended up with a final function. The only thing
+we need to start our function chain is to pass it a <em>right-accumulator</em>.</p>
+<p>But wait, at this point we have the <em>right-accumulator</em>! At the end we have to pass it the
+<em>right-accumulator</em> of our last element. We only have the list <code>[1;2;3;4]</code> so what is the
+<em>right-accumulator</em> of this one? The <em>initial-accumulator</em> that the user passed to <code>foldBack</code>!</p>
+<p>So here is our answer. Once we are at the end of our list we have a function and we need to pass it
+the <em>initial-accumulator</em>. Our <em>empty-list case</em> now looks something like that:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp">| [] <span class="k">-&gt;</span> <span class="i">cont</span> <span class="i">acc</span>
+</code></pre></td>
+</tr>
+</table>
+<h3>With what kind of value do we start our loop?</h3>
+<p>The last remaining part is how we start our loop. Or put in other words. What do we provide
+as our <code>initCont</code> value? To understand this part better, let's assume we started our loop.
+We already saw what kind of structure we build. In the end we just had</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">cont4</span> <span class="i">racc</span> <span class="o">=</span> <span class="i">initCont</span> (<span class="i">f</span> <span class="n">1</span> (<span class="i">f</span> <span class="n">2</span> (<span class="i">f</span> <span class="n">3</span> (<span class="i">f</span> <span class="n">4</span> <span class="i">racc</span>))))
+</code></pre></td>
+</tr>
+</table>
+<p>Once we reach the end of our data-structure in our example we provided the empty list <code>[]</code> as the
+starting right accumulator. So we basically have.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">cont4</span> <span class="o">=</span> <span class="i">initCont</span> (<span class="i">f</span> <span class="n">1</span> (<span class="i">f</span> <span class="n">2</span> (<span class="i">f</span> <span class="n">3</span> (<span class="i">f</span> <span class="n">4</span> []))))
+</code></pre></td>
+</tr>
+</table>
+<p>At this point, now our function starts its execution. First <code>f 4 []</code> is calculated and this will
+return <code>[16]</code></p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">cont4</span> <span class="o">=</span> <span class="i">initCont</span> (<span class="i">f</span> <span class="n">1</span> (<span class="i">f</span> <span class="n">2</span> (<span class="i">f</span> <span class="n">3</span> [<span class="n">16</span>])))
+</code></pre></td>
+</tr>
+</table>
+<p>Now <code>f 3 [16]</code> executes and we get</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">cont4</span> <span class="o">=</span> <span class="i">initCont</span> (<span class="i">f</span> <span class="n">1</span> (<span class="i">f</span> <span class="n">2</span> [<span class="n">9</span>;<span class="n">16</span>]))
+</code></pre></td>
+</tr>
+</table>
+<p>Now it is <code>f 2 [9;16]</code> turn</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">cont4</span> <span class="o">=</span> <span class="i">initCont</span> (<span class="i">f</span> <span class="n">1</span> [<span class="n">4</span>;<span class="n">9</span>;<span class="n">16</span>])
+</code></pre></td>
+</tr>
+</table>
+<p>And finally we have</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">cont4</span> <span class="o">=</span> <span class="i">initCont</span> [<span class="n">1</span>;<span class="n">4</span>;<span class="n">9</span>;<span class="n">16</span>]
+</code></pre></td>
+</tr>
+</table>
+<p>Now <code>initCont</code> also must be a <em>starting function</em>. But what do we expect it to do? Well nothing.
+We just expect it to return it's input as-is. In other words. Our <em>starting function</em> is <code>id</code>. So
+we start our <code>loop</code> with <code>loop id list</code>.</p>
+<h3>All pieces together</h3>
+<p>Now let's put all pieces together, our final <code>foldBack</code> function now looks like this.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs22', 68)" onmouseover="showTip(event, 'fs22', 68)" class="f">foldBack</span> <span onmouseout="hideTip(event, 'fs23', 69)" onmouseover="showTip(event, 'fs23', 69)" class="f">f</span> <span onmouseout="hideTip(event, 'fs24', 70)" onmouseover="showTip(event, 'fs24', 70)" class="i">list</span> (<span onmouseout="hideTip(event, 'fs25', 71)" onmouseover="showTip(event, 'fs25', 71)" class="i">acc</span><span class="o">:</span><span class="o">&#39;</span><span class="i">State</span>) <span class="o">=</span>
+    <span class="k">let</span> <span class="k">rec</span> <span onmouseout="hideTip(event, 'fs26', 72)" onmouseover="showTip(event, 'fs26', 72)" class="f">loop</span> <span onmouseout="hideTip(event, 'fs27', 73)" onmouseover="showTip(event, 'fs27', 73)" class="f">cont</span> <span onmouseout="hideTip(event, 'fs24', 74)" onmouseover="showTip(event, 'fs24', 74)" class="i">list</span> <span class="o">=</span>
+        <span class="k">match</span> <span onmouseout="hideTip(event, 'fs24', 75)" onmouseover="showTip(event, 'fs24', 75)" class="i">list</span> <span class="k">with</span>
+        | []      <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs27', 76)" onmouseover="showTip(event, 'fs27', 76)" class="f">cont</span> <span onmouseout="hideTip(event, 'fs25', 77)" onmouseover="showTip(event, 'fs25', 77)" class="i">acc</span>
+        | <span onmouseout="hideTip(event, 'fs9', 78)" onmouseover="showTip(event, 'fs9', 78)" class="i">x</span><span class="o">::</span><span onmouseout="hideTip(event, 'fs24', 79)" onmouseover="showTip(event, 'fs24', 79)" class="i">list</span> <span class="k">-&gt;</span> 
+            <span class="k">let</span> <span onmouseout="hideTip(event, 'fs28', 80)" onmouseover="showTip(event, 'fs28', 80)" class="f">newCont</span> <span onmouseout="hideTip(event, 'fs29', 81)" onmouseover="showTip(event, 'fs29', 81)" class="i">racc</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs27', 82)" onmouseover="showTip(event, 'fs27', 82)" class="f">cont</span> (<span onmouseout="hideTip(event, 'fs23', 83)" onmouseover="showTip(event, 'fs23', 83)" class="f">f</span> <span onmouseout="hideTip(event, 'fs9', 84)" onmouseover="showTip(event, 'fs9', 84)" class="i">x</span> <span onmouseout="hideTip(event, 'fs29', 85)" onmouseover="showTip(event, 'fs29', 85)" class="i">racc</span>)
+            <span onmouseout="hideTip(event, 'fs26', 86)" onmouseover="showTip(event, 'fs26', 86)" class="f">loop</span> <span onmouseout="hideTip(event, 'fs28', 87)" onmouseover="showTip(event, 'fs28', 87)" class="f">newCont</span> <span onmouseout="hideTip(event, 'fs24', 88)" onmouseover="showTip(event, 'fs24', 88)" class="i">list</span>
+    <span onmouseout="hideTip(event, 'fs26', 89)" onmouseover="showTip(event, 'fs26', 89)" class="f">loop</span> <span onmouseout="hideTip(event, 'fs30', 90)" onmouseover="showTip(event, 'fs30', 90)" class="f">id</span> <span onmouseout="hideTip(event, 'fs24', 91)" onmouseover="showTip(event, 'fs24', 91)" class="i">list</span>
+
+<span onmouseout="hideTip(event, 'fs22', 92)" onmouseover="showTip(event, 'fs22', 92)" class="f">foldBack</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs15', 93)" onmouseover="showTip(event, 'fs15', 93)" class="i">x</span> <span onmouseout="hideTip(event, 'fs19', 94)" onmouseover="showTip(event, 'fs19', 94)" class="i">acc</span> <span class="k">-&gt;</span> (<span onmouseout="hideTip(event, 'fs15', 95)" onmouseover="showTip(event, 'fs15', 95)" class="i">x</span><span class="o">*</span><span onmouseout="hideTip(event, 'fs15', 96)" onmouseover="showTip(event, 'fs15', 96)" class="i">x</span>) <span class="o">::</span> <span onmouseout="hideTip(event, 'fs19', 97)" onmouseover="showTip(event, 'fs19', 97)" class="i">acc</span>) [<span class="n">1</span>;<span class="n">2</span>;<span class="n">3</span>;<span class="n">4</span>] []
+<span class="c">// [1; 4; 9; 16]</span>
+</code></pre></td>
+</tr>
+</table>
+<h2>Conclusion</h2>
+<p>Continuation functions in general are powerful and we can do a lot with them, solving <code>foldBack</code>
+without reversing a list first is just one example. But in this case i have to admit that
+understanding it is quite hard. It has nothing to do that <em>Continuation functions</em> are itself hard to
+understand, the problem why it is so hard is because we cannot traverse a list backwards. Using
+a continuation function is just one possible way to solve the problem. I think it is in general
+worth to know and understand this solution.</p>
+<p>In general I also hope that the analogy that functions just works on a <em>future value</em>
+helps. At least for me this analogy was quite helpful in a lot of cases in the past.</p>
+<p>One question remains. Which solution of <code>foldBack</code> should we prefer, and which is better? Well, at
+first how do you measure "better"? Is it memory-consumption? CPU-time? Understanding code?</p>
+<p>If you really care for <em>performance</em> you should benchmark. But make sure to test <em>small</em>,
+<em>medium</em> and <em>big</em> input lists. In the previous <code>foldBack</code> version it doesn't seem that
+<em>reversing</em> a list is the best option, as you have to go through a list twice and create
+a new intermediate list.</p>
+<p>But using this kind of <em>continuation</em> style isn't quite better. We basically still traverse a
+list twice. We build first a continuation function, and in the end, we have to execute
+it that touches every element again. A <em>continuation function</em> here can result in higher
+memory consumption and could be slower, <em>reversing</em> in the end can really be faster and easier
+to understand. But if you really care, then do benchmarks on your own.</p>
+<p>But I think we should focus more on <em>readability</em>. <em>Reversing</em> is just quite easier,
+so try to use the obvious solution first if you design things.</p>
+<p>But at this point i also want to mention <em>mutability</em>. In functional programming in general
+we don't care how a function work. Functions are black-boxes. We only care for the input and
+the output of a function. It doesn't matter how it works, as long we have a <em>pure</em> function
+and it expect and returns <em>immutable-data</em> everything is fine. Even if a function uses
+loops, mutation or other kind of stuff. This is absolutely fine!</p>
+<p>Controlled or limited <em>mutation</em> inside a function is absolutely okay. As long as that function
+is <em>pure</em> and only takes and returns <em>immutable-data</em>. That doesn't mean everything i said
+is useless.</p>
+<p>It just explains the overall concept that is in general good to know and is useable in
+different scenarios.</p>
+
+
+<div class="tip" id="fs1">module Main</div>
+<div class="tip" id="fs2">val compose : f:&#39;a -&gt; g:&#39;b -&gt; &#39;c<br /><br />Full name: foldcontinuations.compose</div>
+<div class="tip" id="fs3">val f : &#39;a</div>
+<div class="tip" id="fs4">val g : &#39;b</div>
+<div class="tip" id="fs5">val compose : f:(&#39;a -&gt; &#39;b) -&gt; g:(&#39;b -&gt; &#39;c) -&gt; &#39;d<br /><br />Full name: foldcontinuations.compose</div>
+<div class="tip" id="fs6">val f : (&#39;a -&gt; &#39;b)</div>
+<div class="tip" id="fs7">val g : (&#39;b -&gt; &#39;c)</div>
+<div class="tip" id="fs8">val innerFunction : (&#39;a -&gt; &#39;c)</div>
+<div class="tip" id="fs9">val x : &#39;a</div>
+<div class="tip" id="fs10">val result : &#39;b</div>
+<div class="tip" id="fs11">val compose : f:(&#39;a -&gt; &#39;b) -&gt; g:(&#39;b -&gt; &#39;c) -&gt; (&#39;a -&gt; &#39;c)<br /><br />Full name: foldcontinuations.compose</div>
+<div class="tip" id="fs12">val compose : f:(&#39;a -&gt; &#39;b) -&gt; g:(&#39;b -&gt; &#39;c) -&gt; x:&#39;a -&gt; &#39;c<br /><br />Full name: foldcontinuations.compose</div>
+<div class="tip" id="fs13">val compose : ((&#39;a -&gt; &#39;b) -&gt; (&#39;b -&gt; &#39;c) -&gt; &#39;a -&gt; &#39;c)</div>
+<div class="tip" id="fs14">val f : x:int -&gt; int<br /><br />Full name: Main.f</div>
+<div class="tip" id="fs15">val x : int</div>
+<div class="tip" id="fs16">val squared : int list<br /><br />Full name: Main.squared</div>
+<div class="tip" id="fs17">Multiple items<br />module List<br /><br />from Microsoft.FSharp.Collections<br /><br />--------------------<br />type List&lt;&#39;T&gt; =<br />&#160;&#160;| ( [] )<br />&#160;&#160;| ( :: ) of Head: &#39;T * Tail: &#39;T list<br />&#160;&#160;interface IEnumerable<br />&#160;&#160;interface IEnumerable&lt;&#39;T&gt;<br />&#160;&#160;member GetSlice : startIndex:int option * endIndex:int option -&gt; &#39;T list<br />&#160;&#160;member Head : &#39;T<br />&#160;&#160;member IsEmpty : bool<br />&#160;&#160;member Item : index:int -&gt; &#39;T with get<br />&#160;&#160;member Length : int<br />&#160;&#160;member Tail : &#39;T list<br />&#160;&#160;static member Cons : head:&#39;T * tail:&#39;T list -&gt; &#39;T list<br />&#160;&#160;static member Empty : &#39;T list<br /><br />Full name: Microsoft.FSharp.Collections.List&lt;_&gt;</div>
+<div class="tip" id="fs18">val foldBack : folder:(&#39;T -&gt; &#39;State -&gt; &#39;State) -&gt; list:&#39;T list -&gt; state:&#39;State -&gt; &#39;State<br /><br />Full name: Microsoft.FSharp.Collections.List.foldBack</div>
+<div class="tip" id="fs19">val acc : int list</div>
+<div class="tip" id="fs20">type &#39;T list = List&lt;&#39;T&gt;<br /><br />Full name: Microsoft.FSharp.Collections.list&lt;_&gt;</div>
+<div class="tip" id="fs21">val acc : int</div>
+<div class="tip" id="fs22">val foldBack : f:(&#39;a -&gt; &#39;State -&gt; &#39;State) -&gt; list:&#39;a list -&gt; acc:&#39;State -&gt; &#39;State<br /><br />Full name: Main.foldBack</div>
+<div class="tip" id="fs23">val f : (&#39;a -&gt; &#39;State -&gt; &#39;State)</div>
+<div class="tip" id="fs24">Multiple items<br />val list : &#39;a list<br /><br />--------------------<br />type &#39;T list = List&lt;&#39;T&gt;<br /><br />Full name: Microsoft.FSharp.Collections.list&lt;_&gt;</div>
+<div class="tip" id="fs25">val acc : &#39;State</div>
+<div class="tip" id="fs26">val loop : ((&#39;State -&gt; &#39;b) -&gt; &#39;a list -&gt; &#39;b)</div>
+<div class="tip" id="fs27">val cont : (&#39;State -&gt; &#39;b)</div>
+<div class="tip" id="fs28">val newCont : (&#39;State -&gt; &#39;b)</div>
+<div class="tip" id="fs29">val racc : &#39;State</div>
+<div class="tip" id="fs30">val id : x:&#39;T -&gt; &#39;T<br /><br />Full name: Microsoft.FSharp.Core.Operators.id</div>
