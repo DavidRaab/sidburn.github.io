@@ -12,7 +12,7 @@ keywords: f#, fsharp, fold, continuation, foldback, fold, list
 module Main
 
 (**
-In [From mutable loops to immutable folds]({% post_url 2016-04-mutable-loops-to-immutability %})
+In [From mutable loops to immutable folds]({% post_url 2016-04-05-mutable-loops-to-immutability %})
 we implemented `foldBack` through `rev` and `fold`. In this post I show you how you can implement
 `foldBack` by using a *continuation function*.
 
