@@ -5,7 +5,7 @@ permalink: /tags/
 ---
 
 <ul class="tag-cloud">
-{% for tag in site.tags %}
+{% for tag in site.tags | sort %}
   <li style="font-size: {{ tag | last | size | times: 100 | divided_by: site.tags.size | plus: 70  }}%">
     <a href="#{{ tag | first | slugize }}">
       {{ tag | first }}
@@ -15,7 +15,7 @@ permalink: /tags/
 </ul>
 
 <div id="archives">
-{% for tag in site.tags %}
+{% for tag in site.tags | sort %}
   {% capture tag_name %}{{ tag | first }}{% endcapture %}
   <div id="#{{ tag_name | slugize }}" class="archive-group">
     <h3>{{ tag_name }}</h3>
