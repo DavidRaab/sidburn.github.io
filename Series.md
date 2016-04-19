@@ -9,7 +9,7 @@ in different categories.
 
 ## Basic Functional Toolset
 1. [Understanding map]({% post_url 2016-03-27-understanding-map %})
-1. [Understanding apply]({% post_ulr 2016-03-31-applicative-functors %})
+1. [Understanding apply]({% post_url 2016-03-31-applicative-functors %})
 1. [Understanding bind]({% post_url 2016-04-03-understanding-bind %})
 1. [Sequence and Traverse]({% post_url 2016-04-14-sequence-and-traverse %})
 
