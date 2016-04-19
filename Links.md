@@ -1,9 +1,9 @@
 ---
 layout: page
-title: Useful Links
+title: External Links
 ---
 
-This page contains some links that i find worth reading. There exists two types of links i will provide here.
+This page contains some external links that i find worth reading. There exists two types of links i will provide here.
 
 1. Good ideas in how to solve or do something or in general teaching ideas to get a better programmer.
 1. Criticising ideas so you think more deeply about a topic.
