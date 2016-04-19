@@ -7,9 +7,9 @@ keywords: f#, fsharp, bind, monad, continuation, cps, option, maybe
 ---
 
 <p>In <a href="{% post_url 2016-03-27-understanding-map %}">Understanding map</a> we learned that implementing
-a <code>map</code> function is what we call a <em>Functor</em>. In <a href="{% post_url 2016-03-31-applicative-functors %}">Applicative Functors</a>
-we extended that idea with the <code>return</code> and <code>apply</code> function. The next important function in our toolset is
-the <code>bind</code> function.</p>
+a <code>map</code> function is what we call a <em>Functor</em>. In <a href="{% post_url 2016-03-31-applicative-functors %}">Understanding apply</a>
+we extended that idea with the <code>return</code> and <code>apply</code> function and we call the result an <em>Applicative Functor</em>.
+The next important function in our toolset is the <code>bind</code> function.</p>
 <h2>Monads</h2>
 <p>The combination of <code>return</code> and <code>bind</code> is what we call a Monad. But currently
 I will not consider this as an introduction to Monads at all. If you heard the <em>Monad</em> term and
@@ -86,7 +86,7 @@ always have the <em>type-signature</em></p>
 </table>
 <h2><code>return</code> once again</h2>
 <p>The <code>bind</code> function don't stands on it's own. We also need a <code>return</code> function. But we
-already covered this function in <a href="{% post_url 2016-03-31-applicative-functors %}">Applicative Functors</a>.</p>
+already covered this function in <a href="{% post_url 2016-03-31-applicative-functors %}">Understanding apply</a>.</p>
 <h2>Implementing <code>bind</code></h2>
 <p>We can implement <code>bind</code> in two different ways. It is good to know both as depending on which type we
 have, sometimes the one or the other can be easier.</p>
@@ -214,7 +214,7 @@ processing works. So for <code>list</code> we usually would prefer just a <code>
 for every input of our starting list, but we still get a single list, not a list of list back.</p>
 <p>F# also provides an implementation for this function. But it is named <code>List.collect</code> instead of <code>List.bind</code>.</p>
 <h2>An operator for <code>bind</code></h2>
-<p>In <a href="{% post_url 2016-03-31-applicative-functors %}">Applicative Functors</a> we used <code>&lt;!&gt;</code> for the <code>map</code> function.
+<p>In <a href="{% post_url 2016-03-31-applicative-functors %}">Understanding apply</a> we used <code>&lt;!&gt;</code> for the <code>map</code> function.
 And <code>&lt;*&gt;</code> for the <code>apply</code> function. We use <code>&gt;&gt;=</code> as an operator for the <code>bind</code> function. But on top of it.
 If we write it as an operator we swap the arguments. We expects our type <code>option</code>, <code>list</code>, <code>async</code> on the
 left-side and the function on the right-side.</p>
@@ -507,7 +507,7 @@ write your own handling.</p>
 the second solution I showed in the <a href="{% post_url 2016-03-20-null-is-evil %}">null is Evil</a> post.</p>
 <h2>Defining <code>map</code> and <code>apply</code> through <code>bind</code></h2>
 <p>The combination of <code>return</code> and <code>bind</code> is really powerful. In
-<a href="{% post_url 2016-03-31-applicative-functors %}">Applicative Functors</a> we already saw that we can
+<a href="{% post_url 2016-03-31-applicative-functors %}">Understanding apply</a> we already saw that we can
 implement <code>map</code> through <code>return</code> and <code>apply</code>. But with <code>return</code> and <code>bind</code> we can easily implement
 <code>map</code> and <code>apply</code>.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>

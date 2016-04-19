@@ -14,9 +14,9 @@ open System
 
 (**
 In [Understanding map]({% post_url 2016-03-27-understanding-map %}) we learned that implementing 
-a `map` function is what we call a *Functor*. In [Applicative Functors]({% post_url 2016-03-31-applicative-functors %})
-we extended that idea with the `return` and `apply` function. The next important function in our toolset is
-the `bind` function.
+a `map` function is what we call a *Functor*. In [Understanding apply]({% post_url 2016-03-31-applicative-functors %})
+we extended that idea with the `return` and `apply` function and we call the result an *Applicative Functor*.
+The next important function in our toolset is the `bind` function.
 
 ## Monads
 
@@ -84,7 +84,7 @@ always have the *type-signature*
 ## `return` once again
 
 The `bind` function don't stands on it's own. We also need a `return` function. But we
-already covered this function in [Applicative Functors]({% post_url 2016-03-31-applicative-functors %}).
+already covered this function in [Understanding apply]({% post_url 2016-03-31-applicative-functors %}).
 
 ## Implementing `bind`
 
@@ -203,7 +203,7 @@ F# also provides an implementation for this function. But it is named `List.coll
 
 ## An operator for `bind`
 
-In [Applicative Functors]({% post_url 2016-03-31-applicative-functors %}) we used `<!>` for the `map` function.
+In [Understanding apply]({% post_url 2016-03-31-applicative-functors %}) we used `<!>` for the `map` function.
 And `<*>` for the `apply` function. We use `>>=` as an operator for the `bind` function. But on top of it.
 If we write it as an operator we swap the arguments. We expects our type `option`, `list`, `async` on the
 left-side and the function on the right-side.
@@ -442,7 +442,7 @@ the second solution I showed in the [null is Evil]({% post_url 2016-03-20-null-i
 ## Defining `map` and `apply` through `bind`
 
 The combination of `return` and `bind` is really powerful. In 
-[Applicative Functors]({% post_url 2016-03-31-applicative-functors %}) we already saw that we can
+[Understanding apply]({% post_url 2016-03-31-applicative-functors %}) we already saw that we can
 implement `map` through `return` and `apply`. But with `return` and `bind` we can easily implement
 `map` and `apply`.
 *)

@@ -3,7 +3,7 @@
 layout: post
 title: "Understanding apply"
 tags: [functor,applicative,option]
-description: "Explains Applicative Functors with the option type"
+description: "Explains the apply Function (Applicative Functors) with the option type"
 keywords: f#, fsharp, functor, applicative, option, null, apply
 \---
 *)
