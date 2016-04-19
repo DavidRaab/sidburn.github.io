@@ -12,7 +12,7 @@ keywords: f#, fsharp, list, applicative, functor, functional, programming
 module Main
 
 (**
-In [Applicative Functor]({% post_url 2016-03-31-applicative-functors %}) I primarily
+In [Understanding apply]({% post_url 2016-03-31-applicative-functors %}) I primarily
 used the `Option` type to show how you implement and use an *Applicative Functor*.
 But the concept also works for any other type. This time I want to show
 you the idea of an *Applicative* with a list, what it means, what you can do
