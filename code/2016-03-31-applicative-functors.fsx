@@ -1,10 +1,10 @@
 (**
 \---
 layout: post
-title: "Applicative Functors"
+title: "Understanding apply"
 tags: [functor,applicative,option]
 description: "Explains Applicative Functors with the option type"
-keywords: f#, fsharp, functor, applicative, option, null
+keywords: f#, fsharp, functor, applicative, option, null, apply
 \---
 *)
 
@@ -14,8 +14,8 @@ module Main
 (**
 In my previous blog "[Understanding map]({% post_url 2016-03-27-understanding-map %})" I
 introduced the `map` function and described that implementing `map` and fulfilling two laws
-we get what we call a *Functor*. As we already can guess from the title. An
-*Applicative Functor* is some sort of *extension* to that idea.
+we get what we call a *Functor*. In this Post we discuss the `apply` function that
+we can view as an extension to the `map` function.  
 
 ## Problem with `map`
 

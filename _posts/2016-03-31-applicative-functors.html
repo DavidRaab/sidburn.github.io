@@ -1,15 +1,15 @@
 ---
 layout: post
-title: "Applicative Functors"
+title: "Understanding apply"
 tags: [functor,applicative,option]
 description: "Explains Applicative Functors with the option type"
-keywords: f#, fsharp, functor, applicative, option, null
+keywords: f#, fsharp, functor, applicative, option, null, apply
 ---
 
 <p>In my previous blog "<a href="{% post_url 2016-03-27-understanding-map %}">Understanding map</a>" I
 introduced the <code>map</code> function and described that implementing <code>map</code> and fulfilling two laws
-we get what we call a <em>Functor</em>. As we already can guess from the title. An
-<em>Applicative Functor</em> is some sort of <em>extension</em> to that idea.</p>
+we get what we call a <em>Functor</em>. In this Post we discuss the <code>apply</code> function that
+we can view as an extension to the <code>map</code> function.</p>
 <h2>Problem with <code>map</code></h2>
 <p>It might be that you have noticed one problem with <code>map</code>. <code>map</code> only can work with
 one-argument functions! The definition of <code>map</code> expects a function <code>'a -&gt; 'b</code> as it's
