@@ -24,10 +24,17 @@ our function with a `list<string>` we get a `list<option<int>>` back.
 Sometimes that is what we want, but very often it is not. Usually what we want is
 a `option<list<int>>` instead. So we expect the types to be switched.
 
-The idea behind it is that `map`ping over a list is either successful as a whole and all
-elements are `Some` or as soon a single element is `None` we get `None` as a whole. Instead of
-rewriting such a logic whenever we need it, we abstract the idea into two functions
-named `sequence` and `traverse`.
+The idea behind it in this example is that when we use `map` over a list of strings it is
+either successful as a whole and all elements are integers or as soon a single element
+is not an integer we get `None` back as a whole.
+
+We could just write a function that somehow does that kind of transformation just for
+`tryParseInt`, but instead of doing that again and again for every function we try to
+generalize that problem, so we can turn every `list<option<'a>>` into `option<list<'a>>`.
+Not only that, we want to generalize the problem that it works for any type, not
+just `option`.
+
+This generalization is what we think of the `sequence` and `traverse` functions.
 
 ## Sequence
 
@@ -39,15 +46,13 @@ let tryParseInt str =
     | false,_ -> None
     | true,x  -> Some x
 
-(**
-Next, we have some kind of input from a file, user or somewhere else.
-*)
+(** Next, we have some kind of input from a file, user or somewhere else. *)
 
 let validInput   = ["1";"100";"12";"5789"]
 let invalidInput = ["1";"100";"12";"foo"]
 
 (**
-What we now want to do:
+In our example we want to do the following:
 
 1. Parse every `string` to an `int`
 1. If all inputs are valid, we want to `sum` the results
@@ -69,10 +74,17 @@ we encounter a `None` we set the `bool` to `false`.
 
 But we already have `Option` for this kind of purpose. With `Option` we still can
 return the idea of `true` (Some) and `false` (None), but additional we also can return
-a value. At this point it makes more sense to provide a general function that returns
-a new list that already strips the `option` away. For the valid case we just expect:
+a value. 
+
+Instead of just getting a boolean flag like `true` and `false` we just return `Some`
+with a new list that has all the `option` values stripped instead. For the valid 
+input case we just expect:
 
     Some [1; 100; 12; 5789]
+
+for the invalid input list we just expect:
+
+    None
 
 As we need to loop through every element and build a new list, this is just a task for
 `List.foldBack`.
@@ -137,8 +149,8 @@ Let's think about how we can implement `sequence` with `return` and `apply`.
 let retn x = Some x
 
 let sequence listOfOptions =
-    let cons x xs = retn (fun x xs -> x :: xs) <*> x <*> xs
-    List.foldBack cons listOfOptions (retn [])
+    let folder x xs = retn (fun x xs -> x :: xs) <*> x <*> xs
+    List.foldBack folder listOfOptions (retn [])
 
 (** We still get our expected results *)
 
@@ -173,13 +185,14 @@ You first `map` a list, then you use `sequence` on it. `traverse` is just the id
 both operations into a single operation. 
 
 If that sounds complicated, it isn't at all! Just think for a moment. `map` just means we apply
-a function to every element. So the only thing we need to implement `traverse` is to make sure
-we call `f x` before we pass it to the *lifted* `cons` function.
+a function to every element before we use `sequence`. So the only thing we need to
+implement `traverse` is to make sure we call a function that transforms every element
+before we pass it to our *lifted* function.
 *)
 
 let traverse f list =
-    let cons x xs = retn (fun x xs -> x :: xs) <*> f x <*> xs
-    List.foldBack cons list (retn [])
+    let folder x xs = retn (fun x xs -> x :: xs) <*> f x <*> xs
+    List.foldBack folder list (retn [])
 
 (**
 The difference is so *minimal* that it can even be overlooked easily. We added the function
@@ -195,15 +208,15 @@ traverse tryParseInt invalidInput
 
 (**
 If the *logic* seems still hard to follow. We just can think of `traverse` as a `map` function
-for *monadic functions* that *swaps* the layer. When we use
+for *monadic functions* that additionally *swaps* the layer when it finishes. When we use
 
     List.map tryParseInt xs
 
-We get a `list<option<'b>>` back. But when we use
+We get a `list<option<'b>>`. But when we use
 
     traverse tryParseInt xs
 
-we get a `option<list<'b>>` back.
+we get a `option<list<'b>>`.
 
 ## Sequence defined through traverse
 
@@ -230,20 +243,20 @@ let sum input =
     |> traverse tryParseInt
     |> Option.map List.sum
 
-match sum validInput with
-| None     -> printfn "Error: Some inputs were not numbers!"
-| Some sum -> printfn "Sum: %d" sum
+let printSum opt =
+    match opt with
+    | None     -> printfn "Error: Some inputs were not numbers!"
+    | Some sum -> printfn "Sum: %d" sum    
 
-match sum invalidInput with
-| None     -> printfn "Error: Some inputs were not numbers!"
-| Some sum -> printfn "Sum: %d" sum
+printSum (sum validInput)
+printSum (sum invalidInput)
 
 (**
 This code now produces:
 
     [lang=console]
     Sum: 5902
-    Error: Not all inputs were integers!
+    Error: Some inputs were not numbers!
 
 ## Not limited to Option
 
