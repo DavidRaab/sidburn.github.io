@@ -28,7 +28,6 @@ if we want to upgrade two, three or four argument functions?
 
 Once again we will create some dummy functions with more than one argument to see
 how we can work with them.
-
 *)
 
 // int -> int -> int
