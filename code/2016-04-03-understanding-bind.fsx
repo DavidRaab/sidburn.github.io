@@ -621,4 +621,7 @@ The syntax of this kind of continuation-passing style can be improved with a *Co
 * `apply` can be implemented through `return` and `bind`
 * `bind` can be implemented through `map` and some kind of `concat` operation
 
+## Further Reading
+* [Map and Bind and Apply, Oh my!](http://fsharpforfunandprofit.com/series/map-and-bind-and-apply-oh-my.html)
+* [Computation Expressions](http://fsharpforfunandprofit.com/series/computation-expressions.html)
 *)

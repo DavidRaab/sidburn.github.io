@@ -673,4 +673,7 @@ In this introduction we only saw the usuage with the `option` type. But in gener
 idea works also for other types. While the technique how to implement an *Applicative Functor*
 is the same. The meaning of it changes between types. Currently with `option` we basically
 have written a solution to the [null is Evil]({% post_url 2016-03-20-null-is-evil %}) problem.
+
+## Further Reading
+ * [The "Map and Bind and Apply, Oh my!" Series](http://fsharpforfunandprofit.com/series/map-and-bind-and-apply-oh-my.html)
 *)

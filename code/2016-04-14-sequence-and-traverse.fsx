@@ -275,4 +275,8 @@ But when we use `traverse` we get a
 We don't need to write such a function for the `Async` type as we can use `Async.Parallel`.
 `Async.Parallel` is basically the `sequence` function. It takes a `seq<Async<'a>>` and turns
 it into an Async containing an array `Async<'b []>`.
+
+## Further Reading
+ 
+ * [The "Map and Bind and Apply, Oh my!" Series](http://fsharpforfunandprofit.com/series/map-and-bind-and-apply-oh-my.html)
 *)

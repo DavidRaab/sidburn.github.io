@@ -695,4 +695,10 @@ provide methods to convert an mutable object to an immutable object. `StringBuil
 is a good example for an mutable object that fixes the performance problems for creating
 complex strings. Once you are done you convert a `StringBuilder` instance to an
 immutable `string`.
+
+## Further Reading
+
+ * [The Case for Controlled Side Effects](http://two-wrongs.com/the-case-for-controlled-side-effects)
+ * [Is your language unreasonable](http://fsharpforfunandprofit.com/posts/is-your-language-unreasonable/)
+ * [Immutability, Purity, and Referential Transparency](https://blogs.msdn.microsoft.com/wesdyer/2007/03/01/immutability-purity-and-referential-transparency/)
 *)

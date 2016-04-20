@@ -733,5 +733,9 @@ code could also be implemented in this way with C# LINQ feature.
 I covered quite a lot of topics. But I hope that now *functional languages* looks less scary to you. By understanding
 all of the topics you basically already made a big step in understanding F# in general.
 
+## Further Reading
+
+* [Why use F#](http://fsharpforfunandprofit.com/why-use-fsharp/)
+
 *)
 

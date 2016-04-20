@@ -112,4 +112,10 @@ Exceptions in general share the same problems as `null`.
 
 So what is the alternative? My Post about [null is Evil]({% post_url 2016-03-20-null-is-evil %}) contains solution
 of getting rid of `null`. The thing is, the same solutions also works for *Exceptions*!
+
+## Further Reading
+
+ * [Railway Oriented Programming](http://fsharpforfunandprofit.com/rop/)
+ * [Composition with an Either computation expression](http://blog.ploeh.dk/2016/03/21/composition-with-an-either-computation-expression/)
+ * [Functional Error Handling in F# by Example](http://blog.leifbattermann.de/2016/04/09/functional-error-handling-in-fsharp-by-example/)
 *)

@@ -463,4 +463,7 @@ then you are *probably* doing something wrong! The same goes for every other typ
 
 Not only is it easier to just write a function that don't contain any list/looping/recursion
 logic. Such a function is even more reusable.
+
+## Further Reading
+* [Map and Bind and Apply, Oh my!](http://fsharpforfunandprofit.com/series/map-and-bind-and-apply-oh-my.html)
 *)

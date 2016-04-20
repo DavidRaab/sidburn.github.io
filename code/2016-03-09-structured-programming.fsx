@@ -127,6 +127,6 @@ structs!
 
 ## Further Reading
 
- * [Uncle Bob - A Little Structure](https://blog.8thlight.com/uncle-bob/2015/09/23/a-little-structure.html)
+* [Uncle Bob - A Little Structure](https://blog.8thlight.com/uncle-bob/2015/09/23/a-little-structure.html)
 
 *)

@@ -526,4 +526,10 @@ New functions can now be implemented on top of `fold` or the function we created
 While *recursion* is indeed an important aspect of functional programming, as we just need it to
 work with *immutable data*. It doesn't mean we should use *recursion* all over the place. The use
 of *recursion* is often a sign that we lack abstraction.
+
+## Further Reading
+
+ * [Catamorphisms](https://lorgonblog.wordpress.com/2008/04/05/catamorphisms-part-one/)
+ * [Recursive Types and Folds](http://fsharpforfunandprofit.com/series/recursive-types-and-folds.html)
+
 *)

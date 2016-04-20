@@ -446,4 +446,5 @@ works. So you can build your own constructs !
 ## Further Reading
 
 * [Null has no type, but Maybe has](http://blog.ploeh.dk/2015/11/13/null-has-no-type-but-maybe-has/)
+* [The Option Type](http://fsharpforfunandprofit.com/posts/the-option-type/)
 *)

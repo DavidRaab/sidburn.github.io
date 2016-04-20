@@ -286,4 +286,9 @@ functions in that way.
 But it is a really important concept, and I think programing languages should try to focus
 more on this kind of polymorphic behaviour. If you are aware of this feature, probably you see the
 chance of creating your own polymorphic functions and you gain a lot more code reuse.
+
+## Further Reading
+
+ * [Ad-hoc Polymorphism in F#](http://withouttheloop.com/articles/2014-10-21-fsharp-adhoc-polymorphism/)
+ * [Constraints in F#](http://blog.2mas.xyz/constraints-in-fsharp/)
 *)
