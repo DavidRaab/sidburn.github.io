@@ -14,7 +14,7 @@ in different categories.
 1. [Sequence and Traverse]({% post_url 2016-04-14-sequence-and-traverse %})
 
 ## Applicatives
-1. [Applicative: List]({% post_url 2016-04-13-applicative-list %})
+* [Applicative: List]({% post_url 2016-04-13-applicative-list %})
 
 ## Fold (Catamorphism)
 1. [From mutable loops to immutability]({% post_url 2016-04-05-mutable-loops-to-immutability %})
@@ -29,8 +29,8 @@ in different categories.
 1. [Applying Structured Programming]({% post_url 2016-03-09-applying-structured-programming %})
 
 ## X is evil
-1. [Null is evil]({% post_url 2016-03-20-null-is-evil %})
-1. [Exceptions are Evil]({% post_url 2016-03-25-exceptions-are-evil %}) 
+* [Null is evil]({% post_url 2016-03-20-null-is-evil %})
+* [Exceptions are Evil]({% post_url 2016-03-25-exceptions-are-evil %}) 
 
 ## Ungrouped
 * [Higher-Kinded Polymorphism]({% post_url 2016-03-24-higher-kinded-polymorphism %})
