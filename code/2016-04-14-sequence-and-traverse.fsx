@@ -10,6 +10,7 @@ keywords: f#, fsharp, list, applicative, sequence, traverse, functional, program
 
 (*** hide ***)
 module Main
+type Uri = System.Uri
 
 (**
 One problem that appears from time to time is that we we have some kind of 
@@ -261,7 +262,10 @@ This code now produces:
 ## Not limited to Option
 
 It is in general important to understand that this concept is not limited to `list`
-and `option`. The idea is in general to swap two layers, no matter which layer we have.
+and `option`. The only thing we need is a data-structure that has a `fold` function,
+and another type that is an *Applicative Functor* (has `return` and a `apply` function).
+
+After we have those the general idea is to swap both layers.
 For example when we have a *monadic function* `download` that has the signature
 `Uri -> Async<string>` we expect that we can use this function on a `list<Uri>`.
 With `List.map` we would get a
@@ -274,9 +278,55 @@ But when we use `traverse` we get a
 
 We don't need to write such a function for the `Async` type as we can use `Async.Parallel`.
 `Async.Parallel` is basically the `sequence` function. It takes a `seq<Async<'a>>` and turns
-it into an Async containing an array `Async<'b []>`.
+it into an Async containing an array `Async<'b []>`. But anyway to see how it works we could
+extend the `Async` module with the needed functions.
+*)
+
+module Async =
+    let retn x = async { return x }
+    
+    let apply af ax = async {
+        // We start both async task in Parallel
+        let! pf = Async.StartChild af
+        let! px = Async.StartChild ax
+        // We then wait that both async operations complete
+        let! f = pf
+        let! x = px
+        // Finally we execute (f x)
+        return f x
+    }
+    
+    let (<*>)   = apply
+    let map f x = retn f <*> x
+
+    let traverse f list =
+        let folder x xs = retn (fun x xs -> x :: xs) <*> f x <*> xs
+        List.foldBack folder list (retn [])
+
+(** We now can use `Async.traverse` in the following way *)
+
+let uris = [Uri("http://www.google.com"); Uri("https://fsharpforfunandprofit.com")]
+let download uri =
+    use wc = new System.Net.WebClient()
+    wc.AsyncDownloadString(uri)
+
+let sizes =
+    uris
+    |> Async.traverse download
+    |> Async.map (List.map (fun str -> str.Length))
+    |> Async.RunSynchronously
+
+for size in sizes do
+    printfn "Content Length: %d" size
+
+(**
+With `Async.traverse` we get a single Async that only completes once all Uris are downloaded.
+As you can see from the implementation. `Async.traverse` is identical to the version that we
+wrote for the `option` type. We just have to set `retn` and `<*>` to functions that work
+with `Async`.
 
 ## Further Reading
  
- * [The "Map and Bind and Apply, Oh my!" Series](http://fsharpforfunandprofit.com/series/map-and-bind-and-apply-oh-my.html)
+ * [Understanding traverse and sequence](http://fsharpforfunandprofit.com/posts/elevated-world-4/)
+ * [Traversable (Haskell)](https://en.wikibooks.org/wiki/Haskell/Traversable)
 *)
