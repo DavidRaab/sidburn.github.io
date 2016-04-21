@@ -30,6 +30,7 @@ This site will be permanently updated. Links are not sorted in any particular or
 1. [Coupling in Object-Oriented Programming](http://mergeconflict.com/coupling-in-object-oriented-programming/)
 1. [SOLID: the next step is Functional](http://blog.ploeh.dk/2014/03/10/solid-the-next-step-is-functional/)
 1. [Dr. Alan Kay on the Meaning of "Object-Oriented Programming"](http://userpage.fu-berlin.de/~ram/pub/pub_jf47ht81Ht/doc_kay_oop_en)
+1. [The Deep Insights of Alan Kay](http://mythz.servicestack.net/blog/2013/02/27/the-deep-insights-of-alan-kay/)
 1. [OOP is broken](http://www.falkoriemenschneider.de/a__2013-09-12__OOP%20is%20broken.html)
 1. [Programming without objects](http://www.falkoriemenschneider.de/a__2014-09-17__Programming-without-objects.html)
 1. [Object Oriented Programming is an expensive disaster which must end](http://www.smashcompany.com/technology/object-oriented-programming-is-an-expensive-disaster-which-must-end)
