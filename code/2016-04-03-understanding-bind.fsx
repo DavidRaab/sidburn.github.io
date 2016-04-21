@@ -622,6 +622,8 @@ The syntax of this kind of continuation-passing style can be improved with a *Co
 * `bind` can be implemented through `map` and some kind of `concat` operation
 
 ## Further Reading
-* [Map and Bind and Apply, Oh my!](http://fsharpforfunandprofit.com/series/map-and-bind-and-apply-oh-my.html)
-* [Computation Expressions](http://fsharpforfunandprofit.com/series/computation-expressions.html)
+
+ * [Understanding bind](http://fsharpforfunandprofit.com/posts/elevated-world-2/)
+ * [Computation Expressions](http://fsharpforfunandprofit.com/series/computation-expressions.html)
+ * [Wikibooks - Computation Expressions](https://en.wikibooks.org/wiki/F_Sharp_Programming/Computation_Expressions)
 *)

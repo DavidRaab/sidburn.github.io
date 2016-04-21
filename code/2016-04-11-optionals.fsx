@@ -407,9 +407,12 @@ we just call `loop` again that recurs with the new `Map`.
 (**
 We create an *immutable* `Map` as our starting database. With `main storage` we finally
 start our whole application loop.
-*)
 
-(**
+## Further Reading
+
+ * [The Option Type](http://fsharpforfunandprofit.com/posts/the-option-type/)
+ * [Wikibook - Option Type](https://en.wikibooks.org/wiki/F_Sharp_Programming/Option_Types)
+
 ## Full Code
 *)
 

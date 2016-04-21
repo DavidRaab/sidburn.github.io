@@ -465,5 +465,6 @@ Not only is it easier to just write a function that don't contain any list/loopi
 logic. Such a function is even more reusable.
 
 ## Further Reading
-* [Map and Bind and Apply, Oh my!](http://fsharpforfunandprofit.com/series/map-and-bind-and-apply-oh-my.html)
+
+ * [Understanding map and apply](http://fsharpforfunandprofit.com/posts/elevated-world/)
 *)

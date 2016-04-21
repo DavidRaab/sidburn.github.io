@@ -531,5 +531,5 @@ of *recursion* is often a sign that we lack abstraction.
 
  * [Catamorphisms](https://lorgonblog.wordpress.com/2008/04/05/catamorphisms-part-one/)
  * [Recursive Types and Folds](http://fsharpforfunandprofit.com/series/recursive-types-and-folds.html)
-
+ * [Wikibook - Lists](https://en.wikibooks.org/wiki/F_Sharp_Programming/Lists)
 *)
