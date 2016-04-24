@@ -12,6 +12,7 @@ This site will be permanently updated. Links are not sorted in any particular or
 
 ## Functional
 
+1. [Why be Functional?](http://version2beta.com/articles/why_be_functional_post/)
 1. [Ten reasons not to use a statically typed functional programming language](http://fsharpforfunandprofit.com/posts/ten-reasons-not-to-use-a-functional-programming-language/)
 1. [Revenge of the Nerds](http://www.paulgraham.com/icad.html)
 1. [Is your programming language unreasonable?](http://fsharpforfunandprofit.com/posts/is-your-language-unreasonable/)
