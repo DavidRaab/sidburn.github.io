@@ -23,13 +23,12 @@ permalink: /tags/
 
 <div id="archives">
 {% for tag in sortedTags %}
-  {% capture tag_name %}{{ tag | first }}{% endcapture %}
-  <div id="#{{ tag_name | slugize }}" class="archive-group">
-    <h3>{{ tag_name }}</h3>
-    <a name="{{ tag_name | slugize }}"></a>
-    {% for post in site.tags[tag_name] %}
+  <div id="#{{ tag | slugize }}" class="archive-group">
+    <h3>{{ tag }}</h3>
+    <a name="{{ tag | slugize }}"></a>
+    {% for post in site.tags[tag] %}
     <article class="archive-item">
-      <h4><a href="{{ root_url }}{{ post.url }}">{{post.title}}</a></h4>
+      <h4><a href="{{ site.url }}{{ post.url }}">{{post.title}}</a></h4>
     </article>
     {% endfor %}
   </div>
