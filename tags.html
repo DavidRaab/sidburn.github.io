@@ -4,15 +4,8 @@ title: Tags
 permalink: /tags/
 ---
 
-{% capture tags %}
-  {% for tag in site.tags %}
-    {{ tag[0] }}
-  {% endfor %}
-{% endcapture %}
-{% assign sortedTags = tags | split:' ' | sort %}
-
 <ul class="tag-cloud">
-{% for tag in sortedTags %}
+{% for tag in site.tags %}
   <li style="font-size: {{ tag | last | size | times: 100 | divided_by: site.tags.size | plus: 70  }}%">
     <a href="#{{ tag | first | slugize }}">
       {{ tag | first }}
@@ -20,6 +13,13 @@ permalink: /tags/
   </li>
 {% endfor %}
 </ul>
+
+{% capture tags %}
+  {% for tag in site.tags %}
+    {{ tag[0] }}
+  {% endfor %}
+{% endcapture %}
+{% assign sortedTags = tags | split:' ' | sort %}
 
 <div id="archives">
 {% for tag in sortedTags %}
