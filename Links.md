@@ -12,6 +12,7 @@ This site will be permanently updated. Links are not sorted in any particular or
 
 ## Functional
 
+1. [(PDF Book) Purely Functional Data Structures -- Chris Okasaki](http://www.cs.cmu.edu/~rwh/theses/okasaki.pdf)
 1. [Why be Functional?](http://version2beta.com/articles/why_be_functional_post/)
 1. [Ten reasons not to use a statically typed functional programming language](http://fsharpforfunandprofit.com/posts/ten-reasons-not-to-use-a-functional-programming-language/)
 1. [Revenge of the Nerds](http://www.paulgraham.com/icad.html)
