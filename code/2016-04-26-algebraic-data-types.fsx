@@ -448,7 +448,7 @@ we call it a *Sum-Type*. But what is the point of calculating the amount of poss
 First, we usually don't care for the exact amount of values a type can represent. When we use
 four `int` we don't care how many billions of different values it can save. But we can use it in a
 mathematical way. For example we could use `i` that represents `int`. A Product type with
-four `int` can thus save `i*i*i*i` or `i ** 4` possible values.
+four `int` can thus save `i*i*i*i` or `i ^ 4` possible values.
 
 A Discriminated Union like `Choice` with four cases and every case contains a single `int` can
 save `i + i + i + i` or in other words `4i` cases. Doing that kind of calculations is what
@@ -614,20 +614,20 @@ Using primitive types like `string`, `float` throughout your code is also what w
 name [Primitive Obsession](http://enterprisecraftsmanship.com/2015/03/07/functional-c-primitive-obsession/).
 
 With DUs we can easily get rid of *Primitive Obsession* and 
-[avoid a lot of silly mistakes](http://www.markheath.net/post/avoid-silly-mistakes-fsharp-units-of-measure).
+[eliminate a lot of bugs](http://reidev275.azurewebsites.net/eliminating-bugs-with-single-case-discriminated-unions/).
 
 ## Units of Measure
 
 One feature that F# offers that is not directly related to *Algebraic-data types* is
 *Unit of Measures*. Before we go deeper into this topic, let's re-look at our latest
-`Person` definition. We created a *wrapper* called `Size`, a Size contains a `float`,
+`Person` definition. We created a *wrapper* called `Size`, a `Size` contains a `float`,
 but is that really a good definition? What means `Size 172.0` anyway? `172` of what?
 
 *Meters*, *feets*, *miles* or *egg-sizes*? Working just with `int`, `float` and so
 on is probably one common source of errors. The most famous one is probably
 the [Mars Climate Orbiter](https://en.wikipedia.org/wiki/Mars_Climate_Orbiter). Because of
 two software-systems, one produced *newton-seconds*, and another one produced *pound-seconds*
-the calculation to enter the Mars atmosphoere was wrong and it resulted to the destruction
+the calculation to enter the Mars atmosphoere was wrong and it resulted in the destruction
 of the *Mars Orbiter*.
 
 A simple definition like:

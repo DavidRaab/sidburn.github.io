@@ -639,7 +639,7 @@ we call it a <em>Sum-Type</em>. But what is the point of calculating the amount 
 <p>First, we usually don't care for the exact amount of values a type can represent. When we use
 four <code>int</code> we don't care how many billions of different values it can save. But we can use it in a
 mathematical way. For example we could use <code>i</code> that represents <code>int</code>. A Product type with
-four <code>int</code> can thus save <code>i*i*i*i</code> or <code>i ** 4</code> possible values.</p>
+four <code>int</code> can thus save <code>i*i*i*i</code> or <code>i ^ 4</code> possible values.</p>
 <p>A Discriminated Union like <code>Choice</code> with four cases and every case contains a single <code>int</code> can
 save <code>i + i + i + i</code> or in other words <code>4i</code> cases. Doing that kind of calculations is what
 we call the <a href="https://en.wikipedia.org/wiki/Cardinality">Cardinality</a>. The point of calculating
@@ -834,17 +834,17 @@ to compare those different types at all.</p>
 <p>Using primitive types like <code>string</code>, <code>float</code> throughout your code is also what we
 name <a href="http://enterprisecraftsmanship.com/2015/03/07/functional-c-primitive-obsession/">Primitive Obsession</a>.</p>
 <p>With DUs we can easily get rid of <em>Primitive Obsession</em> and
-<a href="http://www.markheath.net/post/avoid-silly-mistakes-fsharp-units-of-measure">avoid a lot of silly mistakes</a>.</p>
+<a href="http://reidev275.azurewebsites.net/eliminating-bugs-with-single-case-discriminated-unions/">eliminate a lot of bugs</a>.</p>
 <h2>Units of Measure</h2>
 <p>One feature that F# offers that is not directly related to <em>Algebraic-data types</em> is
 <em>Unit of Measures</em>. Before we go deeper into this topic, let's re-look at our latest
-<code>Person</code> definition. We created a <em>wrapper</em> called <code>Size</code>, a Size contains a <code>float</code>,
+<code>Person</code> definition. We created a <em>wrapper</em> called <code>Size</code>, a <code>Size</code> contains a <code>float</code>,
 but is that really a good definition? What means <code>Size 172.0</code> anyway? <code>172</code> of what?</p>
 <p><em>Meters</em>, <em>feets</em>, <em>miles</em> or <em>egg-sizes</em>? Working just with <code>int</code>, <code>float</code> and so
 on is probably one common source of errors. The most famous one is probably
 the <a href="https://en.wikipedia.org/wiki/Mars_Climate_Orbiter">Mars Climate Orbiter</a>. Because of
 two software-systems, one produced <em>newton-seconds</em>, and another one produced <em>pound-seconds</em>
-the calculation to enter the Mars atmosphoere was wrong and it resulted to the destruction
+the calculation to enter the Mars atmosphoere was wrong and it resulted in the destruction
 of the <em>Mars Orbiter</em>.</p>
 <p>A simple definition like:</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
