@@ -127,7 +127,7 @@ let me = {
     LastName  = "Raab"
     HairColor = "Blond"
     Birthday  = DateTime(1983, 2, 19)
-    Size      = 173.0
+    Size      = 100.0
 }
 
 (** We always must provide all fields, and we can access a field by its name: *)
@@ -173,7 +173,7 @@ we can do is to create a new record. F# provides a *Copy-and-update* syntax `{ s
 let me2     = { me     with Size = 173.0 }
 let markus2 = { markus with Birthday = DateTime(1983,6,4); Size = 173.0 }
 
-me < me2 // false -- because me2 has a bigger size
+me < me2 // true -- because me2 has a bigger size
 
 (**
 We also can use tuples inside of records. For example in a game we could use a money

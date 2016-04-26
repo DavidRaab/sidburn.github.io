@@ -151,7 +151,7 @@ let's improve that example by just using a Record.</p>
     <span class="i">LastName</span>  <span class="o">=</span> <span class="s">&quot;Raab&quot;</span>
     <span class="i">HairColor</span> <span class="o">=</span> <span class="s">&quot;Blond&quot;</span>
     <span class="i">Birthday</span>  <span class="o">=</span> <span onmouseout="hideTip(event, 'fs31', 50)" onmouseover="showTip(event, 'fs31', 50)" class="t">DateTime</span>(<span class="n">1983</span>, <span class="n">2</span>, <span class="n">19</span>)
-    <span class="i">Size</span>      <span class="o">=</span> <span class="n">173.0</span>
+    <span class="i">Size</span>      <span class="o">=</span> <span class="n">100.0</span>
 }
 </code></pre></td>
 </tr>
@@ -224,7 +224,7 @@ we can do is to create a new record. F# provides a <em>Copy-and-update</em> synt
 <td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs38', 68)" onmouseover="showTip(event, 'fs38', 68)" class="i">me2</span>     <span class="o">=</span> { <span onmouseout="hideTip(event, 'fs34', 69)" onmouseover="showTip(event, 'fs34', 69)" class="i">me</span>     <span class="k">with</span> <span class="i">Size</span> <span class="o">=</span> <span class="n">173.0</span> }
 <span class="k">let</span> <span onmouseout="hideTip(event, 'fs39', 70)" onmouseover="showTip(event, 'fs39', 70)" class="i">markus2</span> <span class="o">=</span> { <span onmouseout="hideTip(event, 'fs37', 71)" onmouseover="showTip(event, 'fs37', 71)" class="i">markus</span> <span class="k">with</span> <span class="i">Birthday</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs31', 72)" onmouseover="showTip(event, 'fs31', 72)" class="t">DateTime</span>(<span class="n">1983</span>,<span class="n">6</span>,<span class="n">4</span>); <span class="i">Size</span> <span class="o">=</span> <span class="n">173.0</span> }
 
-<span onmouseout="hideTip(event, 'fs34', 73)" onmouseover="showTip(event, 'fs34', 73)" class="i">me</span> <span class="o">&lt;</span> <span onmouseout="hideTip(event, 'fs38', 74)" onmouseover="showTip(event, 'fs38', 74)" class="i">me2</span> <span class="c">// false -- because me2 has a bigger size</span>
+<span onmouseout="hideTip(event, 'fs34', 73)" onmouseover="showTip(event, 'fs34', 73)" class="i">me</span> <span class="o">&lt;</span> <span onmouseout="hideTip(event, 'fs38', 74)" onmouseover="showTip(event, 'fs38', 74)" class="i">me2</span> <span class="c">// true -- because me2 has a bigger size</span>
 </code></pre></td>
 </tr>
 </table>
