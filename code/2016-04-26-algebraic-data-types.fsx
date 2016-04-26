@@ -520,7 +520,7 @@ let rect = Rect (p1,p2)
 Now we cannot do `line = rect` anymore. We also cannot pass a `Rect` to a function
 that expects a `Line`.
 
-But how do we work with those values? Do we always have to *Pattern Match* even that we now
+But how do we work with those values? Do we always have to *Pattern Match* even that we know
 there only exists a single case? Yes we do, but every `let` expression is already *Pattern
 Matching*. So we also can write:
 *)

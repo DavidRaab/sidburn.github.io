@@ -719,7 +719,7 @@ tuples in a <em>Single-case Discriminated Union</em> we get distinct types.</p>
 </table>
 <p>Now we cannot do <code>line = rect</code> anymore. We also cannot pass a <code>Rect</code> to a function
 that expects a <code>Line</code>.</p>
-<p>But how do we work with those values? Do we always have to <em>Pattern Match</em> even that we now
+<p>But how do we work with those values? Do we always have to <em>Pattern Match</em> even that we know
 there only exists a single case? Yes we do, but every <code>let</code> expression is already <em>Pattern
 Matching</em>. So we also can write:</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
