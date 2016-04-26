@@ -479,11 +479,11 @@ the same amount of data. We can easily proof that by calculating the Cardinality
    again turns into `i ^ 4`.
 1. `Line2` is `i * i * i * i` and directly turns into `i ^ 4`. 
 
-So we now, we can transform any `Line` into a `Line2` or vice-versa. This is important, because
-in programming it is important to choose the right data-format. Choosing the right format
-often mean some task can either becomes more easier to solve, or we could come up
-with more efficient algorithms. By calculating the *Cardinality* we can be sure that
-we have different representation of the same data.
+With this we now know that we can transform any `Line` into a `Line2` or vice-versa.
+This is important, because in programming it is important to choose the right data-format.
+Choosing the right format often means some task can either becomes more easier to solve,
+or we could come up with more efficient algorithms. By calculating the *Cardinality*
+we can be sure that we have different representation of the same data.
 
 Another way to use it is when we explicitly want to reduce the amount of possible values.
 We did that above with the `PhoneNumber` type. Having less possible values also means we

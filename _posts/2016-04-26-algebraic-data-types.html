@@ -676,11 +676,11 @@ again turns into <code>i ^ 4</code>.
 </li>
 <li><code>Line2</code> is <code>i * i * i * i</code> and directly turns into <code>i ^ 4</code>.</li>
 </ol>
-<p>So we now, we can transform any <code>Line</code> into a <code>Line2</code> or vice-versa. This is important, because
-in programming it is important to choose the right data-format. Choosing the right format
-often mean some task can either becomes more easier to solve, or we could come up
-with more efficient algorithms. By calculating the <em>Cardinality</em> we can be sure that
-we have different representation of the same data.</p>
+<p>With this we now know that we can transform any <code>Line</code> into a <code>Line2</code> or vice-versa.
+This is important, because in programming it is important to choose the right data-format.
+Choosing the right format often means some task can either becomes more easier to solve,
+or we could come up with more efficient algorithms. By calculating the <em>Cardinality</em>
+we can be sure that we have different representation of the same data.</p>
 <p>Another way to use it is when we explicitly want to reduce the amount of possible values.
 We did that above with the <code>PhoneNumber</code> type. Having less possible values also means we
 need less code to check the edge-cases. Changing a <code>string</code> into a DU with just four cases
