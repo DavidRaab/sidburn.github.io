@@ -17,7 +17,7 @@ and <em>OR-composition</em>. F# provides two <em>Product-types</em> and one <em>
 implementation for equality and comparison.</p>
 <h2>Tuples</h2>
 <p>A Tuple is a <em>Product-type</em>. The nice thing about Tuples is that we don't have to define
-a <em>type</em> before-hand. We can easily create any kind of tuple by just seperating
+a <em>type</em> before-hand. We can easily create any kind of tuple by just separating
 variables with a comma.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
@@ -37,7 +37,7 @@ variables with a comma.</p>
 </tr>
 </table>
 <p>When we look at the type-signature we see that <code>foo</code> has the type <code>string * int</code> and
-<code>bar</code> has the type <code>string * string * string * int</code>. Tuples onle can be compared
+<code>bar</code> has the type <code>string * string * string * int</code>. Tuples only can be compared
 if they have the same amount of elements and the types are the same in the exact order.</p>
 <p>A Tuple <code>string * int</code> is something different as <code>int * string</code>. But why are they anyway
 named <em>Product type</em> and why do we <em>multiply</em> types? To understand this, let's look at
@@ -73,7 +73,7 @@ and then define a <code>Line</code> and a <code>Rect</code> like this:</p>
 </code></pre></td>
 </tr>
 </table>
-<p><code>Point</code>, <code>Line</code> and <code>Rect</code> in this example are not types on there own. We can use the namens
+<p><code>Point</code>, <code>Line</code> and <code>Rect</code> in this example are not types on there own. We can use the names
 as they are more declarative, but because their are just <em>aliases</em> we also can compare a
 <code>Line</code> with a <code>Rect</code>. This is usually not what we want, and later we see how we can fix this.</p>
 <p>But overall it is an advantage that we don't have to provide a type first. Tuples
@@ -283,13 +283,13 @@ field that uses three <code>int</code> to represent gold, silver and bronze.</p>
 </code></pre></td>
 </tr>
 </table>
-<p>Because records are compareable it also means a record that uses other records is also
-automatically compareable. But as records are distinct types we cannot compare records of
+<p>Because records are comparable it also means a record that uses other records is also
+automatically comparable. But as records are distinct types we cannot compare records of
 different types. For example trying to compare <code>line</code> with <code>rect</code> will result
 in a compile-time error.</p>
 <p>If you know serialization formats like JSON you already can imagine that we can easily
 represent JSON Structures this way. But we get the benefit that we have a statically
-type-safe version of it, and those data-structures are immutable, and compareable!</p>
+type-safe version of it, and those data-structures are immutable, and comparable!</p>
 <p>For example we could generate a type-definition from
 the <a href="https://en.wikipedia.org/wiki/JSON">JSON example on Wikipedia</a></p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
@@ -426,10 +426,10 @@ the <a href="https://en.wikipedia.org/wiki/JSON">JSON example on Wikipedia</a></
 </table>
 <h2>Discriminated Unions (DU)</h2>
 <p>Up to that point, we only discussed two types: <em>Tuples</em> and <em>Records</em>. Both are <em>Product-types</em>
-or how i would name them <em>AND Composition</em>. Both data-types always contains all the specified
+or how I would name them <em>AND Composition</em>. Both data-types always contains all the specified
 fields. But a Discriminated Union is different. A Discriminated Union is a <em>Sum-Type</em> and
-gives us the Possibility of a choice, or how i would name it, an <em>OR Composition</em>.</p>
-<p>Let's review the JSON example above. What i dislike about it in general is that it just contains
+gives us the Possibility of a choice, or how I would name it, an <em>OR Composition</em>.</p>
+<p>Let's review the JSON example above. What I dislike about it in general is that it just contains
 too much <code>string</code> types. For example the <code>PhoneNumbers</code> part has a <code>Type</code> field, in an application
 you usually expect that <code>Type</code> only can be specific <code>strings</code> but not all possible <code>string</code>
 values. A better approach would be if we can represent the different available choices in
@@ -447,7 +447,7 @@ it's own type. With a DU we just can do that:</p>
 </tr>
 </table>
 <p>At this point you might probably compare it to an <em>enum</em> type as you know it from C# or Java.
-But as we see soon there are not really compareable at all. The first difference is. An <em>enum</em>
+But as we see soon there are not really comparable at all. The first difference is. An <em>enum</em>
 usually is just a wrapper around an <code>int</code>, <code>byte</code> and so on. Usually in C# you could
 for example still save the number <code>10</code> in a <code>PhoneNumberType</code> even if you just defined
 three choices. But with a Discriminated Union that is not possible. There are concrete types
@@ -679,16 +679,16 @@ again turns into <code>i ^ 4</code>.
 <p>So we now, we can transform any <code>Line</code> into a <code>Line2</code> or vice-versa. This is important, because
 in programming it is important to choose the right data-format. Choosing the right format
 often mean some task can either becomes more easier to solve, or we could come up
-with more efficent algorithms. By calculating the <em>Cardinality</em> we can be sure that
+with more efficient algorithms. By calculating the <em>Cardinality</em> we can be sure that
 we have different representation of the same data.</p>
-<p>Another way to use it is when we excplicitly want to reduce the amount of possible values.
+<p>Another way to use it is when we explicitly want to reduce the amount of possible values.
 We did that above with the <code>PhoneNumber</code> type. Having less possible values also means we
 need less code to check the edge-cases. Changing a <code>string</code> into a DU with just four cases
 makes the code simpler and less error-prone. Especially if the language forces you
 to check for all cases you could have, what F# does.</p>
 <h2>Single-case Discriminated Union</h2>
 <p>So far we only have seen Discriminated Unions that contain multiple choices, but we also
-can create a DU with just a single choice. You will probably wonder why that is usefull in
+can create a DU with just a single choice. You will probably wonder why that is useful in
 the first place.</p>
 <p>Do you remember the Problem with <code>Line</code> and <code>Rect</code> at the beginning and that we could
 compare <code>Line</code> and <code>Rect</code> because they were just type-aliases? By wrapping the
@@ -825,7 +825,7 @@ enhance a type and make it more distinct to other type.</p>
 On top of it, we can create functions that take a <code>string</code> and return an <code>Email</code>, and we can add
 validation to it, so when we want an <code>Email</code> we always ensure we have a valid <code>Email</code>, not
 just some random <code>string</code>.</p>
-<p>That's why i mentioned at the beginning that using <code>string</code>, <code>float</code>, <code>int</code> and so on
+<p>That's why I mentioned at the beginning that using <code>string</code>, <code>float</code>, <code>int</code> and so on
 is bad practice. Because we hardly never expects that something can be any <code>string</code>, we
 always have some validation. A <code>Uri</code>, <code>Email</code>, <code>Title</code>, <code>Content</code>, <code>HairColor</code>, <code>Name</code> and
 so on might all be represented by a <code>string</code>. But that doesn't mean they are interchangeable,
@@ -844,7 +844,7 @@ but is that really a good definition? What means <code>Size 172.0</code> anyway?
 on is probably one common source of errors. The most famous one is probably
 the <a href="https://en.wikipedia.org/wiki/Mars_Climate_Orbiter">Mars Climate Orbiter</a>. Because of
 two software-systems, one produced <em>newton-seconds</em>, and another one produced <em>pound-seconds</em>
-the calculation to enter the Mars atmosphoere was wrong and it resulted in the destruction
+the calculation to enter the Mars atmosphere was wrong and it resulted in the destruction
 of the <em>Mars Orbiter</em>.</p>
 <p>A simple definition like:</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
@@ -866,12 +866,12 @@ the code more readable by having types like <code>meter</code>, <code>km</code>,
 </code></pre></td>
 </tr>
 </table>
-<p>Now a definition like <code>Cm 172.0</code> makes it clear that we have <code>172</code> <em>centi-meter</em>. We also
+<p>Now a definition like <code>Cm 172.0</code> makes it clear that we have <code>172</code> <em>centimeter</em>. We also
 cannot easily add a float to a <code>Size</code> anymore. Because they are of different types.</p>
-<p>Specifing units for numeric values is quite common and can help a lot to make code less
+<p>Specifying units for numeric values is quite common and can help a lot to make code less
 error-prone. But when we work with <code>Cm</code> we now always have to <em>unwrap</em> a <code>Cm</code> type
 to work with it. If we just want to add two <code>Cm</code> together we have to write a function
-that unwraps both add the <code>float</code> together, and rewrap it again in a <code>Cm</code> type.</p>
+that unwraps both add the <code>float</code> together and re-wrap it again in a <code>Cm</code> type.</p>
 <p>It has advantages, but it is annoying to do that all over again for every numeric type,
 because especially for numbers we always expect that we can add, subtract, multiply or divide
 numbers. Because wrapping of numbers is such a common task, F# provides a feature named
@@ -1000,12 +1000,12 @@ but whenever you want to wrap a number in a Single-case DU, you should consider 
 <h2>Recursive Discriminated Unions</h2>
 <p>The biggest advantage of Discriminated Unions is that the definition can be recursive. <em>Tuples</em>
 or <em>Records</em> cannot be recursive because F# is not lazy by default and we couldn't create
-an immutable recurisve record. It would be infinite. But a Discriminated Union contains multiple
+an immutable recursive record. It would be infinite. But a Discriminated Union contains multiple
 different cases. So a DU can refer to itself, as long we have at least one non-recursive case.</p>
 <h3>Lists</h3>
 <p>For example, we could create our own <code>MyList</code> type that way. An Immutable linked-list is just
 a DU with two cases. We either reached the end of a list or we have a single-element and another
-<code>List</code>.</p>
+<code>MyList</code>.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -1023,7 +1023,7 @@ a DU with two cases. We either reached the end of a list or we have a single-ele
 </code></pre></td>
 </tr>
 </table>
-<p>If that looks impractical, actually the built-in F# list is exactly defined like this. The only
+<p>When that looks impractical, actually the built-in F# list is exactly defined like this. The only
 difference is that instead of <code>Empty</code> we use <code>[]</code>, and <code>Cons</code> is <code>::</code>. Because it is written
 infix it looks a little bit nicer, but overall it is the same.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
@@ -1128,11 +1128,11 @@ a single element and a Left and a Right Node.</p>
 </code></pre></td>
 </tr>
 </table>
-<h3>Hierachical Data-Structures</h3>
+<h3>Hierarchical Data-Structures</h3>
 <p>We not only can generate general Data-Structure like Lists or Trees, but in general any kind
-of hierachical data-structures, for example we can use it in general to represent XML,
-HTML and so on. For example we could use it to represent a document in the Markdown
-Structure. (It doesn't contain all elements of Markdown)</p>
+of hierarchical data-structures, for example we can use it in general to represent XML,
+HTML and so on. We could use it to represent a document in the Markdown Structure.
+(It doesn't contain all elements of Markdown)</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -1171,7 +1171,7 @@ Structure. (It doesn't contain all elements of Markdown)</p>
 </tr>
 </table>
 <p>Usually we would write a parser that turns a string into such kind of structure.
-Once you have such a structure working with it becomes pretty easy, for example to turn
+Once you have such a structure working with it becomes pretty easy. To turn
 any markdown document into HTML we just write.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
 <span class="l"> 2: </span>
@@ -1217,9 +1217,9 @@ any markdown document into HTML we just write.</p>
 <h2>Make invalid states un-representable</h2>
 <p>The general idea by designing data-types is to make illegal state un-representable. If invalid
 states are un-representable, bugs cannot happen in the first place. This topic alone is big enough
-of it's own and i will suggest to watch the videos in the <em>Further Reading</em> sections instead.</p>
+of it's own and I will suggest to watch the videos in the <em>Further Reading</em> sections instead.</p>
 <p>But to give a quick overview of the idea. Let's imagine we design a system and a user
-could provide multiple e-mail addresses for his acount. First, we want to make sure that
+could provide multiple e-mail addresses for his account. First, we want to make sure that
 all e-mails are valid, so instead of using a <code>string</code> we create an <code>Email</code> type and
 we ensure that we must go through validation. So instead of a list of strings we have
 a list of <code>Email</code>.</p>
@@ -1260,11 +1260,12 @@ compile-time safety that this requirement always holds true.</p>
 </tr>
 </table>
 <p>Now Account always must have at least one single valid <code>PrimaryEmail</code>. This idea can be extended.
-In <strong>Types + Properties = Software</strong> Mark Seeman describes how we can embed the rules of Tennis
-in the Type System itself. For example in Tennis we have the Points <em>Love, 15, 30, 40</em>. You
-could go on and use just a <code>int</code> for that, and instead of <code>Love</code> you use <code>0</code>. But this
-is again error-prone. Because an <code>int</code> support far more values as we need. We also
-could set it to <code>-456</code> for example. So the natural idea is to use a DU for this case.</p>
+In <a href="https://channel9.msdn.com/Events/FSharp-Events/fsharpConf-2016/Types-Properties-Software">Types + Properties = Software</a>
+Mark Seemann describes how we can embed the rules of Tennis in the Type System itself. For
+example in Tennis we have the Points <em>Love, 15, 30, 40</em>. You could go on and use just a
+<code>int</code> for that, and instead of <code>Love</code> you use <code>0</code>. But this is again error-prone. Because an
+<code>int</code> support far more values as we need. We also could set it to <code>-456</code> for example. So
+the natural idea is to use a DU for this case.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
 <td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">type</span> <span onmouseout="hideTip(event, 'fs218', 620)" onmouseover="showTip(event, 'fs218', 620)" class="t">Points</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs219', 621)" onmouseover="showTip(event, 'fs219', 621)" class="p">Love</span> | <span onmouseout="hideTip(event, 'fs220', 622)" onmouseover="showTip(event, 'fs220', 622)" class="p">Fifteen</span> | <span onmouseout="hideTip(event, 'fs221', 623)" onmouseover="showTip(event, 'fs221', 623)" class="p">Thirty</span>
@@ -1276,8 +1277,9 @@ have <code>Forty</code>, but that is an invalid state. When both Players have <c
 state is named <code>Deuce</code>. What we could do instead, we make <code>Forty</code> a whole new type
 that saves which Player has <code>Forty</code> and saves the Points of the other player. With this
 idea we cannot express the idea to have two Player with <code>Forty</code> because we designed
-the data from the ground-up in a way that we cannot express this. As a programmer you
-will be forced to use the <code>Deuce</code> game state instead.</p>
+the data from the ground-up in a way that we cannot express an invalid state. When you
+write the code around your data-structures you are forced to use the <code>Deuce</code>
+game state instead.</p>
 <h2>Summary</h2>
 <p>An algebraic-type system is at some point simple. Because it just provides two ways in how
 we can compose types. We either can use an <em>AND composition</em> or we can use an <em>OR composition</em>.</p>

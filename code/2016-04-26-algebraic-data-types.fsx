@@ -28,7 +28,7 @@ implementation for equality and comparison.
 ## Tuples
 
 A Tuple is a *Product-type*. The nice thing about Tuples is that we don't have to define
-a *type* before-hand. We can easily create any kind of tuple by just seperating
+a *type* before-hand. We can easily create any kind of tuple by just separating
 variables with a comma.
 *)
 
@@ -42,7 +42,7 @@ let str1, str2, str3, nr = bar
 
 (**
 When we look at the type-signature we see that `foo` has the type `string * int` and
-`bar` has the type `string * string * string * int`. Tuples onle can be compared
+`bar` has the type `string * string * string * int`. Tuples only can be compared
 if they have the same amount of elements and the types are the same in the exact order.
 
 A Tuple `string * int` is something different as `int * string`. But why are they anyway
@@ -71,7 +71,7 @@ and then define a `Line` and a `Rect` like this:
     type Line  = Point * Point
     type Rect  = Point * Point
 
-`Point`, `Line` and `Rect` in this example are not types on there own. We can use the namens
+`Point`, `Line` and `Rect` in this example are not types on there own. We can use the names
 as they are more declarative, but because their are just *aliases* we also can compare a
 `Line` with a `Rect`. This is usually not what we want, and later we see how we can fix this.
 
@@ -207,14 +207,14 @@ let rect = {
 }
 
 (**
-Because records are compareable it also means a record that uses other records is also
-automatically compareable. But as records are distinct types we cannot compare records of
+Because records are comparable it also means a record that uses other records is also
+automatically comparable. But as records are distinct types we cannot compare records of
 different types. For example trying to compare `line` with `rect` will result
 in a compile-time error.
 
 If you know serialization formats like JSON you already can imagine that we can easily
 represent JSON Structures this way. But we get the benefit that we have a statically
-type-safe version of it, and those data-structures are immutable, and compareable!
+type-safe version of it, and those data-structures are immutable, and comparable!
 
 For example we could generate a type-definition from
 the [JSON example on Wikipedia](https://en.wikipedia.org/wiki/JSON)
@@ -293,11 +293,11 @@ printfn "He has the following numbers: %A" numbers
 ## Discriminated Unions (DU)
 
 Up to that point, we only discussed two types: *Tuples* and *Records*. Both are *Product-types*
-or how i would name them *AND Composition*. Both data-types always contains all the specified
+or how I would name them *AND Composition*. Both data-types always contains all the specified
 fields. But a Discriminated Union is different. A Discriminated Union is a *Sum-Type* and
-gives us the Possibility of a choice, or how i would name it, an *OR Composition*.
+gives us the Possibility of a choice, or how I would name it, an *OR Composition*.
 
-Let's review the JSON example above. What i dislike about it in general is that it just contains
+Let's review the JSON example above. What I dislike about it in general is that it just contains
 too much `string` types. For example the `PhoneNumbers` part has a `Type` field, in an application
 you usually expect that `Type` only can be specific `strings` but not all possible `string`
 values. A better approach would be if we can represent the different available choices in
@@ -312,7 +312,7 @@ type PhoneNumberType =
 
 (**
 At this point you might probably compare it to an *enum* type as you know it from C# or Java.
-But as we see soon there are not really compareable at all. The first difference is. An *enum*
+But as we see soon there are not really comparable at all. The first difference is. An *enum*
 usually is just a wrapper around an `int`, `byte` and so on. Usually in C# you could
 for example still save the number `10` in a `PhoneNumberType` even if you just defined
 three choices. But with a Discriminated Union that is not possible. There are concrete types
@@ -482,10 +482,10 @@ the same amount of data. We can easily proof that by calculating the Cardinality
 So we now, we can transform any `Line` into a `Line2` or vice-versa. This is important, because
 in programming it is important to choose the right data-format. Choosing the right format
 often mean some task can either becomes more easier to solve, or we could come up
-with more efficent algorithms. By calculating the *Cardinality* we can be sure that
+with more efficient algorithms. By calculating the *Cardinality* we can be sure that
 we have different representation of the same data.
 
-Another way to use it is when we excplicitly want to reduce the amount of possible values.
+Another way to use it is when we explicitly want to reduce the amount of possible values.
 We did that above with the `PhoneNumber` type. Having less possible values also means we
 need less code to check the edge-cases. Changing a `string` into a DU with just four cases
 makes the code simpler and less error-prone. Especially if the language forces you
@@ -494,7 +494,7 @@ to check for all cases you could have, what F# does.
 ## Single-case Discriminated Union
 
 So far we only have seen Discriminated Unions that contain multiple choices, but we also
-can create a DU with just a single choice. You will probably wonder why that is usefull in
+can create a DU with just a single choice. You will probably wonder why that is useful in
 the first place.
 
 Do you remember the Problem with `Line` and `Rect` at the beginning and that we could
@@ -603,7 +603,7 @@ On top of it, we can create functions that take a `string` and return an `Email`
 validation to it, so when we want an `Email` we always ensure we have a valid `Email`, not
 just some random `string`.
 
-That's why i mentioned at the beginning that using `string`, `float`, `int` and so on
+That's why I mentioned at the beginning that using `string`, `float`, `int` and so on
 is bad practice. Because we hardly never expects that something can be any `string`, we
 always have some validation. A `Uri`, `Email`, `Title`, `Content`, `HairColor`, `Name` and
 so on might all be represented by a `string`. But that doesn't mean they are interchangeable,
@@ -627,7 +627,7 @@ but is that really a good definition? What means `Size 172.0` anyway? `172` of w
 on is probably one common source of errors. The most famous one is probably
 the [Mars Climate Orbiter](https://en.wikipedia.org/wiki/Mars_Climate_Orbiter). Because of
 two software-systems, one produced *newton-seconds*, and another one produced *pound-seconds*
-the calculation to enter the Mars atmosphoere was wrong and it resulted in the destruction
+the calculation to enter the Mars atmosphere was wrong and it resulted in the destruction
 of the *Mars Orbiter*.
 
 A simple definition like:
@@ -648,13 +648,13 @@ the code more readable by having types like `meter`, `km`, `feet` and so on, ins
 type Size = Cm of float
 
 (** 
-Now a definition like `Cm 172.0` makes it clear that we have `172` *centi-meter*. We also
+Now a definition like `Cm 172.0` makes it clear that we have `172` *centimeter*. We also
 cannot easily add a float to a `Size` anymore. Because they are of different types.
 
-Specifing units for numeric values is quite common and can help a lot to make code less
+Specifying units for numeric values is quite common and can help a lot to make code less
 error-prone. But when we work with `Cm` we now always have to *unwrap* a `Cm` type
 to work with it. If we just want to add two `Cm` together we have to write a function
-that unwraps both add the `float` together, and rewrap it again in a `Cm` type.
+that unwraps both add the `float` together and re-wrap it again in a `Cm` type.
 
 It has advantages, but it is annoying to do that all over again for every numeric type,
 because especially for numbers we always expect that we can add, subtract, multiply or divide
@@ -746,14 +746,14 @@ module PlayerGame =
 
 The biggest advantage of Discriminated Unions is that the definition can be recursive. *Tuples*
 or *Records* cannot be recursive because F# is not lazy by default and we couldn't create
-an immutable recurisve record. It would be infinite. But a Discriminated Union contains multiple
+an immutable recursive record. It would be infinite. But a Discriminated Union contains multiple
 different cases. So a DU can refer to itself, as long we have at least one non-recursive case.
 
 ### Lists
 
 For example, we could create our own `MyList` type that way. An Immutable linked-list is just
 a DU with two cases. We either reached the end of a list or we have a single-element and another
-`List`.
+`MyList`.
 *)
 
 type MyList<'a> =
@@ -765,7 +765,7 @@ type MyList<'a> =
 let nums = Cons(1, Cons(2, Cons(3, Cons(4, Cons(5, Empty)))))
 
 (**
-If that looks impractical, actually the built-in F# list is exactly defined like this. The only
+When that looks impractical, actually the built-in F# list is exactly defined like this. The only
 difference is that instead of `Empty` we use `[]`, and `Cons` is `::`. Because it is written
 infix it looks a little bit nicer, but overall it is the same.
 *)
@@ -829,12 +829,12 @@ fold (fun acc x -> acc + (string x)) "" tree
 // "1234567"
 
 (**
-### Hierachical Data-Structures
+### Hierarchical Data-Structures
 
 We not only can generate general Data-Structure like Lists or Trees, but in general any kind
-of hierachical data-structures, for example we can use it in general to represent XML,
-HTML and so on. For example we could use it to represent a document in the Markdown
-Structure. (It doesn't contain all elements of Markdown)
+of hierarchical data-structures, for example we can use it in general to represent XML,
+HTML and so on. We could use it to represent a document in the Markdown Structure.
+(It doesn't contain all elements of Markdown)
 *)
 
 type Markdown =
@@ -857,7 +857,7 @@ let document =
 
 (**
 Usually we would write a parser that turns a string into such kind of structure.
-Once you have such a structure working with it becomes pretty easy, for example to turn
+Once you have such a structure working with it becomes pretty easy. To turn
 any markdown document into HTML we just write.
 *)
 
@@ -889,10 +889,10 @@ produceHtml document
 
 The general idea by designing data-types is to make illegal state un-representable. If invalid
 states are un-representable, bugs cannot happen in the first place. This topic alone is big enough
-of it's own and i will suggest to watch the videos in the *Further Reading* sections instead.
+of it's own and I will suggest to watch the videos in the *Further Reading* sections instead.
 
 But to give a quick overview of the idea. Let's imagine we design a system and a user
-could provide multiple e-mail addresses for his acount. First, we want to make sure that
+could provide multiple e-mail addresses for his account. First, we want to make sure that
 all e-mails are valid, so instead of using a `string` we create an `Email` type and
 we ensure that we must go through validation. So instead of a list of strings we have
 a list of `Email`.
@@ -917,11 +917,12 @@ compile-time safety that this requirement always holds true.
     }
 
 Now Account always must have at least one single valid `PrimaryEmail`. This idea can be extended.
-In **Types + Properties = Software** Mark Seeman describes how we can embed the rules of Tennis
-in the Type System itself. For example in Tennis we have the Points *Love, 15, 30, 40*. You
-could go on and use just a `int` for that, and instead of `Love` you use `0`. But this
-is again error-prone. Because an `int` support far more values as we need. We also
-could set it to `-456` for example. So the natural idea is to use a DU for this case.
+In [Types + Properties = Software](https://channel9.msdn.com/Events/FSharp-Events/fsharpConf-2016/Types-Properties-Software)
+Mark Seemann describes how we can embed the rules of Tennis in the Type System itself. For
+example in Tennis we have the Points *Love, 15, 30, 40*. You could go on and use just a
+`int` for that, and instead of `Love` you use `0`. But this is again error-prone. Because an
+`int` support far more values as we need. We also could set it to `-456` for example. So
+the natural idea is to use a DU for this case.
 
     type Points = Love | Fifteen | Thirty
 
@@ -930,8 +931,9 @@ have `Forty`, but that is an invalid state. When both Players have `Forty` the g
 state is named `Deuce`. What we could do instead, we make `Forty` a whole new type
 that saves which Player has `Forty` and saves the Points of the other player. With this
 idea we cannot express the idea to have two Player with `Forty` because we designed
-the data from the ground-up in a way that we cannot express this. As a programmer you
-will be forced to use the `Deuce` game state instead.
+the data from the ground-up in a way that we cannot express an invalid state. When you
+write the code around your data-structures you are forced to use the `Deuce`
+game state instead.
 
 ## Summary
 
