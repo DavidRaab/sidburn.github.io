@@ -537,11 +537,11 @@ let printRect (Rect (tl,br)) =
     let (Point (x1,y1)) = tl
     let (Point (x2,y2)) = br
     printfn "Top Left: %f,%f" x1 y1
-    printfn "Bottom Right: %f,%f" y1 y2
+    printfn "Bottom Right: %f,%f" x2 y2
 
 printRect rect
 // Top Left: 0.000000,5.000000
-// Bottom Right: 5.000000,8.800000
+// Bottom Right: 5.500000,8.800000
 
 (**
 `printRect` is now a function expecting `Rect` as it's input. We cannot pass `line` anymore
@@ -552,7 +552,7 @@ it in its own `let` bindings.
 
 let printRect (Rect (Point (x1,y1), Point (x2,y2))) =
     printfn "Top Left: %f,%f" x1 y1
-    printfn "Bottom Right: %f,%f" y1 y2
+    printfn "Bottom Right: %f,%f" x2 y2
 
 (**
 A Single-case DU is not only useful for giving tuples a distinct type. We can generally wrap
