@@ -571,7 +571,7 @@ module PersonDU =
     type HairColor = HairColor of string
     type Birthday  = Birthday  of DateTime
     type Size      = Size      of float
-    type Person    = Person of FirstName * LastName * HairColor * Birthday * Size
+    type Person    = Person    of FirstName * LastName * HairColor * Birthday * Size
 
 (*** hide ***)
 open PersonDU
@@ -758,7 +758,7 @@ a DU with two cases. We either reached the end of a list or we have a single-ele
 
 type MyList<'a> =
     | Empty
-    | Cons of ('a * MyList<'a>)
+    | Cons of 'a * MyList<'a>
 
 (** We now can create a `MyList` like this: *)
 
