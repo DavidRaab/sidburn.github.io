@@ -30,3 +30,11 @@
     margin-right: 5px;
     padding: 0 5px;
 }
+
+/* Archive CSS */
+.post-archive .post-title {
+    display: block;
+    margin: 10px 10px;
+    text-decoration: underline;
+    font-weight: bold;
+}
