@@ -34,7 +34,7 @@
 /* Archive CSS */
 .post-archive .post-title {
     display: block;
-    margin: 10px 10px;
+    margin: 10px 0px;
     text-decoration: underline;
     font-weight: bold;
 }
