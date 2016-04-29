@@ -624,6 +624,7 @@ The syntax of this kind of continuation-passing style can be improved with a *Co
 ## Further Reading
 
  * [Understanding bind](http://fsharpforfunandprofit.com/posts/elevated-world-2/)
+ * [Functors, Applicatives, And Monads In Pictures](http://adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html)
  * [Computation Expressions](http://fsharpforfunandprofit.com/series/computation-expressions.html)
  * [Wikibooks - Computation Expressions](https://en.wikibooks.org/wiki/F_Sharp_Programming/Computation_Expressions)
 *)
