@@ -6,14 +6,15 @@ title: External Links
 This page contains some external links that i find worth reading. There exists two types of links i will provide here.
 
 1. Good ideas in how to solve or do something or in general teaching ideas to get a better programmer.
-1. Criticising ideas so you think more deeply about a topic.
+1. Criticising ideas, so you think more deeply about a topic.
 
 This site will be permanently updated. Links are not sorted in any particular order.
 
 ## Functional
 
-1. [(PDF Book) Purely Functional Data Structures -- Chris Okasaki](http://www.cs.cmu.edu/~rwh/theses/okasaki.pdf)
+1. [The Case for F#](https://zombiecodekill.com/2016/04/30/the-case-for-f-sharp/)
 1. [Why be Functional?](http://version2beta.com/articles/why_be_functional_post/)
+1. [Less is more: language features](http://blog.ploeh.dk/2015/04/13/less-is-more-language-features/)
 1. [Ten reasons not to use a statically typed functional programming language](http://fsharpforfunandprofit.com/posts/ten-reasons-not-to-use-a-functional-programming-language/)
 1. [Revenge of the Nerds](http://www.paulgraham.com/icad.html)
 1. [Is your programming language unreasonable?](http://fsharpforfunandprofit.com/posts/is-your-language-unreasonable/)
@@ -26,6 +27,7 @@ This site will be permanently updated. Links are not sorted in any particular or
 1. [The "What Are Monads?" Fallacy](http://two-wrongs.com/the-what-are-monads-fallacy)
 1. [The Case for Controlled Side Effects](http://two-wrongs.com/the-case-for-controlled-side-effects)
 1. [Category Theory for Programmers](http://bartoszmilewski.com/2014/10/28/category-theory-for-programmers-the-preface/)
+1. [(PDF Book) Purely Functional Data Structures -- Chris Okasaki](http://www.cs.cmu.edu/~rwh/theses/okasaki.pdf)
 
 ## Object-Orientation
 
