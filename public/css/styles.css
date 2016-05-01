@@ -70,10 +70,26 @@
 .archive time {
   font-size: 0.9em;
   color: #aaa;
+  position: absolute;
+  text-align: right;
+  left: 0em;
+  top: 1.8em;
+  line-height: 1.2em;
+  margin: 0;
+  padding: 0;
+  border: 0;
 }
 
 .archive time .year {
   display: none;
+}
+
+.archive time .month {
+  display: inline-block;
+}
+
+.archive time .day {
+  display: inline-block;
 }
 
 .archive .post-title {

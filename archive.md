@@ -14,8 +14,8 @@ title: Archive
     <article>
       <h1><a href="{{ post.url }}">{{ post.title }}</a></h1>
       <time datetime="{{ post.date | date_to_xmlschema }}" pubdate>
-        <span class="month">{{ post.date | date: "%d" }}</span>
-        <span class="day">{{ post.date | date: "%b" }}</span>
+        <span class="month">{{ post.date | date: "%b" }}</span>
+        <span class="day">{{ post.date | date: "%d" }}</span>
         <span class="year">{{ post.date | date: "%Y" }}</span>
       </time>
       <footer>{% include post-tags.html %}</footer>
