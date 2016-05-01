@@ -412,6 +412,7 @@ start our whole application loop.
 
  * [The Option Type](http://fsharpforfunandprofit.com/posts/the-option-type/)
  * [Wikibook - Option Type](https://en.wikibooks.org/wiki/F_Sharp_Programming/Option_Types)
+ * [[C#] Some optional, functional goodness in C#](http://www.davesquared.net/2012/12/optional-fp-in-csharp.html)
 
 ## Full Code
 *)

@@ -328,5 +328,5 @@ with `Async`.
 ## Further Reading
  
  * [Understanding traverse and sequence](http://fsharpforfunandprofit.com/posts/elevated-world-4/)
- * [Traversable (Haskell)](https://en.wikibooks.org/wiki/Haskell/Traversable)
+ * [[Haskell] Traversable](https://en.wikibooks.org/wiki/Haskell/Traversable)
 *)

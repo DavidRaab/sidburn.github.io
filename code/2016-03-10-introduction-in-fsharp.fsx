@@ -735,8 +735,9 @@ all of the topics you basically already made a big step in understanding F# in g
 
 ## Further Reading
 
-* [[Video] An Introduction to Microsoft F#](https://channel9.msdn.com/Blogs/pdc2008/TL11)
-* [Why use F#](http://fsharpforfunandprofit.com/why-use-fsharp/)
+ * [[Video] An Introduction to Microsoft F#](https://channel9.msdn.com/Blogs/pdc2008/TL11)
+ * [Why use F#](http://fsharpforfunandprofit.com/why-use-fsharp/)
+ * [Why not try F#?](http://www.davesquared.net/2013/05/why-not-try-fsharp.html)
 
 *)
 

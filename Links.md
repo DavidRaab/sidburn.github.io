@@ -27,7 +27,7 @@ This site will be permanently updated. Links are not sorted in any particular or
 1. [The "What Are Monads?" Fallacy](http://two-wrongs.com/the-what-are-monads-fallacy)
 1. [The Case for Controlled Side Effects](http://two-wrongs.com/the-case-for-controlled-side-effects)
 1. [Category Theory for Programmers](http://bartoszmilewski.com/2014/10/28/category-theory-for-programmers-the-preface/)
-1. [(PDF Book) Purely Functional Data Structures -- Chris Okasaki](http://www.cs.cmu.edu/~rwh/theses/okasaki.pdf)
+1. [[PDF Book] Purely Functional Data Structures -- Chris Okasaki](http://www.cs.cmu.edu/~rwh/theses/okasaki.pdf)
 
 ## Object-Orientation
 

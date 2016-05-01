@@ -675,5 +675,8 @@ is the same. The meaning of it changes between types. Currently with `option` we
 have written a solution to the [null is Evil]({% post_url 2016-03-20-null-is-evil %}) problem.
 
 ## Further Reading
+
  * [Understanding map and apply](http://fsharpforfunandprofit.com/posts/elevated-world/)
+ * [The Apply Pattern](http://www.davesquared.net/2015/07/apply-pattern.html)
+ 
 *)
