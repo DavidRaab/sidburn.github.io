@@ -41,6 +41,41 @@
   font-size: 3rem;
 }
 
+.archive h2 {
+    display: inline-block;
+    position: relative;
+    float: left;
+    top: -1px;
+    font-weight: normal;
+    margin-bottom: .3em;
+    font-size: 1.5em;
+    color: #aaa;
+}
+
+.archive article h1 {
+  font-size: 1.5em;
+  text-decoration: none;
+}
+
+.archive article h1 a {
+  color: #313131;
+}
+
+.archive article {
+  padding-left: 4.5em;
+  margin-left: 5em;
+  position: relative;
+}
+
+.archive time {
+  font-size: 0.9em;
+  color: #aaa;
+}
+
+.archive time .year {
+  display: none;
+}
+
 .archive .post-title {
   display: block;
   margin: 10px 0px;
