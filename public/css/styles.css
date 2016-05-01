@@ -96,17 +96,14 @@
   display: inline-block;
 }
 
+.archive footer {
+  color: #aaa;
+}
+
 .archive .tag {
   background-color: transparent;
   color: #aaa !important;
   text-decoration: underline;
   margin: 0;
   padding: 0;
-}
-
-.archive .post-title {
-  display: block;
-  margin: 10px 0px;
-  text-decoration: underline;
-  font-weight: bold;
 }
