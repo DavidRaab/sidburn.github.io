@@ -32,9 +32,18 @@
 }
 
 /* Archive CSS */
-.post-archive .post-title {
-    display: block;
-    margin: 10px 0px;
-    text-decoration: underline;
-    font-weight: bold;
+.archive header {
+  background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAABCAYAAACsXeyTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAFUlEQVQIHWNIS0sr/v//PwMMDzY+ADqMahlW4J91AAAAAElFTkSuQmCC') bottom left repeat-x;
+}
+
+.archive header h1 {
+  color: #404040;
+  font-size: 3rem;
+}
+
+.archive .post-title {
+  display: block;
+  margin: 10px 0px;
+  text-decoration: underline;
+  font-weight: bold;
 }
