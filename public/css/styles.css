@@ -55,6 +55,8 @@
 .archive article h1 {
   font-size: 1.5em;
   text-decoration: none;
+  margin: 0;
+  padding-top: 0.8em;
 }
 
 .archive article h1 a {
@@ -64,7 +66,9 @@
 .archive article {
   padding-left: 4.5em;
   margin-left: 5em;
+  padding-bottom: 0.7em;
   position: relative;
+  background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAABCAYAAACsXeyTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAFUlEQVQIHWNIS0sr/v//PwMMDzY+ADqMahlW4J91AAAAAElFTkSuQmCC') bottom left repeat-x;
 }
 
 .archive time {
@@ -90,6 +94,14 @@
 
 .archive time .day {
   display: inline-block;
+}
+
+.archive .tag {
+  background-color: transparent;
+  color: #aaa !important;
+  text-decoration: underline;
+  margin: 0;
+  padding: 0;
 }
 
 .archive .post-title {

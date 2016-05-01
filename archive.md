@@ -18,7 +18,7 @@ title: Archive
         <span class="day">{{ post.date | date: "%d" }}</span>
         <span class="year">{{ post.date | date: "%Y" }}</span>
       </time>
-      <footer>{% include post-tags.html %}</footer>
+      <footer>Tags: {% include post-tags.html %}</footer>
     </article>
   {% endfor %}
 </div>
