@@ -20,6 +20,7 @@ in different categories.
 1. [Algebraic Data-Types]({% post_url 2016-04-26-algebraic-data-types %})
 1. [From mutable loops to immutability]({% post_url 2016-04-05-mutable-loops-to-immutability %})
 1. [Continuations and foldBack]({% post_url 2016-04-16-fold-continuations %})
+1. [CPS Fold -- fold with early exit]({% post_url 2016-05-07-cps-fold %})
 
 ## Null / Optionals
 1. [Null is evil]({% post_url 2016-03-20-null-is-evil %})
