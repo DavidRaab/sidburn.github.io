@@ -15,7 +15,7 @@ title: Home
     <div class="post-header">
         <span class="post-date">{{ post.date | date_to_long_string }}</span>
         {% include post-tags.html %}
-        <a href="{{ site.baseurl }}{{ post.url }}#disqus_thread">comments</a>
+        <a href="{{ site.disqusurl }}{{ post.url }}#disqus_thread">comments</a>
     </div>
     
     {{ post.content | strip_html | truncatewords: 50 }}
@@ -29,18 +29,18 @@ title: Home
 <div class="pagination">
     {% if paginator.previous_page %}
         {% if paginator.page == 2 %}
-            <a class="pagination-item newer" href="{{ site.baseurl }}">Newer</a>
+            <a class="pagination-item newer" href="/">Newer</a>
         {% else %}
-            <a class="pagination-item newer" href="{{ site.baseurl }}/page{{paginator.previous_page}}">Newer</a>
+            <a class="pagination-item newer" href="/page{{paginator.previous_page}}">Newer</a>
         {% endif %}
     {% else %}
         <span class="pagination-item newer">Newer</span>
         {% if paginator.next_page %}
-            <a class="pagination-item older" href="{{ site.baseurl }}/page{{paginator.next_page}}">Older</a>
+            <a class="pagination-item older" href="/page{{paginator.next_page}}">Older</a>
         {% else %}
             <span class="pagination-item older">Older</span>
         {% endif %}
     {% endif %}
 </div>
 
-<script id="dsq-count-scr" src="http://davidraab.disqus.com/count.js" async></script>
+<script id="dsq-count-scr" src="https://davidraab.disqus.com/count.js" async></script>

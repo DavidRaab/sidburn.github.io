@@ -9,12 +9,12 @@ permalink:        /blog/:year/:month/:day/:title
 title:            'David Raab'
 tagline:          'Blogging about programming'
 description:      ''
-url:              http://sidburn.github.io
-baseurl:          http://sidburn.github.io
+url:              https://sidburn.github.io
+disqusurl:        http://sidburn.github.io
 
 author:
   name:           'David Raab'
-  url:            http://sidburn.github.io
+  url:            https://sidburn.github.io
 
 paginate:         10
 
