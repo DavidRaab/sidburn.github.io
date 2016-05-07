@@ -18,10 +18,10 @@ be helpful.</p>
 tail-recursion right. Wouldn't it be better if we could abstract it just like fold? In this article
 I explain how to write a CPS fold that allows us to do this.</p>
 <h2>Continuation</h2>
-<p>The important concept in implementing a CPS fold is a a so-called <em>Continuation
+<p>The important concept in implementing a CPS fold is a so-called <em>Continuation
 function</em> or often just named CPS (Continuation-Passing Style). The idea of CPS is that we just
 pass an additional function as an argument that the user can call to explicitly recurs. This way the
-use of our CPS fold is in control of the recursion. The user then can decide if he wants to continue
+user of the CPS fold is in control of the recursion. The user then can decide if he wants to continue
 traversing a data-structure or return a value instead. But before we look into how we implement
 the function, let's see some use cases in how we use such a function.</p>
 <p>We name our function <code>foldk</code>. Besides that, <code>foldk</code> looks nearly the same as <code>fold</code>,
@@ -36,24 +36,23 @@ of just two.</p>
 </tr>
 </table>
 <p>When we provide the same code then we already see how it differs. <code>fold</code> always runs through all
-elements of the list. It computes the accumulator and does the needed recursion on it.</p>
-<p><code>foldk</code> on the other hand don't do any recursion on it's own by default. <code>foldk</code> by default always
-just do a single step. It just extract one element from our list and calls the folder function
-with the provided <code>acc</code> and the first element of our list.</p>
+elements of the list. It computes the accumulator and does all recursion on itself.</p>
+<p><code>foldk</code> on the other hand don't do any recursion on it's own. <code>foldk</code> always just do a single
+step. It just extract one element from our list and calls the folder function with the provided
+<code>acc</code> and the first element of our list.</p>
 <p>That's why we get <code>1</code> as a result. It just calculates <code>acc + x</code> or <code>0 + 1</code> in the above example
-and then it immediately ends. <code>foldk</code> don't do any recursion by default on it's own, we must tell
-it when we want to recurs.</p>
+and then it immediately ends. We must explicitly tell <code>foldk</code> when it should recurs.</p>
 <p>That's the reason why we have the third argument. <code>k</code> is the continuation function. <code>k</code> expects
 the next accumulator. When we call <code>k</code> we start recurring again on the next element in our list.
-The primary difference is that the user of <code>foldk</code> has explicit control when recurring should
-happen.</p>
+The primary difference to <code>fold</code> is that the user of <code>foldk</code> has explicit control when
+recurring should happen.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
 <td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp">[<span class="n">1..</span><span class="n">100</span>] <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs2', 30)" onmouseover="showTip(event, 'fs2', 30)" class="f">foldk</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs10', 31)" onmouseover="showTip(event, 'fs10', 31)" class="i">acc</span> <span onmouseout="hideTip(event, 'fs11', 32)" onmouseover="showTip(event, 'fs11', 32)" class="i">x</span> <span onmouseout="hideTip(event, 'fs12', 33)" onmouseover="showTip(event, 'fs12', 33)" class="f">k</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs12', 34)" onmouseover="showTip(event, 'fs12', 34)" class="f">k</span> (<span onmouseout="hideTip(event, 'fs10', 35)" onmouseover="showTip(event, 'fs10', 35)" class="i">acc</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs11', 36)" onmouseover="showTip(event, 'fs11', 36)" class="i">x</span>)) <span class="n">0</span> <span class="c">// 5050</span>
 </code></pre></td>
 </tr>
 </table>
-<p>When we want to traverse all element of our list, then we just call <code>k</code> with the next <em>accumulator</em>.
+<p>When we want to traverse all elements of our list, then we just call <code>k</code> with the next <em>accumulator</em>.
 But if we wanted to do that, we also could just use <code>fold</code>. So here is a more practical example
 in comparison to <code>fold</code>.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
@@ -86,9 +85,9 @@ in comparison to <code>fold</code>.</p>
 </code></pre></td>
 </tr>
 </table>
-<p>Now we getting different results. <code>fold</code> returns <code>30</code>. Actually what <code>fold</code> did was: Pick every
-element that is smaller than 11 and add them together. Our <code>foldk</code> on the other hand runs as
-long all elements are smaller than <code>11</code> and only add those. As soon he encounter a bigger
+<p>Now we are getting different results. What <code>fold</code> did was: <em>Pick every element that is smaller
+than 11 and add them together.</em> <code>foldk</code> on the other hand runs as long all elements are smaller
+than <code>11</code> and only add those together it saw up to this point. As soon he encounter a bigger
 number it will stop traversing the list. <code>fold</code> calculated <code>5 + 10 + 10 + 5</code> while <code>foldk</code>
 just summed up the first two elements <code>5 + 10</code>.</p>
 <h2>Implementing foldk</h2>
@@ -459,7 +458,7 @@ an exception if the input list has not enough elements. We can achieve the same 
 the <code>collected</code> field after <code>foldk</code> finished and throw an exception if it is not the same
 as <code>amount</code>. But I like my behaviour more than the default implementation.</p>
 <p>I could continue by implementing further functions, but I think at this point it should
-be obvious how <code>foldk</code> works on how we use it.</p>
+be obvious how <code>foldk</code> works and how we use it.</p>
 <h2>Summary</h2>
 <p>Implementing a CPS fold gives the control when to recurs to the caller of <code>foldk</code>.</p>
 <p>Some task are easier solved by <code>foldk</code>. Some other task can sometimes be more efficient as we don't

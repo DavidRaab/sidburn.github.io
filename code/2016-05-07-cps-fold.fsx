@@ -28,10 +28,10 @@ I explain how to write a CPS fold that allows us to do this.
 
 ## Continuation
 
-The important concept in implementing a CPS fold is a a so-called *Continuation
+The important concept in implementing a CPS fold is a so-called *Continuation
 function* or often just named CPS (Continuation-Passing Style). The idea of CPS is that we just
 pass an additional function as an argument that the user can call to explicitly recurs. This way the
-use of our CPS fold is in control of the recursion. The user then can decide if he wants to continue
+user of the CPS fold is in control of the recursion. The user then can decide if he wants to continue
 traversing a data-structure or return a value instead. But before we look into how we implement
 the function, let's see some use cases in how we use such a function.
 *)
@@ -53,26 +53,25 @@ of just two.
 
 (**
 When we provide the same code then we already see how it differs. `fold` always runs through all
-elements of the list. It computes the accumulator and does the needed recursion on it.
+elements of the list. It computes the accumulator and does all recursion on itself.
 
-`foldk` on the other hand don't do any recursion on it's own by default. `foldk` by default always
-just do a single step. It just extract one element from our list and calls the folder function
-with the provided `acc` and the first element of our list.
+`foldk` on the other hand don't do any recursion on it's own. `foldk` always just do a single
+step. It just extract one element from our list and calls the folder function with the provided
+`acc` and the first element of our list.
 
 That's why we get `1` as a result. It just calculates `acc + x` or `0 + 1` in the above example
-and then it immediately ends. `foldk` don't do any recursion by default on it's own, we must tell
-it when we want to recurs.
+and then it immediately ends. We must explicitly tell `foldk` when it should recurs.
 
 That's the reason why we have the third argument. `k` is the continuation function. `k` expects
 the next accumulator. When we call `k` we start recurring again on the next element in our list.
-The primary difference is that the user of `foldk` has explicit control when recurring should
-happen.
+The primary difference to `fold` is that the user of `foldk` has explicit control when
+recurring should happen.
 *)
 
 [1..100] |> foldk (fun acc x k -> k (acc + x)) 0 // 5050
 
 (**
-When we want to traverse all element of our list, then we just call `k` with the next *accumulator*.
+When we want to traverse all elements of our list, then we just call `k` with the next *accumulator*.
 But if we wanted to do that, we also could just use `fold`. So here is a more practical example
 in comparison to `fold`.
 *)
@@ -92,9 +91,9 @@ in comparison to `fold`.
 // 15
 
 (**
-Now we getting different results. `fold` returns `30`. Actually what `fold` did was: Pick every
-element that is smaller than 11 and add them together. Our `foldk` on the other hand runs as
-long all elements are smaller than `11` and only add those. As soon he encounter a bigger
+Now we are getting different results. What `fold` did was: *Pick every element that is smaller
+than 11 and add them together.* `foldk` on the other hand runs as long all elements are smaller
+than `11` and only add those together it saw up to this point. As soon he encounter a bigger
 number it will stop traversing the list. `fold` calculated `5 + 10 + 10 + 5` while `foldk`
 just summed up the first two elements `5 + 10`.
 
@@ -270,7 +269,7 @@ the `collected` field after `foldk` finished and throw an exception if it is not
 as `amount`. But I like my behaviour more than the default implementation.
 
 I could continue by implementing further functions, but I think at this point it should
-be obvious how `foldk` works on how we use it.
+be obvious how `foldk` works and how we use it.
 
 ## Summary
 
