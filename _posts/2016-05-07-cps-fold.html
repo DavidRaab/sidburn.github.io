@@ -121,102 +121,166 @@ the next accumulator. As you can see, when the user decides to call <code>k</cod
 </tr>
 </table>
 <p>The result of our function is <code>15</code>. Let's see step-by-step how we got this result. When we call <code>foldk</code>
-we have <code>0</code> as our <code>acc</code> and the list <code>[1;2;3;4;5]</code> as our starting list.</p>
+we start with <code>0</code> as our <code>acc</code> and the list <code>[1;2;3;4;5]</code> as our starting list. As a reminder this is
+<code>foldk</code>.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="k">rec</span> <span onmouseout="hideTip(event, 'fs2', 2)" onmouseover="showTip(event, 'fs2', 2)" class="f">foldk</span> <span onmouseout="hideTip(event, 'fs3', 3)" onmouseover="showTip(event, 'fs3', 3)" class="f">f</span> (<span onmouseout="hideTip(event, 'fs4', 4)" onmouseover="showTip(event, 'fs4', 4)" class="i">acc</span><span class="o">:</span><span class="o">&#39;</span><span class="i">State</span>) <span onmouseout="hideTip(event, 'fs5', 5)" onmouseover="showTip(event, 'fs5', 5)" class="i">xs</span> <span class="o">=</span>
+    <span class="k">match</span> <span onmouseout="hideTip(event, 'fs5', 6)" onmouseover="showTip(event, 'fs5', 6)" class="i">xs</span> <span class="k">with</span>
+    | []    <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs4', 7)" onmouseover="showTip(event, 'fs4', 7)" class="i">acc</span>
+    | <span onmouseout="hideTip(event, 'fs6', 8)" onmouseover="showTip(event, 'fs6', 8)" class="i">x</span><span class="o">::</span><span onmouseout="hideTip(event, 'fs5', 9)" onmouseover="showTip(event, 'fs5', 9)" class="i">xs</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs3', 10)" onmouseover="showTip(event, 'fs3', 10)" class="f">f</span> <span onmouseout="hideTip(event, 'fs4', 11)" onmouseover="showTip(event, 'fs4', 11)" class="i">acc</span> <span onmouseout="hideTip(event, 'fs6', 12)" onmouseover="showTip(event, 'fs6', 12)" class="i">x</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs7', 13)" onmouseover="showTip(event, 'fs7', 13)" class="i">lacc</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs2', 14)" onmouseover="showTip(event, 'fs2', 14)" class="f">foldk</span> <span onmouseout="hideTip(event, 'fs3', 15)" onmouseover="showTip(event, 'fs3', 15)" class="f">f</span> <span onmouseout="hideTip(event, 'fs7', 16)" onmouseover="showTip(event, 'fs7', 16)" class="i">lacc</span> <span onmouseout="hideTip(event, 'fs5', 17)" onmouseover="showTip(event, 'fs5', 17)" class="i">xs</span>)
+</code></pre></td>
+</tr>
+</table>
+<p>When i write <code>f acc x k</code> in the code section i refer to the whole right hand side of <code>x::xs</code> that
+means <code>f acc x (fun lacc -&gt; foldk f lacc xs)</code>. I just use <code>[]</code> and <code>x::xs</code> to represent the
+pattern matching in the <code>foldk</code> function.</p>
 <table>
 <thead>
 <tr class="header">
-<th align="left"><p>Step</p></th>
+<th align="left"><p>Code</p></th>
+<th align="left"><p>Evaluation</p></th>
 <th align="left"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left"><p>match on []</p></td>
-<td align="left"><p>No, we didn't reach the end</p></td>
+<td align="left"><p>foldk f 0 [1..5]</p></td>
+<td align="left"></td>
+<td align="left"><p>First call, we start foldk</p></td>
 </tr>
 <tr class="even">
-<td align="left"><p>match on x::xs</p></td>
-<td align="left"><p>Yes, <code>1::[2;3;4;5]</code></p></td>
+<td align="left"><p>[]</p></td>
+<td align="left"></td>
+<td align="left"><p>No, we did not reach the end</p></td>
 </tr>
 <tr class="odd">
-<td align="left"><p>executing</p></td>
-<td align="left"><p><code>f 0 1 (fun lacc -&gt; foldk f lacc [2;3;4;5])</code></p></td>
+<td align="left"><p>x::xs</p></td>
+<td align="left"><p>1::[2;3;4;5]</p></td>
+<td align="left"><p>Yes, it maches</p></td>
 </tr>
 <tr class="even">
-<td align="left"><p><code>k (0 + 1)</code></p></td>
-<td align="left"><p>executing: <code>foldk f 1 [2;3;4;5]</code></p></td>
+<td align="left"><p>f acc x k</p></td>
+<td align="left"><p>f 0 1 (fun lacc -&gt; foldk f lacc [2;3;4;5])</p></td>
+<td align="left"><p>We now execute <code>f</code></p></td>
 </tr>
 <tr class="odd">
-<td align="left"><p>match on []</p></td>
+<td align="left"><p>k (acc + x)</p></td>
+<td align="left"><p>k (0 + 1)</p></td>
+<td align="left"><p><code>k</code> is the lambda function passed to <code>f</code></p></td>
+</tr>
+<tr class="even">
+<td align="left"><p>foldk f 1 [2;3;4;5]</p></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left"><p>[]</p></td>
+<td align="left"></td>
 <td align="left"><p>No</p></td>
 </tr>
 <tr class="even">
-<td align="left"><p>match on x::xs</p></td>
-<td align="left"><p>Yes, <code>2::[3;4;5]</code></p></td>
+<td align="left"><p>x::xs</p></td>
+<td align="left"><p>2::[3;4;5]</p></td>
+<td align="left"><p>Yes</p></td>
 </tr>
 <tr class="odd">
-<td align="left"><p>executing</p></td>
-<td align="left"><p><code>f 1 2 (fun lacc -&gt; foldk f lacc [3;4;5])</code></p></td>
+<td align="left"><p>f acc x k</p></td>
+<td align="left"><p>f 1 2 (fun lacc -&gt; foldk f lacc [3;4;5])</p></td>
+<td align="left"></td>
 </tr>
 <tr class="even">
-<td align="left"><p><code>k (1 + 2)</code></p></td>
-<td align="left"><p>executing: <code>foldk f 3 [3;4;5]</code></p></td>
+<td align="left"><p>k (acc + x)</p></td>
+<td align="left"><p>k (1 + 2)</p></td>
+<td align="left"></td>
 </tr>
 <tr class="odd">
-<td align="left"><p>match on []</p></td>
+<td align="left"><p>foldk f 3 [3;4;5]</p></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left"><p>[]</p></td>
+<td align="left"></td>
 <td align="left"><p>No</p></td>
 </tr>
-<tr class="even">
-<td align="left"><p>match on x::xs</p></td>
-<td align="left"><p>Yes, <code>3::[4;5]</code></p></td>
-</tr>
 <tr class="odd">
-<td align="left"><p>executing</p></td>
-<td align="left"><p><code>f 3 3 (fun lacc -&gt; foldk f lacc [4;5])</code></p></td>
-</tr>
-<tr class="even">
-<td align="left"><p><code>k (3 + 3)</code></p></td>
-<td align="left"><p>executing: <code>foldk f 6 [4;5]</code></p></td>
-</tr>
-<tr class="odd">
-<td align="left"><p>match on []</p></td>
-<td align="left"><p>No</p></td>
-</tr>
-<tr class="even">
-<td align="left"><p>match on x::xs</p></td>
-<td align="left"><p>Yes, <code>4::[5]</code></p></td>
-</tr>
-<tr class="odd">
-<td align="left"><p>executing</p></td>
-<td align="left"><p><code>f 6 4 (fun lacc -&gt; foldk f lacc [5])</code></p></td>
-</tr>
-<tr class="even">
-<td align="left"><p><code>k (6 + 4)</code></p></td>
-<td align="left"><p>executing: <code>foldk f 10 [5]</code></p></td>
-</tr>
-<tr class="odd">
-<td align="left"><p>match on []</p></td>
-<td align="left"><p>No</p></td>
-</tr>
-<tr class="even">
-<td align="left"><p>match on x::xs</p></td>
-<td align="left"><p>Yes, <code>5::[]</code></p></td>
-</tr>
-<tr class="odd">
-<td align="left"><p>executing</p></td>
-<td align="left"><p><code>f 10 5 (fun lacc -&gt; foldk f lacc [])</code></p></td>
-</tr>
-<tr class="even">
-<td align="left"><p><code>k (10 + 5)</code></p></td>
-<td align="left"><p>executing: <code>foldk f 15 []</code></p></td>
-</tr>
-<tr class="odd">
-<td align="left"><p>match on []</p></td>
+<td align="left"><p>x::xs</p></td>
+<td align="left"><p>3::[4;5]</p></td>
 <td align="left"><p>Yes</p></td>
 </tr>
 <tr class="even">
-<td align="left"><p>returning <code>acc</code></p></td>
-<td align="left"><p>15</p></td>
+<td align="left"><p>f acc x k</p></td>
+<td align="left"><p>f 3 3 (fun lacc -&gt; foldk f lacc [4;5])</p></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left"><p>k (acc + x)</p></td>
+<td align="left"><p>k (3 + 3)</p></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left"><p>foldk f 6 [4;5]</p></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left"><p>[]</p></td>
+<td align="left"></td>
+<td align="left"><p>No</p></td>
+</tr>
+<tr class="even">
+<td align="left"><p>x::xs</p></td>
+<td align="left"><p>4::[5]</p></td>
+<td align="left"><p>Yes</p></td>
+</tr>
+<tr class="odd">
+<td align="left"><p>f acc x k</p></td>
+<td align="left"><p>f 6 4 (fun lacc -&gt; foldk f lacc [5])</p></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left"><p>k (acc + x)</p></td>
+<td align="left"><p>k (6 + 4)</p></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left"><p>foldk f 10 [5]</p></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left"><p>[]</p></td>
+<td align="left"></td>
+<td align="left"><p>No</p></td>
+</tr>
+<tr class="odd">
+<td align="left"><p>x::xs</p></td>
+<td align="left"><p>5::[]</p></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left"><p>f acc x k</p></td>
+<td align="left"><p>f 10 5 (fun lacc -&gt; foldk f lacc [])</p></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left"><p>k (acc + x)</p></td>
+<td align="left"><p>k (10 + 5)</p></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left"><p>foldk f 15 []</p></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left"><p>[] -&gt; acc</p></td>
+<td align="left"><p>[] -&gt; 15</p></td>
+<td align="left"><p>Yes, we just return <code>acc</code> (15)</p></td>
 </tr>
 </tbody>
 </table>
@@ -231,70 +295,101 @@ we have <code>0</code> as our <code>acc</code> and the list <code>[1;2;3;4;5]</c
 <table>
 <thead>
 <tr class="header">
-<th align="left"><p>Step</p></th>
+<th align="left"><p>Code</p></th>
+<th align="left"><p>Evaluation</p></th>
 <th align="left"><p>Description</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left"><p>match on []</p></td>
+<td align="left"><p>foldk f 0 [1..5]</p></td>
+<td align="left"></td>
+<td align="left"><p>First call, we start foldk</p></td>
+</tr>
+<tr class="even">
+<td align="left"><p>[]</p></td>
+<td align="left"></td>
 <td align="left"><p>No</p></td>
 </tr>
+<tr class="odd">
+<td align="left"><p>x::xs</p></td>
+<td align="left"><p>1::[2;3;4;5]</p></td>
+<td align="left"><p>Yes</p></td>
+</tr>
 <tr class="even">
-<td align="left"><p>match on x::xs</p></td>
-<td align="left"><p>Yes, <code>1::[2;3;4;5]</code></p></td>
+<td align="left"><p>f acc x k</p></td>
+<td align="left"><p>f 0 1 (fun lacc -&gt; foldk f lacc [2;3;4;5])</p></td>
+<td align="left"></td>
 </tr>
 <tr class="odd">
-<td align="left"><p>executing</p></td>
-<td align="left"><p><code>f 0 1 (fun lacc -&gt; foldk f lacc [2;3;4;5])</code></p></td>
-</tr>
-<tr class="even">
 <td align="left"><p>x &lt; 3</p></td>
-<td align="left"><p>Yes (1)</p></td>
+<td align="left"><p>1 &lt; 3</p></td>
+<td align="left"><p>Yes</p></td>
 </tr>
-<tr class="odd">
+<tr class="even">
+<td align="left"><p>k (acc + x)</p></td>
 <td align="left"><p>k (0 + 1)</p></td>
-<td align="left"><p>executing: <code>foldk f 1 [2;3;4;5]</code></p></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left"><p>foldk f 1 [2;3;4;5]</p></td>
+<td align="left"></td>
+<td align="left"></td>
 </tr>
 <tr class="even">
-<td align="left"><p>match on []</p></td>
+<td align="left"><p>[]</p></td>
+<td align="left"></td>
 <td align="left"><p>No</p></td>
 </tr>
 <tr class="odd">
-<td align="left"><p>match on x::xs</p></td>
-<td align="left"><p>Yes <code>2::[3;4;5]</code></p></td>
+<td align="left"><p>x::xs</p></td>
+<td align="left"><p>2::[3;4;5]</p></td>
+<td align="left"><p>Yes</p></td>
 </tr>
 <tr class="even">
-<td align="left"><p>executing</p></td>
-<td align="left"><p><code>f 1 2 (fun lacc -&gt; foldk f lacc [3;4;5])</code></p></td>
+<td align="left"><p>f acc x k</p></td>
+<td align="left"><p>f 1 2 (fun lacc -&gt; foldk f lacc [3;4;5])</p></td>
+<td align="left"></td>
 </tr>
 <tr class="odd">
 <td align="left"><p>x &lt; 3</p></td>
-<td align="left"><p>Yes (2)</p></td>
+<td align="left"><p>2 &lt; 3</p></td>
+<td align="left"><p>Yes</p></td>
 </tr>
 <tr class="even">
+<td align="left"><p>k (acc + x)</p></td>
 <td align="left"><p>k (1 + 2)</p></td>
-<td align="left"><p>executing: <code>foldk f 3 [3;4;5]</code></p></td>
+<td align="left"></td>
 </tr>
 <tr class="odd">
-<td align="left"><p>match on []</p></td>
+<td align="left"><p>foldk f 3 [3;4;5]</p></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left"><p>[]</p></td>
+<td align="left"></td>
+<td align="left"><p>No</p></td>
+</tr>
+<tr class="odd">
+<td align="left"><p>x::xs</p></td>
+<td align="left"><p>3::[4;5]</p></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left"><p>f acc x k</p></td>
+<td align="left"><p>f 3 3 (fun lacc -&gt; foldk f lacc [4;5])</p></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left"><p>x &lt; 3</p></td>
+<td align="left"><p>3 &lt; 3</p></td>
 <td align="left"><p>No</p></td>
 </tr>
 <tr class="even">
-<td align="left"><p>match on x::xs</p></td>
-<td align="left"><p>Yes <code>3::[4;5]</code></p></td>
-</tr>
-<tr class="odd">
-<td align="left"><p>executing</p></td>
-<td align="left"><p><code>f 3 3 (fun lacc -&gt; foldk f lacc [4;5])</code></p></td>
-</tr>
-<tr class="even">
-<td align="left"><p>x &lt; 3</p></td>
-<td align="left"><p>No (3)</p></td>
-</tr>
-<tr class="odd">
 <td align="left"><p>else acc</p></td>
-<td align="left"><p>returning <code>3</code></p></td>
+<td align="left"><p>else 3</p></td>
+<td align="left"><p>The pattern match on <code>x::xs</code> now returns 3</p></td>
 </tr>
 </tbody>
 </table>
