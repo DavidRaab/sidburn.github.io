@@ -177,19 +177,19 @@ And one-more time with an example that stops earlier:
 | `[]`               | No |
 | `x::xs`            | `1::[2;3;4;5]` |
 | `f acc x k`        | `f 0 1 (fun lacc -> foldk f lacc [2;3;4;5])` |
-| `x < 3`            | `1 < 3` |
+| `x < 3`            | `1 < 3` / True, then branch |
 | `k (acc + x)`      | `k (0 + 1)` |
 | `foldk f 1 [2;3;4;5]` | |
 | `[]`               | No |
 | `x::xs`            | `2::[3;4;5]` |
 | `f acc x k`        | `f 1 2 (fun lacc -> foldk f lacc [3;4;5])` |
-| `x < 3`            | `2 < 3` |
+| `x < 3`            | `2 < 3` / True, then branch |
 | `k (acc + x)`      | `k (1 + 2)` |
 | `foldk f 3 [3;4;5]` | |
 | `[]`               | No |
 | `x::xs`            | `3::[4;5]` |
 | `f acc x k`        | `f 3 3 (fun lacc -> foldk f lacc [4;5])` |
-| `x < 3`            | `3 < 3` |
+| `x < 3`            | `3 < 3` / False, else branch |
 | `else acc`         | `else 3` The pattern match on `x::xs` now returns 3 |
 
 ## Implementing some other functions
