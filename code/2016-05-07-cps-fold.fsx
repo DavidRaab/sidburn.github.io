@@ -135,35 +135,35 @@ When i write `f acc x k` in the code section i refer to the whole right hand sid
 means `f acc x (fun lacc -> foldk f lacc xs)`. I just use `[]` and `x::xs` to represent the
 pattern matching in the `foldk` function.
 
-| Code | Evaluation  | Description |
-|:-----|:------------|:------------|
-| foldk f 0 [1..5] |             | First call, we start foldk  |
-| []          |                  | No, we did not reach the end |
-| x::xs       | 1::[2;3;4;5]     | Yes, it maches |
-| f acc x k   | f 0 1 (fun lacc -> foldk f lacc [2;3;4;5]) | We now execute `f` |
-| k (acc + x) | k (0 + 1)    | `k` is the lambda function passed to `f` |
-| foldk f 1 [2;3;4;5] | | |
-| []          |                | No |
-| x::xs       | 2::[3;4;5]   | Yes |
-| f acc x k   | f 1 2 (fun lacc -> foldk f lacc [3;4;5]) | |
-| k (acc + x) | k (1 + 2)    | |
-| foldk f 3 [3;4;5] | | |
-| []          |                | No |
-| x::xs       | 3::[4;5]     | Yes |
-| f acc x k   | f 3 3 (fun lacc -> foldk f lacc [4;5]) | |
-| k (acc + x) | k (3 + 3)    | |
-| foldk f 6 [4;5] | | |
-| []          |    | No |
-| x::xs       | 4::[5] | Yes |
-| f acc x k   | f 6 4 (fun lacc -> foldk f lacc [5]) | |
-| k (acc + x) | k (6 + 4)    | 
-| foldk f 10 [5] | | |
-| []          |    | No |
-| x::xs       | 5::[] | |
-| f acc x k   | f 10 5 (fun lacc -> foldk f lacc []) | |
-| k (acc + x) | k (10 + 5) | |
-| foldk f 15 [] | | |
-| [] -> acc   | [] -> 15 | Yes, we just return `acc` (15) |
+| Code | Evaluation / Description |
+|:-----|:-------------------------|
+| `foldk f 0 [1..5]` | First call, we start foldk  |
+| `[]`          | No, we did not reach the end |
+| `x::xs`       | `1::[2;3;4;5]` / Yes, it maches |
+| `f acc x k`   | `f 0 1 (fun lacc -> foldk f lacc [2;3;4;5])` / We now execute `f` |
+| `k (acc + x)` | `k (0 + 1)` / `k` is the lambda function passed to `f` |
+| `foldk f 1 [2;3;4;5]` |
+| `[]`          | No |
+| `x::xs`       | `2::[3;4;5]` |
+| `f acc x k`   | `f 1 2 (fun lacc -> foldk f lacc [3;4;5])` |
+| `k (acc + x)` | `k (1 + 2)` |
+| `foldk f 3 [3;4;5]` | |
+| `[]`          | No |
+| `x::xs`       | `3::[4;5]` |
+| `f acc x k`   | `f 3 3 (fun lacc -> foldk f lacc [4;5])` |
+| `k (acc + x)` | `k (3 + 3)` |
+| `foldk f 6 [4;5]` | |
+| `[]`          | No |
+| `x::xs`       | `4::[5]` |
+| `f acc x k`   | `f 6 4 (fun lacc -> foldk f lacc [5])` |
+| `k (acc + x)` | `k (6 + 4)` | 
+| `foldk f 10 [5]` | |
+| `[]`          | No |
+| `x::xs`       | `5::[]` |
+| `f acc x k`   | `f 10 5 (fun lacc -> foldk f lacc [])` |
+| `k (acc + x)` | `k (10 + 5)` |
+| `foldk f 15 []` | |
+| `[] -> acc`   | `[] -> 15` / Yes, we just return `acc` (15) |
 
 And one-more time with an example that stops earlier:
 *)
@@ -171,26 +171,26 @@ And one-more time with an example that stops earlier:
 [1..5] |> foldk (fun acc x k -> if x < 3 then k (acc + x) else acc) 0 // 3
 
 (**
-| Code | Evaluation | Description |
-|:----|:--------|:----|
-| foldk f 0 [1..5] | | First call, we start foldk |
-| []               | | No |
-| x::xs            | 1::[2;3;4;5] | Yes |
-| f acc x k        | f 0 1 (fun lacc -> foldk f lacc [2;3;4;5]) |
-| x < 3            | 1 < 3 | Yes |
-| k (acc + x)      | k (0 + 1) | |
-| foldk f 1 [2;3;4;5] | | |
-| []               | | No |
-| x::xs            | 2::[3;4;5] | Yes |
-| f acc x k        | f 1 2 (fun lacc -> foldk f lacc [3;4;5]) | |
-| x < 3            | 2 < 3 | Yes |
-| k (acc + x)      | k (1 + 2)  | |
-| foldk f 3 [3;4;5] | | |
-| []               | | No |
-| x::xs            | 3::[4;5] | |
-| f acc x k        | f 3 3 (fun lacc -> foldk f lacc [4;5]) | |
-| x < 3            | 3 < 3 | No |
-| else acc         | else 3 | The pattern match on `x::xs` now returns 3 |
+| Code | Evaluation / Description |
+|:----|:-----------|
+| `foldk f 0 [1..5]` | First call, we start foldk |
+| `[]`               | No |
+| `x::xs`            | `1::[2;3;4;5]` |
+| `f acc x k`        | `f 0 1 (fun lacc -> foldk f lacc [2;3;4;5])` |
+| `x < 3`            | `1 < 3` |
+| `k (acc + x)`      | `k (0 + 1)` |
+| `foldk f 1 [2;3;4;5]` | |
+| `[]`               | No |
+| `x::xs`            | `2::[3;4;5]` |
+| `f acc x k`        | `f 1 2 (fun lacc -> foldk f lacc [3;4;5])` |
+| `x < 3`            | `2 < 3` |
+| `k (acc + x)`      | `k (1 + 2)` |
+| `foldk f 3 [3;4;5]` | |
+| `[]`               | No |
+| `x::xs`            | `3::[4;5]` |
+| `f acc x k`        | `f 3 3 (fun lacc -> foldk f lacc [4;5])` |
+| `x < 3`            | `3 < 3` |
+| `else acc`         | `else 3` The pattern match on `x::xs` now returns 3 |
 
 ## Implementing some other functions
 
