@@ -124,3 +124,27 @@ div.info:before {
     width:   3em;
     height:  2em;
 }
+
+/* Adds small language tags to the code examples */
+table.pre {
+  position: relative;
+}
+
+table.pre code[lang="fsharp"]::before {
+  content: "F#";
+}
+
+table.pre code[lang="csharp"]::before {
+  content: "C#";
+}
+
+table.pre code::before {
+  display: inline-block;
+  position: absolute;
+  right: 0;
+  top: 0;
+  background-color: #c0c0c0;
+  color: #000000;
+  border-radius: 0 0 0 5px;
+  padding: 0px 5px;
+}
