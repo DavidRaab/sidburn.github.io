@@ -773,16 +773,15 @@ infix it looks a little bit nicer, but overall it is the same.
 let numsl = 1::2::3::4::5::[]
 
 (**
-We also can easily create a `fold` function, exactly like we did in
-[From mutable loops to Immutability]({% post_url 2016-04-05-mutable-loops-to-immutability %}).
+We also can easily create a `fold` function, for further information on how fold works
+or how you can create your own list functions you can continue with:
+[From mutable loops to immutable folds]({% post_url 2016-04-05-mutable-loops-to-immutability %}).
 *)
 
-let fold f acc list =
-    let rec loop acc list =
-        match list with
-        | Empty        -> acc
-        | Cons(x,list) -> loop (f acc x) list
-    loop acc list
+let rec fold folder (acc:'State) list =
+    match list with
+    | Empty        -> acc
+    | Cons(x,list) -> fold folder (folder acc x) list
 
 let rev list   = fold (fun acc x -> Cons(x,acc))   Empty list
 let map f list = fold (fun acc x -> Cons(f x,acc)) Empty (rev list)
