@@ -117,6 +117,11 @@ else printfn "invalid input"
 
 // prints: input between 0 and 10 and even
 
+(** We also can use `Option.filter` to easily turn a type into an option based on a predicate. *)
+
+Some 1 |> Option.filter isEven // None
+Some 2 |> Option.filter isEven // Some 2
+
 (**
 ## fold
 
