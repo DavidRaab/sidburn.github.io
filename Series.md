@@ -24,7 +24,8 @@ in different categories.
 
 ## Null / Optionals
 1. [Null is evil]({% post_url 2016-03-20-null-is-evil %})
-1. [Optionals]({% post_url 2016-04-11-optionals %}) 
+1. [Optionals]({% post_url 2016-04-11-optionals %})
+1. [The Option Module]({% post_url 2016-05-11-option-module %})
 
 ## Structured programming
 1. [Structured Programming]({% post_url 2016-03-09-structured-programming %})
