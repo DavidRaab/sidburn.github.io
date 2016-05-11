@@ -179,8 +179,8 @@ let toInt str =
 // Helper Functions
 let orReturn x  = Option.fold (fun _ x -> x) x
 let whenValid   = Option.map
-let is f        = Option.filter f
-let convert f   = Option.bind f
+let is          = Option.filter
+let convert     = Option.bind
 let combine f g = fun x -> Some x |> is f |> Option.exists g
 
 // Validation Functions
