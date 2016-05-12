@@ -109,6 +109,15 @@
   padding: 0;
 }
 
+@media (max-width: 30em) {
+  .post-archive h2 {
+    display: none;
+  }
+  .archive article {
+    margin-left: 0;
+  }
+}
+
 /* CSS Info Box */
 div.info {
     border: 1px solid rgba(0,0,0,0.15);
