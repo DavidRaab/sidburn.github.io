@@ -6,16 +6,16 @@ description: "Gives an introduction to functional programming and shows how the 
 keywords: f#, fsharp, introduction, functional, programming, oop, closures, currying, combinators
 ---
 
-<p>In this article i want to give a general introduction to some of the fundamental ideas of
+<p>In this article I want to give a general introduction to some of the fundamental ideas of
 functional programming. I just start with the idea of function as data, and explain
 why functions are viewed as data and why it makes sense to pass functions as arguments.</p>
-<p>When we understand this concept, i start explaining lambda expression,
+<p>When we understand this concept, I start explaining lambda expression,
 currying, partial application and closures. All of this ideas built on each other.</p>
-<p>But i don't stop at functional programming. Instead i'm going back to OO programming
-and show how you can translate all of these ideas into OO code. Probably
+<p>But I don't stop at functional programming. Instead I will go back to OO programming
+and show you, how you can translate all of these ideas into OO code. Probably
 you will be surprised how similar functional and OO code is, and that most ideas
 are things you already know.</p>
-<p>Overall i show why functional programming and object-oriented programming are
+<p>Overall I show why functional programming and object-oriented programming are
 orthogonal. I hope that by the end of the article you learned something about
 functional programming, but also widen your view on object-oriented programming.</p>
 <h2>Functions as data</h2>
@@ -27,13 +27,14 @@ or retrieve a function from a function.</p>
 this idea and how it is useful, but in fact, when you do OO programming
 you do that kind of idea basically all over the place. You do it even more
 often as in a functional language.</p>
-<p>But even if you don't see the connection at the moment, you probably still
-ask yourself if that idea really makes sense, or what you do what that idea.</p>
+<p>But even if you don't see the connection at the moment, you still could ask
+yourself if that idea really makes sense, or what useful thinks you can
+do with that idea.</p>
 <h2>What is a function?</h2>
 <p>Before we go deeper we have to ask ourself: What is a function anyway? Depending
 on the language there are also multiple terms for the word function. Terms
 like procedures, static methods or subroutines.</p>
-<p>When i talk about functions i just mean the concept that you have some kind
+<p>When I talk about functions I just mean the concept that you have some kind
 of thing that you can pass some arguments, and it returns a result. As a simple
 example we can think of a <code>square</code> function.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
@@ -228,7 +229,7 @@ and a <code>Map</code> data-structure is basically the same. Our own <code>map</
 data-structure is basically the same as the built-in <code>List.map</code>.</p>
 <div class="info">
 The fact that our own <code>map</code> is not tail-recursive and fails with big input lists is not important
-for this article. We could spent some more time in optimizing our own `map` and make it tail-recursive,
+for this article. We could spent some more time in optimizing our own <code>map</code> and make it tail-recursive,
 but the focus is not tail-recursion or performance, the focus is to understand that we can substitute
 a function with a <code>Map</code> data-structure.
 </div>
@@ -260,8 +261,8 @@ a data-structure.
 the length of it. Even when we just consider the stone-age view that they are only 128 characters
 (aka ASCII) and we restrict us on a maximum length of 10 characters there already exists
 1.180.591.620.717.411.303.424 possible input strings we need to handle.</p>
-<p>Creating a data-structure that contains all possible input strings that maps it the
-output is theoretically possible. But already for 10 characters and just considering ASCII
+<p>Creating a data-structure that contains all possible input strings that maps it to the
+length is theoretically possible. But already for 10 characters and just considering ASCII
 we have such a large amount of possible input strings that it just exceeds the amount of memory
 a single computer could have.</p>
 <p>That doesn't mean passing functions doesn't make sense. It is quite the opposite, because the needed
@@ -370,7 +371,7 @@ with the number it stands for. And now we see something like:</p>
 </tr>
 </table>
 <p>After the <em>substitution</em> we can calculate the result <code>1174904396</code> and bind the result to <code>y</code>.
-Now also <code>y</code> can be used in other calculations. This substiution process is quite
+Now also <code>y</code> can be used in other calculations. This substitution process is quite
 important. It is basically the foundation of a function. Previously we defined <code>square</code>
 like that.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
@@ -379,8 +380,8 @@ like that.</p>
 </code></pre></td>
 </tr>
 </table>
-<p>In fact, the language cannot execute anything, as there is nothing to execute. <code>x</code> has no
-meaning at this point. To really calculate something we must substitute <code>x</code> with
+<p>In fact, the language cannot execute anything in this example, as there is nothing to
+execute. <code>x</code> has no meaning at this point. To really calculate something we must substitute <code>x</code> with
 something different. How do we substitute it? We do it when we write:</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
@@ -388,15 +389,14 @@ something different. How do we substitute it? We do it when we write:</p>
 </code></pre></td>
 </tr>
 </table>
-<p>We then tell the language that the <code>x</code> in <code>square</code> should be substituted with <code>10</code>.
-Instead of <code>x * x</code> it substitutes <code>x</code> with <code>10</code> and it calculates <code>10 * 10</code>. What we see
-here are three things.</p>
+<p>We then say that <code>x</code> in <code>square</code> should be substituted with <code>10</code>. Instead of <code>x * x</code> it
+substitutes <code>x</code> with <code>10</code> and it calculates <code>10 * 10</code>. What we see here are three things:</p>
 <ol>
 <li>We have a concrete value like <code>10</code></li>
-<li>We can bind a value to a symbol with <code>let</code></li>
-<li>We can later substitute a symbol with something concrete</li>
+<li>We can bind a concrete value to a symbol with <code>let</code></li>
+<li>Symbols get substituted with a concrete value</li>
 </ol>
-<p>The interesting part is now. Technically a function definition does not exists. The only
+<p>The interesting part is. Technically a function definition does not exists. The only
 way to create a function is through the <code>fun</code> keyword (also named: lambda expression). So when
 we want to write a calculation with a symbol. We just write.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
@@ -437,8 +437,8 @@ But we already have seen what we do in such a case. We just bind it to a symbol 
 </code></pre></td>
 </tr>
 </table>
-<p>Actually what really happens. <code>square</code> is just a symbol and it is once again substitued by
-<code>(fun x -&gt; x * x)</code>. When we write <code>5</code> after it, then <code>x</code> in our function gets substitued by <code>5</code>.
+<p>Actually what really happens. <code>square</code> is just a symbol and it is once again substituted by
+<code>(fun x -&gt; x * x)</code>. When we write <code>5</code> after it, then <code>x</code> in our function gets substituted by <code>5</code>.
 But creating functions and binding it to a symbol happens so often that we just have a shortcut
 for that.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
@@ -526,7 +526,7 @@ use <code>fun</code> with multiple arguments and it creates the nesting for you.
 important to understand that all three ways of writing a function are interchangeable
 and mean the exact same.</p>
 <p>How does those information help us? We can rewrite our <code>add10</code> function that we created
-previously. Previosly we wrote <code>add10</code> like this.</p>
+previously. Previously we wrote <code>add10</code> like this.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 </pre></td>
@@ -570,8 +570,8 @@ But this creates conflict with Partial Applied functions. When i write <code>add
 would expect that it is a partial applied function with the first argument set to <code>3</code>.
 </div></p>
 <h2>Closures</h2>
-<p>Previously i said that when you call a function then some kind of substitution happens.
-When you call <code>add 10</code> in the last example then <code>x</code> gets substitued by <code>10</code> and it returns
+<p>Previously I said that when you call a function then some kind of substitution happens.
+When you call <code>add 10</code> in the last example then <code>x</code> gets substituted by <code>10</code> and it returns
 a function <code>10 + y</code>. But this is not quite correct. What really happens is that the actual
 variable <code>x</code> is just <em>remembered</em>.</p>
 <p>It seems not like a big distinction, but the difference becomes more obvious when we use
@@ -599,9 +599,9 @@ reason why we anyway get different values is because the returned function only 
 to <code>x</code> and does not do a real substitution of the value.</p>
 <div class="info">
 <p>
-Usually the difference between refering and substitution only becomes a problem with
+Usually the difference between referring and substitution only becomes a problem with
 mutable variables. Something we anyway avoid in functional programming. When we think
-of referential transperency (this is how functional programming is usually defined)
+of referential transparency (this is how functional programming is usually defined)
 we could even say that this code is not functional at all.
 </p>
 <p>But i don't go further into this topic. Usually we don't use mutable variables, but
@@ -612,8 +612,8 @@ is important to mention.
 we need to keep <code>x</code> in memory? The answer is, as long we have some code that still refers
 to it. In our case <code>add10</code> refers to <code>x</code>, we always must keep <code>x</code> in memory, as long
 we have access to <code>add10</code>.</p>
-<p>This is also the reason why the first LISP compiler already provided automatic memory
-management with garbage collection (invented 1962). More precisely i don't even know
+<p>This is also the reason why the first Lisp compiler already provided automatic memory
+management with garbage collection (invented 1962). More precisely I don't even know
 of any functional language that don't provide automatic memory management. While it
 might be theoretically possible to not provide automatic memory management. It
 is probably not a good practical decision.</p>
@@ -624,7 +624,7 @@ we call it a <em>Closure</em>.</p>
 currying and closures all in action. In F# we have an option type. An option type can have
 two states, <code>Some</code> or <code>None</code>. The <code>Some</code> state can carry an additional value with it.
 Usually the option type is used for the idea of <em>No Value</em>, but it also can be used as
-the idea of a <em>Success</em> or <em>Failure</em>, or how i use it as <em>Valid</em> or <em>Invalid</em>.</p>
+the idea of a <em>Success</em> or <em>Failure</em>, or how I use it as <em>Valid</em> or <em>Invalid</em>.</p>
 <p>We could for example write two functions that check if a number is greater or smaller
 than a limit. If the number is valid (smaller or greater) then we just return the number
 unchanged, otherwise we return <code>None</code>. But it also could be that we already get a <code>None</code> as
@@ -722,7 +722,7 @@ as a value to the <code>is</code> function.</p>
 <p>We also could nest the calls, for example when we want to do two checks at once. The second
 argument to <code>is</code> must be an option value. But this is also what <code>is</code> returns. So we could
 use the output of another <code>is</code> as the input for the first <code>is</code>. What we then get is very
-LISP-like code.</p>
+Lisp-like code.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -837,9 +837,9 @@ really no point in showing C# code that uses functional features as an example t
 and functional programming are orthogonal. Because of this i will only use classes.</p>
 <h2>What is a class?</h2>
 <p>We start with the same idea. What is actually a class anyway? A class is actually some
-kind of composable type. It always has at least one constructor, beyond that it can contain
+kind of compose-able type. It always has at least one constructor, beyond that it can contain
 multiple data in the form of public and private fields, additional it can contain multiple
-functions operating on those data, often named <em>methods</em>. I make no destinction between
+functions operating on those data, often named <em>methods</em>. I make no distinction between
 functions and methods.</p>
 <p>But one important aspect is that there is no technical restriction to create classes with no
 data or no functions. There is also no restriction that tells you how many data fields or
@@ -929,7 +929,7 @@ you only need to write once. Because we don't have currying in C#, we probably a
 write a version with two or three arguments, but overall you only need to define those once.</p>
 <p>Writing everything this way feels a little bit dump. Mainly because most often the time there is a
 (IMHO: dump) rule that tells you to put every class into its own file. The above code leads to
-an explosion of classes/files. But instead of critizizing the code, you should probably critizize
+an explosion of classes/files. But instead of criticizing the code, you should probably criticize
 your rules and OO on why such a simple example is already so complex.</p>
 <div class="info">
 Once again I want to highlight the importance that i ignore the functional features. You
@@ -939,8 +939,8 @@ But those are the functional features that were added with C# 3. There is no poi
 functional concepts with functional features in an OO language to prove that they are orthogonal.
 </div>
 <h2>Currying, Partial Application and Closures</h2>
-<p>All three things are somehow connected to each other. In the functional code i first introduced
-currying, but i primarily used it to show Partial Application (only providing some arguments
+<p>All three things are somehow connected to each other. In the functional code I first introduced
+currying, but I primarily used it to show Partial Application (only providing some arguments
 to a function, not all) and explained why this needs the concept of a closure. I will first ignore
 currying and only talk about the later two. So how can we create a function like <code>add</code> and partial apply
 the first argument?</p>
@@ -979,7 +979,7 @@ all of those fields must remain in memory as long we have access to <code>add10<
 fundamental idea. A closure and an object is the same.</p>
 <p>Whenever you create an object in OO programming. It is the same as calling a function that returns
 a function. The returned function then has access to the input through a closure. In the functional
-code i only returned a single function, but you also can return multiple functions or data-structure
+code I only returned a single function, but you also can return multiple functions or data-structure
 like a <em>Tuple</em> or <em>Record</em> that contains those functions.</p>
 <p>In C# we could for example create a class like:</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
@@ -1080,14 +1080,14 @@ Console.WriteLine(counter.Current()); <span class="c">// 11</span>
 <p>An object is just a collection of functions that still has access to some hidden fields.
 Objects and closures are the same. Probably you have heard that "Objects are poor man closures",
 now you know why. But it is also the same reversed. "Closures are poor man objects". Why? A
-class is basically an <em>optimiziation</em> of this use-case.</p>
+class is basically an <em>optimization</em> of this use-case.</p>
 <p>A class contains the definition, fields and so on in one unit. Instead of creating a record
-definition, using <code>counter</code> as a closure and return a record, i also could just define
+definition, using <code>counter</code> as a closure and return a record, I also could just define
 a class with the members (methods) and a private field. Defining a class is shorter.</p>
 <p>So a class is a poor man closures because it did not add anything more useful as what a
 function with closure already gives you (functional languages, lambdas, closures and so
 on already existed before OO). But on the other hand, OO optimized this use-case in such
-a way that Closures are really "poor mans objects".</p>
+a way that Closures are really "poor man objects".</p>
 <p>As F# also supports classes, if you really want to write something like this i would suggest you
 also should create a class, and not use a record with functions and a closure. A class is just
 much shorter.</p>
@@ -1135,7 +1135,7 @@ function. This transformation process is what we name currying. Once a function 
 form we don't have to specify all arguments at once. Not providing all arguments at once is
 partial application. But you don't need currying to use partial application.</p>
 <p>Often beginners have a problem to differentiate both. We also can write a curry
-function in F#. And probably that can help to demonstrate the destinction. First
+function in F#. And probably that can help to demonstrate the distinction. First
 we create a function that expects two arguments in tupled form.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
@@ -1220,7 +1220,7 @@ now go back to the OO world. We already defined a generic interface with one arg
 </code></pre></td>
 </tr>
 </table>
-<p>How could an interface with two arguments, without currying, look like?</p>
+<p>How could the interface for a function with two arguments, without currying, look like?</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
 <td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="i">IFunction</span><span class="o">&lt;</span><span class="i">A</span>,<span class="i">B</span>,<span class="i">C</span><span class="o">&gt;</span>
@@ -1241,7 +1241,7 @@ up to impossible.</p>
 have seen what partial application means in OO. It just means we already provide the arguments
 to the constructor when we create a class. But it is really bad that we have to do that kind
 of thing explicitly and manually.</p>
-<p>Instead of creating classes that expects its value explcitily in the constructor, we should
+<p>Instead of creating classes that expects its value explicitly in the constructor, we should
 write a generic version that can partial apply any two argument IFunction instead. We
 could write it like that:</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
@@ -1362,11 +1362,11 @@ We also can easily define <code>curry</code> functions.
 <td class="snippet"><pre class="fssnip highlighted"><code lang="csharp"><span class="k">public</span> <span class="k">static</span> <span class="k">class</span> Lambda {
     <span class="c">// 2-args</span>
     <span class="k">public</span> <span class="k">static</span> Func&lt;A,Func&lt;B,C&gt;<span class="o">&gt;</span> Curry&lt;A,B,C&gt;(Func&lt;A,B,C&gt; func) {
-        <span class="k">return</span> (A a) <span class="o">=</span><span class="o">&gt;</span> (B b) <span class="o">=</span><span class="o">&gt;</span> func(a,b);
+        <span class="k">return</span> a <span class="o">=</span><span class="o">&gt;</span> b <span class="o">=</span><span class="o">&gt;</span> func(a,b);
     }
     <span class="c">// 3-args</span>
     <span class="k">public</span> <span class="k">static</span> Func&lt;A,Func&lt;B,Func&lt;C,D&gt;<span class="o">&gt;</span><span class="o">&gt;</span> Curry&lt;A,B,C,D&gt;(Func&lt;A,B,C,D&gt; func) {
-        <span class="k">return</span> (A a) <span class="o">=</span><span class="o">&gt;</span> (B b) <span class="o">=</span><span class="o">&gt;</span> (C c) <span class="o">=</span><span class="o">&gt;</span> func(a,b,c);
+        <span class="k">return</span> a <span class="o">=</span><span class="o">&gt;</span> b <span class="o">=</span><span class="o">&gt;</span> c <span class="o">=</span><span class="o">&gt;</span> func(a,b,c);
     }
 }
 
@@ -1391,10 +1391,10 @@ We also can easily define <code>curry</code> functions.
 </code></pre></td></tr></table>
 </div>
 <h2>Exercise</h2>
-<p>Previously i provided a small exercise with validation, but i left the task to implement it
-in your favorite language. Up to this point you should know enough about currying and
+<p>Previously I provided a small exercise with validation, but I leave the task to implement it
+in your favourite language. Up to this point you should know enough about currying and
 partial application. Most languages today also support lambda statements. Not every language
-has automatic currying, but i showed how to create a curry function in F# and C#.</p>
+has automatic currying, but I showed how to create a curry function in F# and C#.</p>
 <p>Otherwise you still can use partial application instead of currying. The example is still
 small and still heavily rely on currying or in general the ability to take functions as
 arguments and return new functions from other functions. When you want a better understanding
@@ -1513,14 +1513,14 @@ x.IsValid() <span class="c">// False</span>
 </code></pre></td></tr></table>
 <p>But first try to write it only with functions/static methods. The predicates itself
 like <code>smaller</code>, <code>greater</code> and so on should never be part of the validation class you create.</p>
-<p>When you create a solution in your favorite language, you can leave a message in the Disqus
-chat, or sent me a notification via Twitter. If you like i add a link to your solution here.</p>
+<p>When you create a solution in your favourite language, you can leave a message in the Disqus
+chat, or sent me a notification via Twitter, I add a link to your solution here.</p>
 <h2>Summary</h2>
 <p>I started with the idea of functions as data and why it makes sense that we can pass functions
 as arguments or return functions from other functions. A lambda expression is a way to
 create a function on-the-fly, so we can easily pass functions as arguments or return them from
-functions without explcitily defining them. Then we learned that a language like F# basically
-treats all functions just as lambdas. We also have seen that multi-arguments fucntions didn't
+functions without explicitly defining them. Then we learned that a language like F# basically
+treats all functions just as lambdas. We also have seen that multi-arguments functions didn't
 exists, they are just a chain of one argument functions. This on the other hand means we can easily
 partial apply any function. But not only that, it means every multi argument function is automatically
 a function that can generate other functions.</p>

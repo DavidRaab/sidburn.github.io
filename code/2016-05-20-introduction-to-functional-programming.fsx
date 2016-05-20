@@ -12,19 +12,19 @@ keywords: f#, fsharp, introduction, functional, programming, oop, closures, curr
 module Main
 
 (**
-In this article i want to give a general introduction to some of the fundamental ideas of
+In this article I want to give a general introduction to some of the fundamental ideas of
 functional programming. I just start with the idea of function as data, and explain
 why functions are viewed as data and why it makes sense to pass functions as arguments.
 
-When we understand this concept, i start explaining lambda expression, 
+When we understand this concept, I start explaining lambda expression, 
 currying, partial application and closures. All of this ideas built on each other.
 
-But i don't stop at functional programming. Instead i'm going back to OO programming
-and show how you can translate all of these ideas into OO code. Probably
+But I don't stop at functional programming. Instead I will go back to OO programming
+and show you, how you can translate all of these ideas into OO code. Probably
 you will be surprised how similar functional and OO code is, and that most ideas
 are things you already know.
 
-Overall i show why functional programming and object-oriented programming are
+Overall I show why functional programming and object-oriented programming are
 orthogonal. I hope that by the end of the article you learned something about
 functional programming, but also widen your view on object-oriented programming.
 
@@ -40,8 +40,9 @@ this idea and how it is useful, but in fact, when you do OO programming
 you do that kind of idea basically all over the place. You do it even more
 often as in a functional language.
 
-But even if you don't see the connection at the moment, you probably still
-ask yourself if that idea really makes sense, or what you do what that idea.
+But even if you don't see the connection at the moment, you still could ask
+yourself if that idea really makes sense, or what useful thinks you can
+do with that idea.
 
 ## What is a function?
 
@@ -49,7 +50,7 @@ Before we go deeper we have to ask ourself: What is a function anyway? Depending
 on the language there are also multiple terms for the word function. Terms
 like procedures, static methods or subroutines.
 
-When i talk about functions i just mean the concept that you have some kind
+When I talk about functions I just mean the concept that you have some kind
 of thing that you can pass some arguments, and it returns a result. As a simple
 example we can think of a `square` function.
 *)
@@ -203,7 +204,7 @@ data-structure is basically the same as the built-in `List.map`.
 
 <div class="info">
 The fact that our own <code>map</code> is not tail-recursive and fails with big input lists is not important
-for this article. We could spent some more time in optimizing our own `map` and make it tail-recursive,
+for this article. We could spent some more time in optimizing our own <code>map</code> and make it tail-recursive,
 but the focus is not tail-recursion or performance, the focus is to understand that we can substitute
 a function with a <code>Map</code> data-structure.
 </div>
@@ -236,8 +237,8 @@ the length of it. Even when we just consider the stone-age view that they are on
 (aka ASCII) and we restrict us on a maximum length of 10 characters there already exists
 1.180.591.620.717.411.303.424 possible input strings we need to handle.
 
-Creating a data-structure that contains all possible input strings that maps it the
-output is theoretically possible. But already for 10 characters and just considering ASCII 
+Creating a data-structure that contains all possible input strings that maps it to the
+length is theoretically possible. But already for 10 characters and just considering ASCII 
 we have such a large amount of possible input strings that it just exceeds the amount of memory
 a single computer could have.
 
@@ -325,27 +326,26 @@ with the number it stands for. And now we see something like:
     let y = 587452198 + 587452198
 
 After the *substitution* we can calculate the result `1174904396` and bind the result to `y`.
-Now also `y` can be used in other calculations. This substiution process is quite
+Now also `y` can be used in other calculations. This substitution process is quite
 important. It is basically the foundation of a function. Previously we defined `square`
 like that.
 
     let square x = x * x
 
-In fact, the language cannot execute anything, as there is nothing to execute. `x` has no
-meaning at this point. To really calculate something we must substitute `x` with
+In fact, the language cannot execute anything in this example, as there is nothing to
+execute. `x` has no meaning at this point. To really calculate something we must substitute `x` with
 something different. How do we substitute it? We do it when we write:
 
     square 10
 
-We then tell the language that the `x` in `square` should be substituted with `10`.
-Instead of `x * x` it substitutes `x` with `10` and it calculates `10 * 10`. What we see
-here are three things.
+We then say that `x` in `square` should be substituted with `10`. Instead of `x * x` it
+substitutes `x` with `10` and it calculates `10 * 10`. What we see here are three things:
 
 1. We have a concrete value like `10`
-1. We can bind a value to a symbol with `let`
-1. We can later substitute a symbol with something concrete
+1. We can bind a concrete value to a symbol with `let`
+1. Symbols get substituted with a concrete value
 
-The interesting part is now. Technically a function definition does not exists. The only
+The interesting part is. Technically a function definition does not exists. The only
 way to create a function is through the `fun` keyword (also named: lambda expression). So when
 we want to write a calculation with a symbol. We just write.
 
@@ -372,8 +372,8 @@ square 10 // 100
 square 25 // 625
 
 (**
-Actually what really happens. `square` is just a symbol and it is once again substitued by
-`(fun x -> x * x)`. When we write `5` after it, then `x` in our function gets substitued by `5`.
+Actually what really happens. `square` is just a symbol and it is once again substituted by
+`(fun x -> x * x)`. When we write `5` after it, then `x` in our function gets substituted by `5`.
 But creating functions and binding it to a symbol happens so often that we just have a shortcut
 for that.
 *)
@@ -438,7 +438,7 @@ important to understand that all three ways of writing a function are interchang
 and mean the exact same.
 
 How does those information help us? We can rewrite our `add10` function that we created
-previously. Previosly we wrote `add10` like this.
+previously. Previously we wrote `add10` like this.
 *)
 
 let generateAdd x = fun i -> i + x
@@ -479,8 +479,8 @@ would expect that it is a partial applied function with the first argument set t
 
 ## Closures
 
-Previously i said that when you call a function then some kind of substitution happens.
-When you call `add 10` in the last example then `x` gets substitued by `10` and it returns
+Previously I said that when you call a function then some kind of substitution happens.
+When you call `add 10` in the last example then `x` gets substituted by `10` and it returns
 a function `10 + y`. But this is not quite correct. What really happens is that the actual
 variable `x` is just *remembered*.
 
@@ -503,9 +503,9 @@ to `x` and does not do a real substitution of the value.
 
 <div class="info">
 <p>
-Usually the difference between refering and substitution only becomes a problem with
+Usually the difference between referring and substitution only becomes a problem with
 mutable variables. Something we anyway avoid in functional programming. When we think
-of referential transperency (this is how functional programming is usually defined)
+of referential transparency (this is how functional programming is usually defined)
 we could even say that this code is not functional at all.
 </p>
 
@@ -519,8 +519,8 @@ we need to keep `x` in memory? The answer is, as long we have some code that sti
 to it. In our case `add10` refers to `x`, we always must keep `x` in memory, as long
 we have access to `add10`. 
 
-This is also the reason why the first LISP compiler already provided automatic memory
-management with garbage collection (invented 1962). More precisely i don't even know
+This is also the reason why the first Lisp compiler already provided automatic memory
+management with garbage collection (invented 1962). More precisely I don't even know
 of any functional language that don't provide automatic memory management. While it
 might be theoretically possible to not provide automatic memory management. It
 is probably not a good practical decision.
@@ -534,7 +534,7 @@ I want to give a small example that shows functions as value and return values,
 currying and closures all in action. In F# we have an option type. An option type can have
 two states, `Some` or `None`. The `Some` state can carry an additional value with it.
 Usually the option type is used for the idea of *No Value*, but it also can be used as
-the idea of a *Success* or *Failure*, or how i use it as *Valid* or *Invalid*.
+the idea of a *Success* or *Failure*, or how I use it as *Valid* or *Invalid*.
 
 We could for example write two functions that check if a number is greater or smaller
 than a limit. If the number is valid (smaller or greater) then we just return the number
@@ -601,7 +601,7 @@ as a value to the `is` function.
 We also could nest the calls, for example when we want to do two checks at once. The second
 argument to `is` must be an option value. But this is also what `is` returns. So we could
 use the output of another `is` as the input for the first `is`. What we then get is very
-LISP-like code.
+Lisp-like code.
 *)
 
 (is (greater 0)
@@ -697,9 +697,9 @@ and functional programming are orthogonal. Because of this i will only use class
 ## What is a class?
 
 We start with the same idea. What is actually a class anyway? A class is actually some
-kind of composable type. It always has at least one constructor, beyond that it can contain
+kind of compose-able type. It always has at least one constructor, beyond that it can contain
 multiple data in the form of public and private fields, additional it can contain multiple
-functions operating on those data, often named *methods*. I make no destinction between
+functions operating on those data, often named *methods*. I make no distinction between
 functions and methods.
 
 But one important aspect is that there is no technical restriction to create classes with no
@@ -779,7 +779,7 @@ write a version with two or three arguments, but overall you only need to define
 
 Writing everything this way feels a little bit dump. Mainly because most often the time there is a
 (IMHO: dump) rule that tells you to put every class into its own file. The above code leads to
-an explosion of classes/files. But instead of critizizing the code, you should probably critizize
+an explosion of classes/files. But instead of criticizing the code, you should probably criticize
 your rules and OO on why such a simple example is already so complex.
 
 <div class="info">
@@ -792,8 +792,8 @@ functional concepts with functional features in an OO language to prove that the
 
 ## Currying, Partial Application and Closures
 
-All three things are somehow connected to each other. In the functional code i first introduced
-currying, but i primarily used it to show Partial Application (only providing some arguments
+All three things are somehow connected to each other. In the functional code I first introduced
+currying, but I primarily used it to show Partial Application (only providing some arguments
 to a function, not all) and explained why this needs the concept of a closure. I will first ignore
 currying and only talk about the later two. So how can we create a function like `add` and partial apply
 the first argument?
@@ -825,7 +825,7 @@ fundamental idea. A closure and an object is the same.
 
 Whenever you create an object in OO programming. It is the same as calling a function that returns
 a function. The returned function then has access to the input through a closure. In the functional
-code i only returned a single function, but you also can return multiple functions or data-structure
+code I only returned a single function, but you also can return multiple functions or data-structure
 like a *Tuple* or *Record* that contains those functions.
 
 In C# we could for example create a class like:
@@ -887,16 +887,16 @@ printfn "%d" (count.Current()) // 11
 An object is just a collection of functions that still has access to some hidden fields.
 Objects and closures are the same. Probably you have heard that "Objects are poor man closures",
 now you know why. But it is also the same reversed. "Closures are poor man objects". Why? A
-class is basically an *optimiziation* of this use-case.
+class is basically an *optimization* of this use-case.
 
 A class contains the definition, fields and so on in one unit. Instead of creating a record
-definition, using `counter` as a closure and return a record, i also could just define
+definition, using `counter` as a closure and return a record, I also could just define
 a class with the members (methods) and a private field. Defining a class is shorter.
 
 So a class is a poor man closures because it did not add anything more useful as what a
 function with closure already gives you (functional languages, lambdas, closures and so
 on already existed before OO). But on the other hand, OO optimized this use-case in such
-a way that Closures are really "poor mans objects". 
+a way that Closures are really "poor man objects". 
 
 As F# also supports classes, if you really want to write something like this i would suggest you
 also should create a class, and not use a record with functions and a closure. A class is just
@@ -938,7 +938,7 @@ form we don't have to specify all arguments at once. Not providing all arguments
 partial application. But you don't need currying to use partial application.
 
 Often beginners have a problem to differentiate both. We also can write a curry
-function in F#. And probably that can help to demonstrate the destinction. First
+function in F#. And probably that can help to demonstrate the distinction. First
 we create a function that expects two arguments in tupled form.
 *)
 
@@ -994,7 +994,7 @@ now go back to the OO world. We already defined a generic interface with one arg
 
     IFunction<A,B>
 
-How could an interface with two arguments, without currying, look like?
+How could the interface for a function with two arguments, without currying, look like?
 
     IFunction<A,B,C>
 
@@ -1011,7 +1011,7 @@ have seen what partial application means in OO. It just means we already provide
 to the constructor when we create a class. But it is really bad that we have to do that kind
 of thing explicitly and manually.
 
-Instead of creating classes that expects its value explcitily in the constructor, we should
+Instead of creating classes that expects its value explicitly in the constructor, we should
 write a generic version that can partial apply any two argument IFunction instead. We
 could write it like that:
 
@@ -1075,11 +1075,11 @@ We also can easily define <code>curry</code> functions.
     public static class Lambda {
         // 2-args
         public static Func<A,Func<B,C>> Curry<A,B,C>(Func<A,B,C> func) {
-            return (A a) => (B b) => func(a,b);
+            return a => b => func(a,b);
         }
         // 3-args
         public static Func<A,Func<B,Func<C,D>>> Curry<A,B,C,D>(Func<A,B,C,D> func) {
-            return (A a) => (B b) => (C c) => func(a,b,c);
+            return a => b => c => func(a,b,c);
         }
     }
 
@@ -1105,10 +1105,10 @@ We also can easily define <code>curry</code> functions.
 
 ## Exercise
 
-Previously i provided a small exercise with validation, but i left the task to implement it
-in your favorite language. Up to this point you should know enough about currying and 
+Previously I provided a small exercise with validation, but I leave the task to implement it
+in your favourite language. Up to this point you should know enough about currying and 
 partial application. Most languages today also support lambda statements. Not every language
-has automatic currying, but i showed how to create a curry function in F# and C#.
+has automatic currying, but I showed how to create a curry function in F# and C#.
 
 Otherwise you still can use partial application instead of currying. The example is still
 small and still heavily rely on currying or in general the ability to take functions as
@@ -1193,16 +1193,16 @@ then look similar to this:
 But first try to write it only with functions/static methods. The predicates itself
 like `smaller`, `greater` and so on should never be part of the validation class you create.
 
-When you create a solution in your favorite language, you can leave a message in the Disqus
-chat, or sent me a notification via Twitter. If you like i add a link to your solution here.
+When you create a solution in your favourite language, you can leave a message in the Disqus
+chat, or sent me a notification via Twitter, I add a link to your solution here.
 
 ## Summary
 
 I started with the idea of functions as data and why it makes sense that we can pass functions
 as arguments or return functions from other functions. A lambda expression is a way to
 create a function on-the-fly, so we can easily pass functions as arguments or return them from
-functions without explcitily defining them. Then we learned that a language like F# basically
-treats all functions just as lambdas. We also have seen that multi-arguments fucntions didn't
+functions without explicitly defining them. Then we learned that a language like F# basically
+treats all functions just as lambdas. We also have seen that multi-arguments functions didn't
 exists, they are just a chain of one argument functions. This on the other hand means we can easily
 partial apply any function. But not only that, it means every multi argument function is automatically
 a function that can generate other functions.
