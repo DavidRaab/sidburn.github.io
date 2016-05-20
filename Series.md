@@ -7,6 +7,10 @@ Some articles build on each other. This page groupes some articles together and/
 a reading order. As they are grouped by context, some pages can appear multiple times
 in different categories.
 
+## Introductions
+* [Introduction to Functional Programming]({% post_url 2016-05-20-introduction-to-functional-programming %})
+* [Introduction to F#]({% post_url 2016-03-10-introduction-in-fsharp %})
+
 ## Basic Functional Toolset
 1. [Understanding map]({% post_url 2016-03-27-understanding-map %})
 1. [Understanding apply]({% post_url 2016-03-31-applicative-functors %})
@@ -38,4 +42,3 @@ in different categories.
 ## Ungrouped
 * [Higher-Kinded Polymorphism]({% post_url 2016-03-24-higher-kinded-polymorphism %})
 * [Immutability and Pure Functions]({% post_url 2016-03-14-immutability-and-pure-functions %})
-* [Introduction to F#]({% post_url 2016-03-10-introduction-in-fsharp %})
