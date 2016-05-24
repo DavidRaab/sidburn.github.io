@@ -43,6 +43,7 @@ This site will be permanently updated. Links are not sorted in any particular or
 
 1. [Why Functional Programming Matters](https://www.youtube.com/watch?v=Z35Tt87pIpg)
 1. [Simple Made Easy](http://www.infoq.com/presentations/Simple-Made-Easy)
+1. [8 Lines of Code](https://www.infoq.com/presentations/8-lines-code-refactoring)
 1. [The Value of Values](http://www.infoq.com/presentations/Value-Values)
 
 ## Other
