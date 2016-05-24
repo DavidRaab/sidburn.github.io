@@ -777,8 +777,8 @@ And `squared` is a new list with all elements squared. The `IFunction` interface
 you only need to write once. Because we don't have currying in C#, we probably also want to
 write a version with two or three arguments, but overall you only need to define those once.
 
-Writing everything this way feels a little bit dump. Mainly because most often the time there is a
-(IMHO: dump) rule that tells you to put every class into its own file. The above code leads to
+Writing everything this way feels a little bit dumb. Mainly because most often the time there is a
+(IMHO: dumb) rule that tells you to put every class into its own file. The above code leads to
 an explosion of classes/files. But instead of criticizing the code, you should probably criticize
 your rules and OO on why such a simple example is already so complex.
 
