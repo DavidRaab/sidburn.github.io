@@ -35,10 +35,14 @@ in different categories.
 1. [Structured Programming]({% post_url 2016-03-09-structured-programming %})
 1. [Applying Structured Programming]({% post_url 2016-03-09-applying-structured-programming %})
 
+## Immutability
+* [From mutable loops to immutability]({% post_url 2016-04-05-mutable-loops-to-immutability %})
+* [Immutability and Pure Functions]({% post_url 2016-03-14-immutability-and-pure-functions %})
+
 ## X is evil
 * [Null is evil]({% post_url 2016-03-20-null-is-evil %})
 * [Exceptions are Evil]({% post_url 2016-03-25-exceptions-are-evil %}) 
 
 ## Ungrouped
 * [Higher-Kinded Polymorphism]({% post_url 2016-03-24-higher-kinded-polymorphism %})
-* [Immutability and Pure Functions]({% post_url 2016-03-14-immutability-and-pure-functions %})
+* [Monoids]({% post_url 2016-05-24-monoids %})

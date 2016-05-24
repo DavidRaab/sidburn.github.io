@@ -1,0 +1,415 @@
+(**
+\---
+layout: post
+title: "Monoids"
+tags: [monoids]
+description: "Describes Monoids in F#"
+keywords: f#, fsharp, functional, programming, monoids
+\---
+*)
+
+(*** hide ***)
+module Main
+#I __SOURCE_DIRECTORY__
+#r "../packages/FSharp.Collections.ParallelSeq/lib/net40/FSharp.Collections.ParallelSeq.dll"
+
+open System
+open FSharp.Collections.ParallelSeq
+
+(**
+A monoid is a simple concept. It is a generalization of some patterns that you
+very likely already have seen. Being aware of those can help in designing some
+operations, and can simplify things. Without much further ado, let us look at
+three simple math equations.
+
+    [lang=math]
+    1 + 2       = 3
+    (1 + 2) + 3 = 1 + (2 + 3)
+    1 + 0       = 0 + 1
+
+## Binary Operations
+
+When we look at the first equation we just see the following: There exists some kind
+of binary operation that takes two things of the same type, and somehow *combines*
+those two things into one result of the same type. When we look at the type-signature
+of our `+` operation we see something like
+
+    [lang=no]
+    int -> int -> int
+
+or when we generalize the idea, we expect any type. So we think of functions with
+the signature
+
+    [lang=no]
+    'a -> 'a -> 'a
+
+## Associative
+
+The second equation tells us that our binary operation `+` has another property. The
+order in which we do the calculation don't change the end result. We can first
+calculate `1 + 2` and then add `3` or we can first calculate `2 + 3` and then
+add `1`. Both result in `6`.
+
+## Identity
+
+The last equation tells us that there exists some kind of *zero-element* or in mathematics
+named *identity* that don't effect the result of the operation. It works as some
+kind of *noop-operation*.
+
+For the binary operation `+` this kind of element is `0`. No matter which number we have,
+when we add zero to it, it doesn't change the number at all.
+
+## Monoids
+
+Whenever all three properties are fulfilled, we name it a monoid. The question is probably
+how such kind of simple generalization is even helpful. But before we look into this, let's
+look at some other example first, to get a better hang of the three rules. First all three rules again.
+
+1. There exists a binary operation that combines two things, and returns something of the same type.
+1. The binary operation is associative.
+1. There is some kind of *Zero/Identity/Noop-element* for the binary operation.
+
+## Examples
+
+Let's first look `-`, `*` and `/` to better understand the rules. As all of those are binary
+operations all of them already fulfil the first rule, but do they also fulfil the
+second and third rule?
+
+### Subtraction
+
+Subtraction is not associative. `(1 - 2) - 3` gives us `-1 - 3` that result in `-4`. But
+`1 - (2 - 3)` gives us `1 - (-1)` and this returns `2`.
+
+There also does not exists an identity element. We could think once again of `0`. As `1 - 0`
+return once again `1` unchanged. But when we do `0 - 1` we get `-1`.
+
+### Multiplication
+
+Multiplication is a monoid as both rules are fulfilled. We can do multiplication in any order
+and it always yield the same result. But what is our identity element? This time it is `1`
+not `0`. Multiplying a number with `1` never changes the number itself.
+
+    [lang=math]
+    (1 * 2) * 3 = 6
+    1 * (2 * 3) = 6
+    6 * 1 = 6
+    1 * 6 = 6
+
+### Division
+
+Division is not associative:
+
+    [lang=math]
+    (100.0 / 2.0) / 5.0 =  50.0 / 5.0 = 10.0
+    100.0 / (2.0 / 5.0) = 100.0 / 0.4 = 250.0
+
+and we also don't have an identity element. We could once again think of `1`. As `3.0 / 1.0`
+don't change `3.0`, but the reverse `1.0 / 3.0` is once again something different.
+
+## What is the purpose of all of this?
+
+Now that we have seen more examples we should get familiar with the concept. But why are those
+rules anyway useful? Actually, all three rules gives us an ability that we can use in programming.
+
+### Binary Operations
+
+When we have a binary operation that combines two things that returns another new thing of the same
+type. It simply means we always can combine a whole list of elements with `List.reduce`. Let's
+assume we have a list of numbers and we just want to add, subtract, multiply or divide all numbers.
+Then we just can write:
+*)
+
+let xs = [1.0 .. 10.0]
+
+List.reduce (+) xs // 55.0
+List.reduce (-) xs // -53.0
+List.reduce (*) xs // 3628800.0
+List.reduce (/) xs // 2.755731922e-07
+
+(**
+If you are unfamiliar with `List.reduce`. You can think of it as a way to always combines the first two
+elements of a list, until you only have a single element left. When we use `List.reduce` on
+
+    [1;2;3;4;5]
+
+it basically combines the first two elements. `1 + 2` and replaces it with `3`. So what happens is
+just:
+
+    [1;2;3;4;5]
+    [3;3;4;5]
+    [6;4;5]
+    [10;5]
+    [15]
+
+Once there is only a single result, it returns it.
+
+<div class="info">
+This is not how it exactly works, but this is one way how you can think of it.
+</div>
+
+But think about it why it makes in general sense that we can reduce a list of something to
+a single value. When we can combine two things into one thing, we always can keep
+going combining two things until we end up with a single element. A `reduce` operation
+just does that repetitive combining for us.
+
+### Associativity
+
+Associativity can enhance the reduce operation. If the exact order doesn't play a role. It means
+the combining can be done in Parallel on multiple CPUs. As a simple example let's look at a list
+with four elements. 
+
+    [1;2;3;4]
+
+CPU1 could start combining `1 + 2` while CPU2 starts combining `3 + 4`. Once both are finished
+CPU1 could combine the result `3 + 7`.
+
+But note that this is a naive approach, when we just combine numbers and always split every addition
+on it's own CPU the whole combining process would be probably slower and not faster as before. To
+be more efficient we need to better divide the input. For example combine the first 1000 elements
+of a list on CPU1, and the elements 1001-2000 on CPU2 and so on. To get a fast operation it is a
+little bit more complicated. But there usually already exists libraries that addresses those
+problems. We could for example use [FSharp.Collections.ParallelSeq][pseq]
+*)
+
+// Sequence of all number from 1 to 10.000.000
+let nums = [| 1L .. 10000000L |]
+
+// Reduce just with one CPU
+Seq.reduce (+) nums
+
+//Real: 00:00:00.103, CPU: 00:00:00.093, GC gen0: 0, gen1: 0, gen2: 0
+//val it : int64 = 50000005000000L
+
+// Reduce with multiple CPUs
+PSeq.reduce (+) nums
+
+//Real: 00:00:00.107, CPU: 00:00:00.390, GC gen0: 0, gen1: 0, gen2: 0
+//val it : int64 = 50000005000000L
+
+(**
+And as you see, even then you have no guarantee that it is faster (I use a quad-core machine).
+The problem is that the combine operation itself is already fast, or probably the reduce algorithm
+in `PSeq` is not good enough. But still general speaking. Associativity opens up Parallelism, in the
+case of using multiple CPUs or using multiple computers (distributed computing).
+
+But it also allows you to divide an operations into chunks so you can save intermediate result
+or calculate a result incrementally. In a reporting system you could for example aggregate all
+data for one day, and save the result. If you want to create a month report, you always just
+need to combine the results of let's say the last 30 days. You don't need to rerun the combine
+operation completely from the start.
+
+### Identity
+
+There is one problem with `reduce` or in general we have one problem. Our binary operations
+always expect to combine two things. But what happens if we have zero or only one element? You
+probably ask why we then even want to run a `reduce` operation. But in normal circumstances
+we don't want to check the amount of elements in a list. But this leads to a problem.
+
+A `reduce` operation with a single element just returns the single element, as there is nothing
+to combine. But with an empty list it just throws an exception as it don't know what 
+it should return.
+
+In such a case, the identity element is helpful, as we just can return the identity element.
+But it is also useful in other cases. We just have some kind of starting value that we can
+begin with. To solve the problem with `reduce` we can use `fold` instead of `reduce`.
+*)
+
+List.fold (+) 0 []          // 0
+List.fold (+) 0 [1;2;3;4;5] // 15
+List.fold (*) 1 []          // 1
+List.fold (*) 1 [1;2;3;4;5] // 120
+
+(**
+The additional value we pass to `fold` acts in this case as the identity element.
+
+## More examples
+
+As we now have a rough view what an monoid is, and what it allows us to do, let's look at some
+more simple monoids.
+
+### String concatenation
+
+String concatenation is a monoid, the identity element is just the empty string.
+*)
+
+List.fold (+) "" ["Hello"; " "; "World!"] // "Hello World!"
+
+(**
+### List appending
+
+Appending lists is a monoid. The identity element is just the empty list.
+*)
+
+List.fold List.append [] [["foo"]; ["bar"; "baz"]]   // ["foo"; "bar"; "baz"]
+List.fold List.append [] [[1;2;3]; [4;5;6]; [7;8;9]] // [1;2;3;4;5;6;7;8;9]
+
+(**
+### Maximum value
+
+We can threat the `max` operation as a monoid. It just takes two values, and returns
+the one which is greater. Notice that combining doesn't literally mean we really have
+to work with both values and *combine* them. A function that just throws away one
+value is still valid.
+
+If you wonder why. The only thing we must ensure is that we can combine two things into
+one result. There is no restriction on the result itself. It only matters that we
+get the same result.
+*)
+
+(max (max 1 2) 3) // 3
+(max 1 (max 2 3)) // 3
+
+(** or with reduce. *)
+
+List.reduce max [1;2;3;4;5;6]         // 6
+List.reduce max ["foo"; "abc"; "zoo"] // "zoo"
+
+(**
+But what is the identity element? Well it depends on the type we use. Just consider what
+the purpose of the identity element is. It acts as a noop-operation. When we have one value
+and use it with the identity element, we always must get the input value back.
+
+When we use `max` with `int`, we must find an `int` that always makes sure we get our input
+value unchanged back, no matter what our input is. That means the identity element
+for `max` with the `int` type is `Int32.MinValue`
+*)
+
+max Int32.MinValue -2147483648    // -2147483648
+max Int32.MinValue 0              // 0
+max Int32.MinValue 12345          // 12345
+max Int32.MinValue Int32.MaxValue // 2147483647
+
+(** The identity element for string is just the empty string *)
+
+max "" ""    // ""
+max "" "Foo" // "Foo"
+max "" "Bar" // "Bar" 
+max "" "Baz" // "Baz"
+
+(**
+### Combining Sets
+
+Also combining two Sets is a monoid, once again with just the empty set as the identity element.
+*)
+
+let sa = set [1;2]
+let sb = set [2;3]
+let sc = set [3;4]
+
+(Set.union (Set.union sa sb) sc) // set [1;2;3;4]
+(Set.union sa (Set.union sb sc)) // set [1;2;3;4]
+
+List.fold Set.union Set.empty [sa; sb; sc] // [1;2;3;4]
+List.fold Set.union Set.empty [sc; sb; sa] // [1;2;3;4]
+
+(**
+## Commutative Monoids
+
+Up so far you probably noticed one additional variation. For some combine operations
+the whole order on how we combine them don't play a role. Actually `+` for
+numbers and the `Set.union` fall into this category. But other operation are
+*just* associative, for example List or String concatenation. When we concatenate
+three strings, it doesn't matter if we do `(a + b) + c` or `a + (b + c)`. But
+we cannot do `(a + c) + b`. This will give us a completely different string.
+*)
+
+("foo" + "bar") + "baz" // "foobarbaz"
+"foo" + ("bar" + "baz") // "foobarbaz"
+("foo" + "baz") + "bar" // "foobazbar"
+
+(** But for other operations, the whole order doesn't matter *)
+
+(1 + 2) + 3 // 6
+1 + (2 + 3) // 6
+(1 + 3) + 2 // 6
+
+(**
+We can even shuffle an array before summing it, it will always give us the same sum.
+But shuffling an array of strings, will return another string. When we have a monoid
+where the whole order doesn't play a role. then we have a *Commutative Monoid*.
+
+For example adding numbers or multiplying them, combining sets with `Set.union` or
+getting the `max` value are *Commutative Monoids*.
+
+## Creating Monoid Types
+
+Up so far we always used `List.fold` or `List.reduce` directly and provided the identity
+element directly. But overall it can help to create a type that combines the binary
+operation with the identity element in its own type.
+
+We can overload the `+` and the `Zero` operator to get some nice behaviour. We treat
+`+` just as our *combine* operation. And `Zero` is our *identity* element.
+
+### Sum Monoid
+
+As a simple example let's create a `Sum` type.
+*)
+
+type Sum = Sum of int with
+    static member (+) (Sum x, Sum y) = Sum (x + y)
+    static member Zero = Sum 0
+
+(**
+The advantage is that we can use `List.sum` with such a type. `List.sum` adds all elements
+together with the `+` operator. So it is like `reduce`, but in the case of an empty list,
+it returns the `Zero` element.
+*)
+
+List.sum [Sum 1; Sum 2; Sum 3]  // Sum 6
+List.sum [Sum 5; Sum 10; Sum 5] // Sum 20
+
+(**
+Defining a Sum type for `int` and `+` doesn't seems like much value, and it isn't. But it
+is only one example to understand the concept. A Product for example seems much more usable.
+
+### Product Monoid
+
+The product Monoid just multiplies the numbers and we use `1` as Zero.
+*)
+
+type Product = Product of int with
+    static member (+) (Product x, Product y) = Product (x * y)
+    static member Zero = Product 1
+
+List.sum [Product 5; Product 10; Product 3] // Product 150
+List.sum [Product 3; Product 2]             // Product 6
+
+(**
+### Ordering Monoid
+
+Let's create a Monoid that adds two list together and sorts the list while doing it.
+*)
+
+type Order<'a when 'a : comparison> = Order of 'a list with
+    static member (+) (Order xs : Order<'a>, Order ys) = Order (List.sort (List.append xs ys))
+    static member Zero : Order<'a> = Order []
+
+Order [3;4] + Order [1;2] + Order [6;6;10] // [1;2;3;4;6;6;10]
+Order ["foo";"bar"] + Order ["zoo"]        // ["bar"; "foo"; "zoo"]
+
+List.sum [Order [3;4]; Order [1;2]]           // [1;2;3;4]
+List.sum [Order ["foo";"bar"]; Order ["zoo"]] // ["bar"; "foo"; "zoo"]
+
+(**
+## Summary
+
+A Monoid is a simple way to aggregate data. When you design functions consider if there exists
+binary operations to somehow combine types. If you can implement them you get the ability
+to combine a list of types for free.
+
+Additionally it opens up the possibility to allow combining data in parallel or build data
+incrementally.
+
+## Further Reading
+
+* [Monoid without Tears][profit-monoids]
+* [Understanding Monoids using F#][under-mono]
+* [[Haskell] Learn You a Haskell][learn-haskell]
+* [[Haskell] Monoids][haskell-wiki-monoids]
+
+[pseq]: http://fsprojects.github.io/FSharp.Collections.ParallelSeq/
+[profit-monoids]: https://fsharpforfunandprofit.com/posts/monoids-without-tears/
+[under-mono]: http://gettingsharper.de/2015/03/03/understanding-monoids-using-f/
+[learn-haskell]: http://learnyouahaskell.com/functors-applicative-functors-and-monoids#monoids
+[haskell-wiki-monoids]: https://en.wikibooks.org/wiki/Haskell/Monoids
+*)
