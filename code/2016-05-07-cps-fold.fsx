@@ -2,7 +2,7 @@
 \---
 layout: post
 title: "CPS fold -- fold with early exit"
-tags: [list,fold,cps]
+tags: [list,fold,cps,recursion]
 description: Describes how to implement a CPS fold. A CPS fold supports early exit 
 keywords: f#, fsharp, functional, programming, fold, cps, continuation 
 \---
