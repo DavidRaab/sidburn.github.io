@@ -151,6 +151,10 @@ table.pre code[lang="js"]::before {
   content: "JS";
 }
 
+table.pre code[lang="racket"]::before {
+  content: "Racket";
+}
+
 table.pre code::before {
   display: inline-block;
   position: absolute;
