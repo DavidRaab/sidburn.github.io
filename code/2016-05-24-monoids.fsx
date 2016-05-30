@@ -26,7 +26,45 @@ three simple math equations.
     1 + 2       = 3
     (1 + 2) + 3 = 1 + (2 + 3)
     1 + 0       = 0 + 1
+    
+## Table of Content
 
+<ul class="toc">
+  <li><a href="#binary">Binary Operations</a></li>
+  <li><a href="#assoc">Associativity</a></li>
+  <li><a href="#identity">Identity</a></li>
+  <li><a href="#monoids">Monoids</a></li>
+    <ul>
+      <li><a href="#example-sub">Subtraction</a></li>
+      <li><a href="#example-mul">Multiplication</a></li>
+      <li><a href="#example-div">Division</a></li>
+    </ul>
+  <li><a href="#purpose">What is the purpose of all of this?</a></li>
+    <ul>
+      <li><a href="#pur-bin">Binary Operations</a></li>
+      <li><a href="#pur-assoc">Associativity</a></li>
+      <li><a href="#pur-identity">Identity</a></li>
+    </ul>
+  <li><a href="#mono">Monoids Examples</a></li>
+    <ul>
+      <li><a href="#mono-str-concat">String concatenation</a></li>
+      <li><a href="#mono-list-appending">List appending</a></li>
+      <li><a href="#mono-max-value">Maximum value</a></li>
+      <li><a href="#mono-sets">Combining Sets</a></li>
+    </ul>
+  <li><a href="#comm-monoids">Commutative Monoids</a></li>
+  <li><a href="#type">Creating Monoids Types</a></li>
+    <ul>
+      <li><a href="#type-sum">Sum Monoid</a></li>
+      <li><a href="#type-product">Product Monoid</a></li>
+      <li><a href="#type-ordering">Ordering Monoid</a></li>
+    </ul>
+  <li><a href="#summary">Summary</a></li>
+  <li><a href="#further">Further Reading</a></li>
+  <li><a href="#comments">Comments</a></li>
+</ul>
+
+<a name="binary"></a>
 ## Binary Operations
 
 When we look at the first equation we just see the following: There exists some kind
@@ -43,13 +81,15 @@ the signature
     [lang=no]
     'a -> 'a -> 'a
 
-## Associative
+<a name="assoc"></a>
+## Associativity
 
 The second equation tells us that our binary operation `+` has another property. The
 order in which we do the calculation don't change the end result. We can first
 calculate `1 + 2` and then add `3` or we can first calculate `2 + 3` and then
 add `1`. Both result in `6`.
 
+<a name="identity"></a>
 ## Identity
 
 The last equation tells us that there exists some kind of *zero-element* or in mathematics
@@ -59,6 +99,7 @@ kind of *noop-operation*.
 For the binary operation `+` this kind of element is `0`. No matter which number we have,
 when we add zero to it, it doesn't change the number at all.
 
+<a name="monoids"></a>
 ## Monoids
 
 Whenever all three properties are fulfilled, we name it a monoid. The question is probably
@@ -69,12 +110,11 @@ look at some other example first, to get a better hang of the three rules. First
 1. The binary operation is associative.
 1. There is some kind of *Zero/Identity/Noop-element* for the binary operation.
 
-## Examples
-
-Let's first look `-`, `*` and `/` to better understand the rules. As all of those are binary
+To understand the rules better let's look at `-`, `*` and `/`. As all of those are binary
 operations all of them already fulfil the first rule, but do they also fulfil the
 second and third rule?
 
+<a name="example-sub"></a>
 ### Subtraction
 
 Subtraction is not associative. `(1 - 2) - 3` gives us `-1 - 3` that result in `-4`. But
@@ -83,6 +123,7 @@ Subtraction is not associative. `(1 - 2) - 3` gives us `-1 - 3` that result in `
 There also does not exists an identity element. We could think once again of `0`. As `1 - 0`
 return once again `1` unchanged. But when we do `0 - 1` we get `-1`.
 
+<a name="example-mul"></a>
 ### Multiplication
 
 Multiplication is a monoid as both rules are fulfilled. We can do multiplication in any order
@@ -95,6 +136,7 @@ not `0`. Multiplying a number with `1` never changes the number itself.
     6 * 1 = 6
     1 * 6 = 6
 
+<a name="example-div"></a>
 ### Division
 
 Division is not associative:
@@ -106,11 +148,13 @@ Division is not associative:
 and we also don't have an identity element. We could once again think of `1`. As `3.0 / 1.0`
 don't change `3.0`, but the reverse `1.0 / 3.0` is once again something different.
 
+<a name="purpose"></a>
 ## What is the purpose of all of this?
 
 Now that we have seen more examples we should get familiar with the concept. But why are those
 rules anyway useful? Actually, all three rules gives us an ability that we can use in programming.
 
+<a name="pur-bin"></a>
 ### Binary Operations
 
 When we have a binary operation that combines two things that returns another new thing of the same
@@ -152,6 +196,7 @@ a single value. When we can combine two things into one thing, we always can kee
 going combining two things until we end up with a single element. A `reduce` operation
 just does that repetitive combining for us.
 
+<a name="pur-assoc"></a>
 ### Associativity
 
 Associativity can enhance the reduce operation. If the exact order doesn't play a role. It means
@@ -198,6 +243,7 @@ data for one day, and save the result. If you want to create a month report, you
 need to combine the results of let's say the last 30 days. You don't need to rerun the combine
 operation completely from the start.
 
+<a name="pur-identity"></a>
 ### Identity
 
 There is one problem with `reduce` or in general we have one problem. Our binary operations
@@ -222,11 +268,13 @@ List.fold (*) 1 [1;2;3;4;5] // 120
 (**
 The additional value we pass to `fold` acts in this case as the identity element.
 
-## More examples
+<a name="mono"></a>
+## Monoids examples
 
 As we now have a rough view what an monoid is, and what it allows us to do, let's look at some
 more simple monoids.
 
+<a name="mono-str-concat"></a>
 ### String concatenation
 
 String concatenation is a monoid, the identity element is just the empty string.
@@ -235,6 +283,7 @@ String concatenation is a monoid, the identity element is just the empty string.
 List.fold (+) "" ["Hello"; " "; "World!"] // "Hello World!"
 
 (**
+<a name="mono-list-appending"></a>
 ### List appending
 
 Appending lists is a monoid. The identity element is just the empty list.
@@ -244,6 +293,7 @@ List.fold List.append [] [["foo"]; ["bar"; "baz"]]   // ["foo"; "bar"; "baz"]
 List.fold List.append [] [[1;2;3]; [4;5;6]; [7;8;9]] // [1;2;3;4;5;6;7;8;9]
 
 (**
+<a name="mono-max-value"></a>
 ### Maximum value
 
 We can threat the `max` operation as a monoid. It just takes two values, and returns
@@ -287,6 +337,7 @@ max "" "Bar" // "Bar"
 max "" "Baz" // "Baz"
 
 (**
+<a name="mono-sets"></a>
 ### Combining Sets
 
 Also combining two Sets is a monoid, once again with just the empty set as the identity element.
@@ -303,6 +354,7 @@ List.fold Set.union Set.empty [sa; sb; sc] // [1;2;3;4]
 List.fold Set.union Set.empty [sc; sb; sa] // [1;2;3;4]
 
 (**
+<a name="comm-monoids"></a>
 ## Commutative Monoids
 
 Up so far you probably noticed one additional variation. For some combine operations
@@ -331,7 +383,8 @@ where the whole order doesn't play a role. then we have a *Commutative Monoid*.
 For example adding numbers or multiplying them, combining sets with `Set.union` or
 getting the `max` value are *Commutative Monoids*.
 
-## Creating Monoid Types
+<a name="type"></a>
+## Creating Monoids Types
 
 Up so far we always used `List.fold` or `List.reduce` directly and provided the identity
 element directly. But overall it can help to create a type that combines the binary
@@ -340,6 +393,7 @@ operation with the identity element in its own type.
 We can overload the `+` and the `Zero` operator to get some nice behaviour. We treat
 `+` just as our *combine* operation. And `Zero` is our *identity* element.
 
+<a name="type-sum"></a>
 ### Sum Monoid
 
 As a simple example let's create a `Sum` type.
@@ -362,6 +416,7 @@ List.sum [Sum 5; Sum 10; Sum 5] // Sum 20
 Defining a Sum type for `int` and `+` doesn't seems like much value, and it isn't. But it
 is only one example to understand the concept. A Product for example seems much more usable.
 
+<a name="type-product"></a>
 ### Product Monoid
 
 The product Monoid just multiplies the numbers and we use `1` as Zero.
@@ -375,6 +430,7 @@ List.sum [Product 5; Product 10; Product 3] // Product 150
 List.sum [Product 3; Product 2]             // Product 6
 
 (**
+<a name="type-ordering"></a>
 ### Ordering Monoid
 
 Let's create a Monoid that adds two list together and sorts the list while doing it.
@@ -391,6 +447,7 @@ List.sum [Order [3;4]; Order [1;2]]           // [1;2;3;4]
 List.sum [Order ["foo";"bar"]; Order ["zoo"]] // ["bar"; "foo"; "zoo"]
 
 (**
+<a name="summary"></a>
 ## Summary
 
 A Monoid is a simple way to aggregate data. When you design functions consider if there exists
@@ -400,12 +457,15 @@ to combine a list of types for free.
 Additionally it opens up the possibility to allow combining data in parallel or build data
 incrementally.
 
+<a name="further"></a>
 ## Further Reading
 
 * [Monoid without Tears][profit-monoids]
 * [Understanding Monoids using F#][under-mono]
 * [[Haskell] Learn You a Haskell][learn-haskell]
 * [[Haskell] Monoids][haskell-wiki-monoids]
+
+<a name="comments"></a>
 
 [pseq]: http://fsprojects.github.io/FSharp.Collections.ParallelSeq/
 [profit-monoids]: https://fsharpforfunandprofit.com/posts/monoids-without-tears/
