@@ -28,6 +28,32 @@ Overall I show why functional programming and object-oriented programming are
 orthogonal. I hope that by the end of the article you learned something about
 functional programming, but also widen your view on object-oriented programming.
 
+## Table of Content
+
+<ul class="toc">
+  <li>Functional Programming</li>
+  <ul>
+    <li><a href="#fp-data">Functions as Data</a></li>
+    <li><a href="#fp-function">What is a function?</a></li>
+    <li><a href="#fp-exp-functions">Exploiting Functions</a></li>
+    <li><a href="#fp-retn-functions">Functions as return values</a></li>
+    <li><a href="#fp-lambda">There is only lambda</a></li>
+    <li><a href="#fp-currying">Currying</a></li>
+    <li><a href="#fp-closures">Closures</a></li>
+    <li><a href="#fp-example">Example: Currying and Closures</a></li>
+  </ul>
+  <li><a href="#oo">Object-Oriented Programming</a></li>
+  <ul>
+    <li><a href="#oo-class">What is a Class?</a></li>
+    <li><a href="#oo-function">Functions as Data</a></li>
+    <li><a href="#oo-curry-partial-closure">Currying, Partial Application and Closures</a></li>
+    <li><a href="#oo-currying">Currying</a></li>
+    <li><a href="#oo-exercise">Exercise</a></li>
+  </ul>
+  <li><a href="#summary">Summary</a></li>
+</ul>
+
+<a name="fp-data"></a>
 ## Functions as data
 
 One important concept in functional programming is the ability to use functions just
@@ -44,6 +70,7 @@ But even if you don't see the connection at the moment, you still could ask
 yourself if that idea really makes sense, or what useful thinks you can
 do with that idea.
 
+<a name="fp-function"></a>
 ## What is a function?
 
 Before we go deeper we have to ask ourself: What is a function anyway? Depending 
@@ -95,6 +122,7 @@ we get some profit out of it. We just have:
 What happens between those steps? We don't know, but we also don't care. The only
 thing that matters is that we can somehow turn underpants into profit.
 
+<a name="fp-exp-functions"></a>
 ## Exploiting functions
 
 The idea that only the input and output of a function matters is quite interesting.
@@ -247,6 +275,7 @@ data to represent a function is so huge, it is even more important that we can p
 that only calculates those things we truly need.
 </div>
 
+<a name="fp-retn-functions"></a>
 ## Functions as return values
 
 Let's consider the following function.
@@ -301,6 +330,7 @@ can turn any input `int` into an output `int` where we added `10` to it.
 As you can see, both versions with a data-structure or the functions are quite similar.
 But the last version still contains some interesting things that are worth to talk about.
 
+<a name="fp-lambda"></a>
 ## There is only lambda
 
 When we want to create an `int`. How do we do that? Well we just write it. For example `5` is
@@ -398,6 +428,7 @@ squareB 5 // 25
 It just shows that the second `let` definition that already includes the function arguments
 is only a shortcut to the more explicit lambda expression.
 
+<a name="fp-currying"></a>
 ## Currying
 
 In fact the simplification don't stop here. We don't even have functions with more than one
@@ -477,6 +508,7 @@ But this creates conflict with Partial Applied functions. When i write <code>add
 would expect that it is a partial applied function with the first argument set to <code>3</code>.
 </div>
 
+<a name="fp-closures"></a>
 ## Closures
 
 Previously I said that when you call a function then some kind of substitution happens.
@@ -528,6 +560,7 @@ is probably not a good practical decision.
 Whenever we *remember* a variable or refer to a variable from a lambda expression,
 we call it a *Closure*.
 
+<a name="fp-example"></a>
 ## Example: Currying and Closures
 
 I want to give a small example that shows functions as value and return values,
@@ -686,6 +719,7 @@ then composing them into bigger functions is the heart of functional programming
 programming we directly work with functions and we even write our own combinators
 to compose functions.
 
+<a name="oo"></a>
 ## Object-Oriented programming
 
 At the start of the article i said we can achieve the same ideas in Object-Oriented programming
@@ -694,6 +728,7 @@ same things. C# already has some functional features like lambda-expressions. Bu
 really no point in showing C# code that uses functional features as an example that OO
 and functional programming are orthogonal. Because of this i will only use classes.
 
+<a name="oo-class"></a>
 ## What is a class?
 
 We start with the same idea. What is actually a class anyway? A class is actually some
@@ -706,6 +741,7 @@ But one important aspect is that there is no technical restriction to create cla
 data or no functions. There is also no restriction that tells you how many data fields or
 functions you must implement.
 
+<a name="oo-function"></a>
 ## Function as data
 
 I started with the idea of functions as data. I created a `square` function and passed the function
@@ -790,6 +826,7 @@ But those are the functional features that were added with C# 3. There is no poi
 functional concepts with functional features in an OO language to prove that they are orthogonal.
 </div>
 
+<a name="oo-curry-partial-closure"></a>
 ## Currying, Partial Application and Closures
 
 All three things are somehow connected to each other. In the functional code I first introduced
@@ -922,6 +959,7 @@ But as a final note. Writing things like this is anyway not idiomatic functional
 code uses immutability. With immutable data you don't really need a class at all. A class gives you
 the ability to hide *mutable data* so you only have specific functions that can manipulate those.
 
+<a name="oo-currying"></a>
 ## Currying
 
 F# does automatic currying by default, but it doesn't mean just because your language doesn't do
@@ -1103,6 +1141,7 @@ We also can easily define <code>curry</code> functions.
     }
 </div>
 
+<a name="oo-exercise"></a>
 ## Exercise
 
 Previously I provided a small exercise with validation, but I leave the task to implement it
@@ -1196,6 +1235,7 @@ like `smaller`, `greater` and so on should never be part of the validation class
 When you create a solution in your favourite language, you can leave a message in the Disqus
 chat, or sent me a notification via Twitter, I add a link to your solution here.
 
+<a name="summary"></a>
 ## Summary
 
 I started with the idea of functions as data and why it makes sense that we can pass functions
