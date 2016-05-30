@@ -116,6 +116,12 @@ strong {
 
 
 /* Lists */
+.toc ul, .toc li {
+  margin-bottom: 0;
+  list-style-type: disc;
+  line-height: 1.2em;
+}
+
 ul, ol, dl {
   margin-top: 0;
   margin-bottom: 1rem;
