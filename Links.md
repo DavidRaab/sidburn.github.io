@@ -48,5 +48,7 @@ This site will be permanently updated. Links are not sorted in any particular or
 
 ## Other
 
+1. [Effective Learning Strategies for Programmers](http://akaptur.com/blog/2015/10/10/effective-learning-strategies-for-programmers/)
+1. [Malcolm Gladwell got us wrong: Our research was key to the 10,000-hour rule, but here’s what got oversimplified](http://www.salon.com/2016/04/10/malcolm_gladwell_got_us_wrong_our_research_was_key_to_the_10000_hour_rule_but_heres_what_got_oversimplified/)
 1. [Teach Yourself Programming in Ten Years](http://www.norvig.com/21-days.html)
 1. [A co-Relational Model of Data for Large Shared Data Banks](http://queue.acm.org/detail.cfm?id=1961297)
