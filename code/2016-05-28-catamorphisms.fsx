@@ -38,6 +38,7 @@ I want to talk about the remaining parts.
   <li><a href="#markdown">Markdown</a></li>
   <li><a href="#summary">Summary</a></li>
   <li><a href="#further">Further Reading</a></li>
+  <li><a href="#comments">Comments</a></li>
 </ul>
 
 <a name="TheLists"></a>
@@ -1222,6 +1223,8 @@ is automatically better or faster.
 
 * [Recursive types and folds][scott-fold]
 * [Catamorphisms, part one][cata-one]
+
+<a name="comments"></a>
 
 [scott-fold]: http://fsharpforfunandprofit.com/series/recursive-types-and-folds.html
 [cata-one]: https://lorgonblog.wordpress.com/2008/04/05/catamorphisms-part-one/

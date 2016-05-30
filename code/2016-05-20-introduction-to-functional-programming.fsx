@@ -51,6 +51,7 @@ functional programming, but also widen your view on object-oriented programming.
     <li><a href="#oo-exercise">Exercise</a></li>
   </ul>
   <li><a href="#summary">Summary</a></li>
+  <li><a href="#comments">Comments</a></li>
 </ul>
 
 <a name="fp-data"></a>
@@ -1253,4 +1254,6 @@ to Object-Oriented programming and why closures and objects are the same.
 
 I overall hope that this introduction helped you not only in understanding functional programming
 better, but also widen your view on object-oriented programming.
+
+<a name="comments"></a>
 *)
