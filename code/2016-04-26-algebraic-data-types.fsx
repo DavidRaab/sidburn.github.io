@@ -25,6 +25,28 @@ and *OR-composition*. F# provides two *Product-types* and one *Sum-type*.
 Those compositions are immutable by default. Because of this, we already have default
 implementation for equality and comparison.
 
+## Table of Content
+
+<ul class="toc">
+  <li><a href="#tuples">Tuples</a></li>
+  <li><a href="#records">Records</a></li>
+  <li><a href="#discriminated-unions">Discriminated Unions</a></li>
+  <li><a href="#du-as-sum">Discriminated Unions as Sum-Types</a></li>
+  <li><a href="#single-du">Single-case Discriminated Unions</a></li>
+  <li><a href="#units-of-measure">Units of Measure</a></li>
+  <li><a href="#recursive-du">Recursive Discriminated Unions</a></li>
+    <ul>
+      <li><a href="#rdu-lists">Lists</a></li>
+      <li><a href="#rdu-btree">Binary Trees</a></li>
+      <li><a href="#rdu-ds">Hierarchical Data-Structures</a></li>
+    </ul>
+  <li><a href="#invalid-state">Make invalid states un-representable</a></li>
+  <li><a href="#summary">Summary</a></li>
+  <li><a href="#further">Further Reading</a></li>
+  <li><a href="#comments">Comments</a></li>
+</ul>
+
+<a name="tuples"></a>
 ## Tuples
 
 A Tuple is a *Product-type*. The nice thing about Tuples is that we don't have to define
@@ -90,6 +112,7 @@ We also can use it to easily return multiple arguments from a function.
 
 In those examples we don't want to define types all the time before-hand.
 
+<a name="records"></a>
 ## Records
 
 A *records* is also a *Product-type*. But we must define a type before-hand.
@@ -290,6 +313,7 @@ printfn "He has the following numbers: %A" numbers
 // He has the following numbers: ["212 555-1234"; "646 555-4567"; "123 456-7890"]
 
 (**
+<a name="discriminated-unions"></a>
 ## Discriminated Unions (DU)
 
 Up to that point, we only discussed two types: *Tuples* and *Records*. Both are *Product-types*
@@ -409,6 +433,7 @@ the phone number types. The language also don't help you to find all those spots
 But with a DU instead the compiler will give you all places where you worked with
 the `PhoneNumber` type and you didn't handle the new cases.
 
+<a name="du-as-sum"></a>
 ## Discriminated Unions as Sum-Types
 
 So far we talked about *Tuple* and *Records* as a *Product-type*. We name it *Product-type*
@@ -491,7 +516,8 @@ need less code to check the edge-cases. Changing a `string` into a DU with just 
 makes the code simpler and less error-prone. Especially if the language forces you
 to check for all cases you could have, what F# does.
 
-## Single-case Discriminated Union
+<a name="single-du"></a>
+## Single-case Discriminated Unions
 
 So far we only have seen Discriminated Unions that contain multiple choices, but we also
 can create a DU with just a single choice. You will probably wonder why that is useful in
@@ -616,6 +642,7 @@ name [Primitive Obsession](http://enterprisecraftsmanship.com/2015/03/07/functio
 With DUs we can easily get rid of *Primitive Obsession* and 
 [eliminate a lot of bugs](http://reidev275.azurewebsites.net/eliminating-bugs-with-single-case-discriminated-unions/).
 
+<a name="units-of-measure"></a>
 ## Units of Measure
 
 One feature that F# offers that is not directly related to *Algebraic-data types* is
@@ -742,6 +769,7 @@ module PlayerGame =
     }
 
 (**
+<a name="recursive-du"></a>
 ## Recursive Discriminated Unions
 
 The biggest advantage of Discriminated Unions is that the definition can be recursive. *Tuples*
@@ -749,6 +777,7 @@ or *Records* cannot be recursive because F# is not lazy by default and we couldn
 an immutable recursive record. It would be infinite. But a Discriminated Union contains multiple
 different cases. So a DU can refer to itself, as long we have at least one non-recursive case.
 
+<a name="rdu-lists"></a>
 ### Lists
 
 For example, we could create our own `MyList` type that way. An Immutable linked-list is just
@@ -790,6 +819,7 @@ map (fun x -> x * x) nums
 // Cons (1, Cons (4, Cons (9, Cons (16, Cons (25, Empty)))))
 
 (**
+<a name="rdu-btree"></a>
 ### Binary Trees
 
 We also can generate any kind of Binary Trees easily. Or in general any kind of Tree type. A
@@ -828,6 +858,7 @@ fold (fun acc x -> acc + (string x)) "" tree
 // "1234567"
 
 (**
+<a name="rdu-ds"></a>
 ### Hierarchical Data-Structures
 
 We not only can generate general Data-Structure like Lists or Trees, but in general any kind
@@ -884,6 +915,7 @@ produceHtml document
 // <p>Hello<strong>World!</strong><br/>InlineCode of<code>let sum x y = x + y</code><br/><p>This is the end</p></p>
 
 (**
+<a name="invalid-state"></a>
 ## Make invalid states un-representable
 
 The general idea by designing data-types is to make illegal state un-representable. If invalid
@@ -934,6 +966,7 @@ the data from the ground-up in a way that we cannot express an invalid state. Wh
 write the code around your data-structures you are forced to use the `Deuce`
 game state instead.
 
+<a name="summary"></a>
 ## Summary
 
 An algebraic-type system is at some point simple. Because it just provides two ways in how
@@ -952,6 +985,7 @@ As Linus Torvalds once said, we should write our code around our data-structures
 > in fact, claim that the difference between a bad programmer and a good one is whether he
 > considers his code or his data structures more important.
 
+<a name="further"></a>
 ## Further Reading
 
 1. [[Video] Domain modelling with the F# type system](https://vimeo.com/97507575)
@@ -967,4 +1001,6 @@ As Linus Torvalds once said, we should write our code around our data-structures
 1. [Cardinality](https://en.wikipedia.org/wiki/Cardinality)
 1. [[C#] Primitive Obsession](http://enterprisecraftsmanship.com/2015/03/07/functional-c-primitive-obsession/)
 1. [[PHP] Type Safety and Money](http://verraes.net/2016/02/type-safety-and-money/)
+
+<a name="comments"></a>
 *)

@@ -15,6 +15,26 @@ types. They are named <em>Product-types</em> and <em>Sum-type</em>. I often name
 and <em>OR-composition</em>. F# provides two <em>Product-types</em> and one <em>Sum-type</em>.</p>
 <p>Those compositions are immutable by default. Because of this, we already have default
 implementation for equality and comparison.</p>
+<h2>Table of Content</h2>
+<ul class="toc">
+  <li><a href="#tuples">Tuples</a></li>
+  <li><a href="#records">Records</a></li>
+  <li><a href="#discriminated-unions">Discriminated Unions</a></li>
+  <li><a href="#du-as-sum">Discriminated Unions as Sum-Types</a></li>
+  <li><a href="#single-du">Single-case Discriminated Unions</a></li>
+  <li><a href="#units-of-measure">Units of Measure</a></li>
+  <li><a href="#recursive-du">Recursive Discriminated Unions</a></li>
+    <ul>
+      <li><a href="#rdu-lists">Lists</a></li>
+      <li><a href="#rdu-btree">Binary Trees</a></li>
+      <li><a href="#rdu-ds">Hierarchical Data-Structures</a></li>
+    </ul>
+  <li><a href="#invalid-state">Make invalid states un-representable</a></li>
+  <li><a href="#summary">Summary</a></li>
+  <li><a href="#further">Further Reading</a></li>
+  <li><a href="#comments">Comments</a></li>
+</ul>
+<a name="tuples"></a>
 <h2>Tuples</h2>
 <p>A Tuple is a <em>Product-type</em>. The nice thing about Tuples is that we don't have to define
 a <em>type</em> before-hand. We can easily create any kind of tuple by just separating
@@ -95,6 +115,7 @@ of second list, 2 element of 1 list, 2 element of 2 list, ...) then we could jus
 </tr>
 </table>
 <p>In those examples we don't want to define types all the time before-hand.</p>
+<a name="records"></a>
 <h2>Records</h2>
 <p>A <em>records</em> is also a <em>Product-type</em>. But we must define a type before-hand.
 <em>Records</em> are also often named <em>Named Tuples</em>.</p>
@@ -424,6 +445,7 @@ the <a href="https://en.wikipedia.org/wiki/JSON">JSON example on Wikipedia</a></
 </code></pre></td>
 </tr>
 </table>
+<a name="discriminated-unions"></a>
 <h2>Discriminated Unions (DU)</h2>
 <p>Up to that point, we only discussed two types: <em>Tuples</em> and <em>Records</em>. Both are <em>Product-types</em>
 or how I would name them <em>AND Composition</em>. Both data-types always contains all the specified
@@ -590,6 +612,7 @@ code, as now you have to find all the places in your code where yo do decisions 
 the phone number types. The language also don't help you to find all those spots.</p>
 <p>But with a DU instead the compiler will give you all places where you worked with
 the <code>PhoneNumber</code> type and you didn't handle the new cases.</p>
+<a name="du-as-sum"></a>
 <h2>Discriminated Unions as Sum-Types</h2>
 <p>So far we talked about <em>Tuple</em> and <em>Records</em> as a <em>Product-type</em>. We name it <em>Product-type</em>
 because we get the amount of possible combinations by multiplying the types. A tuple with
@@ -686,7 +709,8 @@ We did that above with the <code>PhoneNumber</code> type. Having less possible v
 need less code to check the edge-cases. Changing a <code>string</code> into a DU with just four cases
 makes the code simpler and less error-prone. Especially if the language forces you
 to check for all cases you could have, what F# does.</p>
-<h2>Single-case Discriminated Union</h2>
+<a name="single-du"></a>
+<h2>Single-case Discriminated Unions</h2>
 <p>So far we only have seen Discriminated Unions that contain multiple choices, but we also
 can create a DU with just a single choice. You will probably wonder why that is useful in
 the first place.</p>
@@ -835,6 +859,7 @@ to compare those different types at all.</p>
 name <a href="http://enterprisecraftsmanship.com/2015/03/07/functional-c-primitive-obsession/">Primitive Obsession</a>.</p>
 <p>With DUs we can easily get rid of <em>Primitive Obsession</em> and
 <a href="http://reidev275.azurewebsites.net/eliminating-bugs-with-single-case-discriminated-unions/">eliminate a lot of bugs</a>.</p>
+<a name="units-of-measure"></a>
 <h2>Units of Measure</h2>
 <p>One feature that F# offers that is not directly related to <em>Algebraic-data types</em> is
 <em>Unit of Measures</em>. Before we go deeper into this topic, let's re-look at our latest
@@ -997,11 +1022,13 @@ but whenever you want to wrap a number in a Single-case DU, you should consider 
 </code></pre></td>
 </tr>
 </table>
+<a name="recursive-du"></a>
 <h2>Recursive Discriminated Unions</h2>
 <p>The biggest advantage of Discriminated Unions is that the definition can be recursive. <em>Tuples</em>
 or <em>Records</em> cannot be recursive because F# is not lazy by default and we couldn't create
 an immutable recursive record. It would be infinite. But a Discriminated Union contains multiple
 different cases. So a DU can refer to itself, as long we have at least one non-recursive case.</p>
+<a name="rdu-lists"></a>
 <h3>Lists</h3>
 <p>For example, we could create our own <code>MyList</code> type that way. An Immutable linked-list is just
 a DU with two cases. We either reached the end of a list or we have a single-element and another
@@ -1059,6 +1086,7 @@ or how you can create your own list functions you can continue with:
 </code></pre></td>
 </tr>
 </table>
+<a name="rdu-btree"></a>
 <h3>Binary Trees</h3>
 <p>We also can generate any kind of Binary Trees easily. Or in general any kind of Tree type. A
 Binary Tree is either a <code>Leaf</code> an End-node without data. Or we have a <code>Node</code> that contains
@@ -1125,6 +1153,7 @@ a single element and a Left and a Right Node.</p>
 </code></pre></td>
 </tr>
 </table>
+<a name="rdu-ds"></a>
 <h3>Hierarchical Data-Structures</h3>
 <p>We not only can generate general Data-Structure like Lists or Trees, but in general any kind
 of hierarchical data-structures, for example we can use it in general to represent XML,
@@ -1211,6 +1240,7 @@ any markdown document into HTML we just write.</p>
 </code></pre></td>
 </tr>
 </table>
+<a name="invalid-state"></a>
 <h2>Make invalid states un-representable</h2>
 <p>The general idea by designing data-types is to make illegal state un-representable. If invalid
 states are un-representable, bugs cannot happen in the first place. This topic alone is big enough
@@ -1277,6 +1307,7 @@ idea we cannot express the idea to have two Player with <code>Forty</code> becau
 the data from the ground-up in a way that we cannot express an invalid state. When you
 write the code around your data-structures you are forced to use the <code>Deuce</code>
 game state instead.</p>
+<a name="summary"></a>
 <h2>Summary</h2>
 <p>An algebraic-type system is at some point simple. Because it just provides two ways in how
 we can compose types. We either can use an <em>AND composition</em> or we can use an <em>OR composition</em>.</p>
@@ -1292,6 +1323,7 @@ way around, and I think it's one of the reasons git has been fairly successful [
 in fact, claim that the difference between a bad programmer and a good one is whether he
 considers his code or his data structures more important.</p>
 </blockquote>
+<a name="further"></a>
 <h2>Further Reading</h2>
 <ol>
 <li><a href="https://vimeo.com/97507575">[Video] Domain modelling with the F# type system</a></li>
@@ -1308,6 +1340,7 @@ considers his code or his data structures more important.</p>
 <li><a href="http://enterprisecraftsmanship.com/2015/03/07/functional-c-primitive-obsession/">[C#] Primitive Obsession</a></li>
 <li><a href="http://verraes.net/2016/02/type-safety-and-money/">[PHP] Type Safety and Money</a></li>
 </ol>
+<a name="comments"></a>
 
 
 <div class="tip" id="fs1">module Main</div>
