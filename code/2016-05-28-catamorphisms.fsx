@@ -20,19 +20,25 @@ I want to talk about the remaining parts.
 
 ## Table of Content
 
-  * <a href="#TheLists">The List</a>
-    * <a href="#cata">Introducing Cata</a>
-    * <a href="#tail-recursion">Tail Recursion with FoldBack</a>
-  * <a href="#binary-trees">Binary Trees</a>
-    * <a href="#tree-cata">Cata for Tree</a>
-    * <a href="#fold-vs-foldback">Fold vs. FoldBack</a>
-    * <a href="#tree-foldback">FoldBack for Tree</a>
-    * <a href="#tree-foldback-examples">FoldBack examples</a>
-    * <a href="#tree-fold">Fold for Tree</a>
-    * <a href="#benchmarking">Some Benchmarking</a>
-  * <a href="#markdown">Markdown</a>
-  * <a href="#summary">Summary</a>
-  * <a href="#further">Further Reading</a>
+<ul class="toc">
+  <li><a href="#TheLists">The List</a></li>
+    <ul>
+      <li><a href="#cata">Introducing Cata</a></li>
+      <li><a href="#tail-recursion">Tail Recursion with FoldBack</a></li>
+    </ul>
+  <li><a href="#binary-trees">Binary Trees</a></li>
+    <ul>
+      <li><a href="#tree-cata">Cata for Tree</a></li>
+      <li><a href="#fold-vs-foldback">Fold vs. FoldBack</a></li>
+      <li><a href="#tree-foldback">FoldBack for Tree</a></li>
+      <li><a href="#tree-foldback-examples">FoldBack examples</a></li>
+      <li><a href="#tree-fold">Fold for Tree</a></li>
+      <li><a href="#benchmarking">Some Benchmarking</a></li>
+    </ul>
+  <li><a href="#markdown">Markdown</a></li>
+  <li><a href="#summary">Summary</a></li>
+  <li><a href="#further">Further Reading</a></li>
+</ul>
 
 <a name="TheLists"></a>
 ## The List
