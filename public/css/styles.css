@@ -18,6 +18,7 @@
 .archive-group {
   margin: 5px;
   border-top: 1px solid #ddd;
+  margin-bottom: 2em;
 }
 
 .archive-item {
