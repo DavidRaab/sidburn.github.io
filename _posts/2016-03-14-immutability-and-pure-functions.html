@@ -354,16 +354,18 @@ different every time we call it.</p>
 <li>We cannot write to a file/database</li>
 <li>We cannot send data over network</li>
 </ol>
-<p>Let's assume we have <code>someFunciton 5</code> that always will return <code>10</code> but also prints something
+<p>Let's assume we have <code>someFunction 5</code> that always will return <code>10</code> but also prints something
 to the console. We couldn't replace all calls to <code>someFunction 5</code> just with <code>10</code> because otherwise
 we lose all log statements in our console.</p>
 <p>Thinking over it, we could ask the question. Can we even write any useful program without
 side-effects? The answer is no. That is the reason why Erik Meijer often say:
-<em>We all love side-effects</em>. But that doesn't mean we want side-effects happens all
+<em>We all love side-effects</em>. But that doesn't mean we want side-effects happenning all
 over our code in every function. If a statement like <code>3 + 5</code> could yield <code>10</code> that would
-probably drive a lot of people crazy, me too. We want side-effects but we want to somehow
+probably drive a lot of people crazy, me too. We want side-effects but we somehow want to
 control them. We want to minimize side-effects as much as possible.</p>
-<p>So how do we do that? By letting pure functions return immutable data!</p>
+<p>So how do we do that? We first assume that impure functions do as little as possible and have
+nearly no logic at all, second we just assume that they return some immutable data! Those
+immutable data then can be used/transformed and so on by pure functions.</p>
 <h3>(Im)mutability and (im)pure functions</h3>
 <p>One interesting aspect is that both concepts are completely orthogonal. That means, we can have
 any combination of those. We can have pure functions that take mutable or immutable data, and return

@@ -323,18 +323,20 @@ But this kind of description also eliminates some additional behaviour.
 1. We cannot write to a file/database
 1. We cannot send data over network
 
-Let's assume we have `someFunciton 5` that always will return `10` but also prints something
+Let's assume we have `someFunction 5` that always will return `10` but also prints something
 to the console. We couldn't replace all calls to `someFunction 5` just with `10` because otherwise
 we lose all log statements in our console.
 
 Thinking over it, we could ask the question. Can we even write any useful program without
 side-effects? The answer is no. That is the reason why Erik Meijer often say:
-*We all love side-effects*. But that doesn't mean we want side-effects happens all
+*We all love side-effects*. But that doesn't mean we want side-effects happenning all
 over our code in every function. If a statement like `3 + 5` could yield `10` that would
-probably drive a lot of people crazy, me too. We want side-effects but we want to somehow
+probably drive a lot of people crazy, me too. We want side-effects but we somehow want to
 control them. We want to minimize side-effects as much as possible.
 
-So how do we do that? By letting pure functions return immutable data!
+So how do we do that? We first assume that impure functions do as little as possible and have
+nearly no logic at all, second we just assume that they return some immutable data! Those
+immutable data then can be used/transformed and so on by pure functions.
 
 ### (Im)mutability and (im)pure functions
 
