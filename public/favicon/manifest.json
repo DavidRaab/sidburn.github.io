@@ -2,15 +2,10 @@
 	"name": "David Raab",
 	"icons": [
 		{
-			"src": "\/public\/favicon\/android-chrome-192x192.png?v=XBrbrWNgYz",
+			"src": "\/public\/favicon\/android-chrome-192x192.png?v=XBr3BkNgXe",
 			"sizes": "192x192",
-			"type": "image\/png"
-		},
-		{
-			"src": "\/public\/favicon\/android-chrome-512x512.png?v=XBrbrWNgYz",
-			"sizes": "512x512",
 			"type": "image\/png"
 		}
 	],
-	"theme_color": "#999fff"
+	"theme_color": "#ff0000"
 }
