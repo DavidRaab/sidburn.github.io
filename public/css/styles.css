@@ -2,7 +2,7 @@
 .tag-cloud {
   list-style: none;
   padding: 0;
-  text-align: justify; 
+  text-align: justify;
   font-size: 16px;
 }
 
@@ -129,10 +129,13 @@ div.info {
 }
 
 div.info:before {
-    content: url(/public/bulb.svg);
+    content: url(/public/info.svg);
     float:   left;
-    width:   3em;
+    width:   2em;
     height:  2em;
+    position: relative;
+    left: -10px;
+    top: 10px;
 }
 
 /* Adds small language tags to the code examples */
