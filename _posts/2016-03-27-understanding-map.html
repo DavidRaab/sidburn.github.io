@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Understanding map"
-tags: [functor,list,option]
+tags: [F#,functor,list,option]
 description: "Explains the map function and what a Functor is"
 keywords: f#, fsharp, programming, functional, functor, map
 ---
@@ -28,7 +28,7 @@ You will often see examples like this:</p>
 <span class="c">// C#</span>
 <span class="i">var</span> <span onmouseout="hideTip(event, 'fs2', 7)" onmouseover="showTip(event, 'fs2', 7)" class="i">xs</span> <span class="o">=</span> <span class="i">Enumerable</span><span class="o">.</span><span class="i">Range</span>(<span class="n">1</span>,<span class="n">5</span>)<span class="o">.</span><span class="i">Select</span>(<span class="i">x</span> <span class="o">=&gt;</span> <span class="i">x</span> <span class="o">*</span> <span class="n">2</span>) <span class="c">// Select is `map`</span>
 
-<span class="c">// JavaScript    </span>
+<span class="c">// JavaScript</span>
 <span class="i">var</span> <span onmouseout="hideTip(event, 'fs2', 8)" onmouseover="showTip(event, 'fs2', 8)" class="i">xs</span> <span class="o">=</span> [<span class="n">1</span>,<span class="n">2</span>,<span class="n">3</span>,<span class="n">4</span>,<span class="n">5</span>]<span class="o">.</span><span class="i">map</span>(<span class="k">function</span>(<span class="i">x</span>) { <span class="k">return</span> <span class="i">x</span> <span class="o">*</span> <span class="n">2</span> })
 </code></pre></td>
 </tr>
@@ -428,7 +428,7 @@ is telling us. We have to write a function with the signature</p>
 </table>
 <ol>
 <li>
-That means a function with two arguments. The first arguments is a <em>function</em> <code>'a -&gt; 'b</code>, the second 
+That means a function with two arguments. The first arguments is a <em>function</em> <code>'a -&gt; 'b</code>, the second
 is an <code>Async&lt;'a&gt;</code>, and we have to return an <code>Async&lt;'b&gt;</code>.
 </li>
 <li>Because we have to return an <code>Async</code> we start with <code>async { ... }</code>.</li>
@@ -459,7 +459,7 @@ But because parsing could fail, for example a table entry is not a number, we wr
 </pre></td>
 <td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs56', 180)" onmouseover="showTip(event, 'fs56', 180)" class="i">downloadPage</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs54', 181)" onmouseover="showTip(event, 'fs54', 181)" class="i">async</span> {
     <span class="c">// Simulating Download, wait 1 second</span>
-    <span class="k">do!</span> <span onmouseout="hideTip(event, 'fs57', 182)" onmouseover="showTip(event, 'fs57', 182)" class="t">Async</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs58', 183)" onmouseover="showTip(event, 'fs58', 183)" class="f">Sleep</span> <span class="n">1000</span> 
+    <span class="k">do!</span> <span onmouseout="hideTip(event, 'fs57', 182)" onmouseover="showTip(event, 'fs57', 182)" class="t">Async</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs58', 183)" onmouseover="showTip(event, 'fs58', 183)" class="f">Sleep</span> <span class="n">1000</span>
     <span class="c">// A list of optionals list&lt;option&lt;int&gt;&gt;</span>
     <span class="k">let</span> <span onmouseout="hideTip(event, 'fs59', 184)" onmouseover="showTip(event, 'fs59', 184)" class="i">numbers</span> <span class="o">=</span> [<span onmouseout="hideTip(event, 'fs30', 185)" onmouseover="showTip(event, 'fs30', 185)" class="p">Some</span> <span class="n">1</span>; <span onmouseout="hideTip(event, 'fs30', 186)" onmouseover="showTip(event, 'fs30', 186)" class="p">Some</span> <span class="n">2</span>; <span onmouseout="hideTip(event, 'fs29', 187)" onmouseover="showTip(event, 'fs29', 187)" class="p">None</span>; <span onmouseout="hideTip(event, 'fs30', 188)" onmouseover="showTip(event, 'fs30', 188)" class="p">Some</span> <span class="n">3</span>; <span onmouseout="hideTip(event, 'fs29', 189)" onmouseover="showTip(event, 'fs29', 189)" class="p">None</span>; <span onmouseout="hideTip(event, 'fs29', 190)" onmouseover="showTip(event, 'fs29', 190)" class="p">None</span>; <span onmouseout="hideTip(event, 'fs30', 191)" onmouseover="showTip(event, 'fs30', 191)" class="p">Some</span> <span class="n">10</span>]
     <span class="c">// return it: This adds async&lt;&gt; layer</span>

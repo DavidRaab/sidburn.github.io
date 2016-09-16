@@ -1,7 +1,7 @@
 ---
 layout: post
 title: null is Evil
-tags: ["null",option,evil]
+tags: [F#,C#,"null",option,evil]
 description: "Explains why we consider null as a mistake, and shows alternatives to it"
 keywords: null, mistake, billion-dollar, tony hoare, option, maybe, monad
 ---
@@ -178,7 +178,7 @@ print the Name of a person, what do we have to write now?</p>
 either <code>Some</code> or <code>None</code>. So why is that better?</p>
 <ol>
 <li>
-The important point is, not every function returns an <code>option</code>. You only have to add this check if 
+The important point is, not every function returns an <code>option</code>. You only have to add this check if
 a function returns an optional.
 </li>
 <li>You are <em>forced</em> by the language at <em>compile-time</em> to add the checks if a function returns an <code>option</code>.</li>

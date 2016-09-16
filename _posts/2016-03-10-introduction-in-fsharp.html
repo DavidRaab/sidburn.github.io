@@ -2,7 +2,7 @@
 layout: post
 title: Introduction to F#
 date: 2016-03-10 00:00:00
-tags: [intro]
+tags: [F#,C#,intro]
 description: "Gives an introduction to F# for C# developers"
 keywords: f#, fsharp, c#, csharp, introduction, beginner
 ---
@@ -368,7 +368,7 @@ you can create hierarchical data-structures.</p>
 
 <span class="k">let</span> <span onmouseout="hideTip(event, 'fs53', 118)" onmouseover="showTip(event, 'fs53', 118)" class="i">warrior</span> <span class="o">=</span> {
     <span class="i">Name</span> <span class="o">=</span> <span class="s">&quot;Conan&quot;</span>
-    <span class="i">Attribute</span> <span class="o">=</span> 
+    <span class="i">Attribute</span> <span class="o">=</span>
     {
         <span class="i">Strength</span> <span class="o">=</span> <span class="n">1000</span>
         <span class="i">Dexterity</span> <span class="o">=</span> <span class="n">200</span>
@@ -415,7 +415,7 @@ user can pay with different methods.</p>
     | <span onmouseout="hideTip(event, 'fs56', 127)" onmouseover="showTip(event, 'fs56', 127)" class="p">PayPal</span>     <span class="k">of</span> <span onmouseout="hideTip(event, 'fs15', 128)" onmouseover="showTip(event, 'fs15', 128)" class="t">string</span>
     | <span onmouseout="hideTip(event, 'fs57', 129)" onmouseover="showTip(event, 'fs57', 129)" class="p">CreditCard</span> <span class="k">of</span> <span onmouseout="hideTip(event, 'fs15', 130)" onmouseover="showTip(event, 'fs15', 130)" class="t">string</span>
 
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs58', 131)" onmouseover="showTip(event, 'fs58', 131)" class="f">inform</span> <span onmouseout="hideTip(event, 'fs59', 132)" onmouseover="showTip(event, 'fs59', 132)" class="i">payment</span> <span class="o">=</span> 
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs58', 131)" onmouseover="showTip(event, 'fs58', 131)" class="f">inform</span> <span onmouseout="hideTip(event, 'fs59', 132)" onmouseover="showTip(event, 'fs59', 132)" class="i">payment</span> <span class="o">=</span>
     <span class="k">match</span> <span onmouseout="hideTip(event, 'fs59', 133)" onmouseover="showTip(event, 'fs59', 133)" class="i">payment</span> <span class="k">with</span>
     | <span onmouseout="hideTip(event, 'fs55', 134)" onmouseover="showTip(event, 'fs55', 134)" class="p">Cash</span>          <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs43', 135)" onmouseover="showTip(event, 'fs43', 135)" class="f">printfn</span> <span class="s">&quot;User payed cash&quot;</span>
     | <span onmouseout="hideTip(event, 'fs56', 136)" onmouseover="showTip(event, 'fs56', 136)" class="p">PayPal</span> <span onmouseout="hideTip(event, 'fs60', 137)" onmouseover="showTip(event, 'fs60', 137)" class="i">email</span>  <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs43', 138)" onmouseover="showTip(event, 'fs43', 138)" class="f">printfn</span> <span class="s">&quot;User payed with PayPal. Email: </span><span class="pf">%s</span><span class="s">&quot;</span> <span onmouseout="hideTip(event, 'fs60', 139)" onmouseover="showTip(event, 'fs60', 139)" class="i">email</span>
@@ -512,7 +512,7 @@ can easily build recursive data-structures.</p>
     | <span onmouseout="hideTip(event, 'fs66', 156)" onmouseover="showTip(event, 'fs66', 156)" class="p">InlineCode</span> <span class="k">of</span> <span onmouseout="hideTip(event, 'fs15', 157)" onmouseover="showTip(event, 'fs15', 157)" class="t">string</span>
     | <span onmouseout="hideTip(event, 'fs67', 158)" onmouseover="showTip(event, 'fs67', 158)" class="p">Block</span>      <span class="k">of</span> <span onmouseout="hideTip(event, 'fs62', 159)" onmouseover="showTip(event, 'fs62', 159)" class="t">Markdown</span> <span onmouseout="hideTip(event, 'fs68', 160)" onmouseover="showTip(event, 'fs68', 160)" class="t">list</span>
 
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs69', 161)" onmouseover="showTip(event, 'fs69', 161)" class="i">document</span> <span class="o">=</span> 
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs69', 161)" onmouseover="showTip(event, 'fs69', 161)" class="i">document</span> <span class="o">=</span>
     <span onmouseout="hideTip(event, 'fs67', 162)" onmouseover="showTip(event, 'fs67', 162)" class="p">Block</span> [
         <span onmouseout="hideTip(event, 'fs64', 163)" onmouseover="showTip(event, 'fs64', 163)" class="p">Literal</span> <span class="s">&quot;Hello&quot;</span>; <span onmouseout="hideTip(event, 'fs65', 164)" onmouseover="showTip(event, 'fs65', 164)" class="p">Bold</span> <span class="s">&quot;World!&quot;</span>; <span onmouseout="hideTip(event, 'fs63', 165)" onmouseover="showTip(event, 'fs63', 165)" class="p">NewLine</span>
         <span onmouseout="hideTip(event, 'fs64', 166)" onmouseover="showTip(event, 'fs64', 166)" class="p">Literal</span> <span class="s">&quot;InlineCode of&quot;</span>; <span onmouseout="hideTip(event, 'fs66', 167)" onmouseover="showTip(event, 'fs66', 167)" class="p">InlineCode</span> <span class="s">&quot;let sum x y = x + y&quot;</span>; <span onmouseout="hideTip(event, 'fs63', 168)" onmouseover="showTip(event, 'fs63', 168)" class="p">NewLine</span>

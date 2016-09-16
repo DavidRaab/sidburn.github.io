@@ -2,7 +2,7 @@
 \---
 layout: post
 title: "Catamorphisms"
-tags: [fold,list,data,types,recursion]
+tags: [F#,fold,list,data,types,recursion]
 description: "Explains Catamorphisms in F#. That means the purpose of fold and foldBack."
 keywords: f#, fsharp, functional, programming, catamorphisms, fold, foldback, foldleft, foldright
 \---
@@ -79,10 +79,10 @@ in such way.
 
 with the defined helper functions above in F# it sure looks completely different.
 
-    let xs = (cons 1 (cons 2 (cons 3 empty)))    
+    let xs = (cons 1 (cons 2 (cons 3 empty)))
 </div>
 
-As soon we have any kind of discriminated union, working with such a type follows 
+As soon we have any kind of discriminated union, working with such a type follows
 a straight pattern. Usually we create a function that matches on our type, and
 we must provide code for every case we have. In our list case that means
 we must match on the `Empty` case and on the `Cons(h,t)` case and do something
@@ -459,7 +459,7 @@ should also be done for other discriminated unions, not just for a list.
 For the next example we will look at a binary tree. A binary tree is quite interesting
 because it is very similar to a list. But let's see that in more detail:
 *)
-    
+
 type Tree<'a> =
     | Leaf
     | Node of 'a * Tree<'a> * Tree<'a>
@@ -818,7 +818,7 @@ as a result. When we search for `1` we get "Left Left" and so on.
 let path search tree =
     let leaf = (false, [])
     let node x (lb,lp) (rb,rp) =
-        if x = search then 
+        if x = search then
             (true, [])
         elif lb = true then
             (true, "Left" :: lp)
@@ -931,7 +931,7 @@ we can return `acc`. So our final `treeFold` looks like this:
 let treeFold folder acc tree =
     let rec loop acc stack tree =
         match tree with
-        | Leaf -> 
+        | Leaf ->
             match stack with
             | []          -> acc
             | tree::stack -> loop acc stack tree
@@ -1067,7 +1067,7 @@ let treeFoldStack folder acc tree =
         match tree with
         | Leaf ->
             if   stack.Count > 0
-            then loop acc (stack.Pop()) 
+            then loop acc (stack.Pop())
             else acc
         | Node(x,l,r) ->
             stack.Push r
@@ -1120,7 +1120,7 @@ also quite good, at least better as a naive implementation with continuation fun
 most memory get handled by the stack, it also don't causes garbage collection.
 
 An implementation with a mutable stack also can be efficient in terms of garbage collection, but at least
-on my machine it is still slower compared to the pure recursive version. 
+on my machine it is still slower compared to the pure recursive version.
 
 As an overall result you shouldn't abandon the `cata` function, just because you fear that
 non tail-recursive functions are automatically slower. Usually they are very easy to implement
@@ -1190,7 +1190,7 @@ tags itself. The arguments of the `wrap` and `wrapEscape` function are chosen in
 use currying, so I don't need to create a lot of lambda expressions.
 *)
 
-let document = 
+let document =
     Block [
         Literal "Hello"; Bold "World!"; NewLine
         Literal "InlineCode of"; InlineCode "let sum x y = x + y"; NewLine

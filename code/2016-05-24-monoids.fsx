@@ -2,7 +2,7 @@
 \---
 layout: post
 title: "Monoids"
-tags: [monoids]
+tags: [F#,monoids]
 description: "Describes Monoids in F#"
 keywords: f#, fsharp, functional, programming, monoids
 \---
@@ -26,7 +26,7 @@ three simple math equations.
     1 + 2       = 3
     (1 + 2) + 3 = 1 + (2 + 3)
     1 + 0       = 0 + 1
-    
+
 ## Table of Content
 
 <ul class="toc">
@@ -201,7 +201,7 @@ just does that repetitive combining for us.
 
 Associativity can enhance the reduce operation. If the exact order doesn't play a role. It means
 the combining can be done in Parallel on multiple CPUs. As a simple example let's look at a list
-with four elements. 
+with four elements.
 
     [1;2;3;4]
 
@@ -252,7 +252,7 @@ probably ask why we then even want to run a `reduce` operation. But in normal ci
 we don't want to check the amount of elements in a list. But this leads to a problem.
 
 A `reduce` operation with a single element just returns the single element, as there is nothing
-to combine. But with an empty list it just throws an exception as it don't know what 
+to combine. But with an empty list it just throws an exception as it don't know what
 it should return.
 
 In such a case, the identity element is helpful, as we just can return the identity element.
@@ -333,7 +333,7 @@ max Int32.MinValue Int32.MaxValue // 2147483647
 
 max "" ""    // ""
 max "" "Foo" // "Foo"
-max "" "Bar" // "Bar" 
+max "" "Bar" // "Bar"
 max "" "Baz" // "Baz"
 
 (**

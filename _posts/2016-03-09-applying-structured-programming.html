@@ -2,7 +2,7 @@
 layout: post
 title: Applying Structured Programming
 date: 2016-03-09 01:00:00
-tags: [list,refactoring,immutability,structured]
+tags: [F#,list,refactoring,immutability,structured]
 description: "Shows how applying the idea of Structured Programming can improve the code"
 keywords: f#, fsharp, programming, functional, structured, looping, list
 ---
@@ -187,7 +187,7 @@ left into a <code>fold</code> call.</p>
     <span onmouseout="hideTip(event, 'fs23', 76)" onmouseover="showTip(event, 'fs23', 76)" class="f">randomSeq</span> <span class="n">0</span> <span class="n">100</span>
     <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs26', 77)" onmouseover="showTip(event, 'fs26', 77)" class="t">Seq</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs28', 78)" onmouseover="showTip(event, 'fs28', 78)" class="f">take</span> <span class="n">1000</span>
     <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs26', 79)" onmouseover="showTip(event, 'fs26', 79)" class="t">Seq</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs29', 80)" onmouseover="showTip(event, 'fs29', 80)" class="f">fold</span> (<span class="k">fun</span> (<span onmouseout="hideTip(event, 'fs21', 81)" onmouseover="showTip(event, 'fs21', 81)" class="i">criticalHit</span>,<span onmouseout="hideTip(event, 'fs22', 82)" onmouseover="showTip(event, 'fs22', 82)" class="i">normalHit</span>) <span onmouseout="hideTip(event, 'fs10', 83)" onmouseover="showTip(event, 'fs10', 83)" class="i">random</span> <span class="k">-&gt;</span>
-        <span class="k">if</span>   <span onmouseout="hideTip(event, 'fs10', 84)" onmouseover="showTip(event, 'fs10', 84)" class="i">random</span> <span class="o">&lt;</span> <span onmouseout="hideTip(event, 'fs6', 85)" onmouseover="showTip(event, 'fs6', 85)" class="i">chance</span> 
+        <span class="k">if</span>   <span onmouseout="hideTip(event, 'fs10', 84)" onmouseover="showTip(event, 'fs10', 84)" class="i">random</span> <span class="o">&lt;</span> <span onmouseout="hideTip(event, 'fs6', 85)" onmouseover="showTip(event, 'fs6', 85)" class="i">chance</span>
         <span class="k">then</span> (<span onmouseout="hideTip(event, 'fs21', 86)" onmouseover="showTip(event, 'fs21', 86)" class="i">criticalHit</span><span class="o">+</span><span class="n">1</span>),<span onmouseout="hideTip(event, 'fs22', 87)" onmouseover="showTip(event, 'fs22', 87)" class="i">normalHit</span>
         <span class="k">else</span> <span onmouseout="hideTip(event, 'fs21', 88)" onmouseover="showTip(event, 'fs21', 88)" class="i">criticalHit</span>,(<span onmouseout="hideTip(event, 'fs22', 89)" onmouseover="showTip(event, 'fs22', 89)" class="i">normalHit</span><span class="o">+</span><span class="n">1</span>)
     ) (<span class="n">0</span>,<span class="n">0</span>)

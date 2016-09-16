@@ -2,9 +2,9 @@
 \---
 layout: post
 title: "CPS fold -- fold with early exit"
-tags: [list,fold,cps,recursion]
-description: Describes how to implement a CPS fold. A CPS fold supports early exit 
-keywords: f#, fsharp, functional, programming, fold, cps, continuation 
+tags: [F#,list,fold,cps,recursion]
+description: Describes how to implement a CPS fold. A CPS fold supports early exit
+keywords: f#, fsharp, functional, programming, fold, cps, continuation
 \---
 *)
 
@@ -156,7 +156,7 @@ pattern matching in the `foldk` function.
 | `[]`          | No |
 | `x::xs`       | `4::[5]` |
 | `f acc x k`   | `f 6 4 (fun lacc -> foldk f lacc [5])` |
-| `k (acc + x)` | `k (6 + 4)` | 
+| `k (acc + x)` | `k (6 + 4)` |
 | `foldk f 10 [5]` | |
 | `[]`          | No |
 | `x::xs`       | `5::[]` |

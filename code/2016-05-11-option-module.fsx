@@ -2,7 +2,7 @@
 \---
 layout: post
 title: "The Option Module"
-tags: [option]
+tags: [F#,option]
 description: Explains some lesser known functions in the Option Module
 keywords: f#, fsharp, functional, programming, option
 \---
@@ -105,7 +105,7 @@ unchanged. Otherwise we get `None`.
 let isValid x = x |> Option.exists (fun _ -> true)
 let isEven x  = x % 2 = 0
 
-let input = 
+let input =
     Some 6
     |> Option.filter (greater 0)
     |> Option.filter (smaller 10)

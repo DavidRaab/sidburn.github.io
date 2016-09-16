@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Algebraic Data-Types"
-tags: [types,data,units-of-measure]
+tags: [F#,types,data,units-of-measure]
 description: An Introduction to algebraic data-types in F#
 keywords: f#, fsharp, algebraic, data, types, functional, programming
 ---
@@ -400,14 +400,14 @@ the <a href="https://en.wikipedia.org/wiki/JSON">JSON example on Wikipedia</a></
     <span class="i">LastName</span>  <span class="o">=</span> <span class="s">&quot;Smith&quot;</span>
     <span class="i">IsAlive</span>   <span class="o">=</span> <span class="k">true</span>
     <span class="i">Age</span>       <span class="o">=</span> <span class="n">25</span>
-    <span onmouseout="hideTip(event, 'fs56', 144)" onmouseover="showTip(event, 'fs56', 144)" class="i">Address</span>   <span class="o">=</span> 
+    <span onmouseout="hideTip(event, 'fs56', 144)" onmouseover="showTip(event, 'fs56', 144)" class="i">Address</span>   <span class="o">=</span>
         {
             <span class="i">StreetAddress</span> <span class="o">=</span> <span class="s">&quot;21 2nd Street&quot;</span>
             <span class="i">City</span>          <span class="o">=</span> <span class="s">&quot;New York&quot;</span>
             <span class="i">State</span>         <span class="o">=</span> <span class="s">&quot;NY&quot;</span>
             <span class="i">PostalCode</span>    <span class="o">=</span> <span class="s">&quot;10021-3100&quot;</span>
         }
-    <span class="i">PhoneNumbers</span> <span class="o">=</span> 
+    <span class="i">PhoneNumbers</span> <span class="o">=</span>
         [
         {
             <span onmouseout="hideTip(event, 'fs78', 145)" onmouseover="showTip(event, 'fs78', 145)" class="i">Type</span>   <span class="o">=</span> <span class="s">&quot;Home&quot;</span>
@@ -559,14 +559,14 @@ construct to.</p>
     <span class="i">LastName</span>  <span class="o">=</span> <span class="s">&quot;Smith&quot;</span>
     <span class="i">IsAlive</span>   <span class="o">=</span> <span class="k">true</span>
     <span class="i">Age</span>       <span class="o">=</span> <span class="n">25</span>
-    <span onmouseout="hideTip(event, 'fs89', 209)" onmouseover="showTip(event, 'fs89', 209)" class="i">Address</span>   <span class="o">=</span> 
+    <span onmouseout="hideTip(event, 'fs89', 209)" onmouseover="showTip(event, 'fs89', 209)" class="i">Address</span>   <span class="o">=</span>
         {
             <span class="i">StreetAddress</span> <span class="o">=</span> <span class="s">&quot;21 2nd Street&quot;</span>
             <span class="i">City</span>          <span class="o">=</span> <span class="s">&quot;New York&quot;</span>
             <span class="i">State</span>         <span class="o">=</span> <span class="s">&quot;NY&quot;</span>
             <span class="i">PostalCode</span>    <span class="o">=</span> <span class="s">&quot;10021-3100&quot;</span>
         }
-    <span class="i">PhoneNumbers</span> <span class="o">=</span> 
+    <span class="i">PhoneNumbers</span> <span class="o">=</span>
         [
             <span onmouseout="hideTip(event, 'fs91', 210)" onmouseover="showTip(event, 'fs91', 210)" class="p">Home</span>   <span class="s">&quot;212 555-1234&quot;</span>
             <span onmouseout="hideTip(event, 'fs92', 211)" onmouseover="showTip(event, 'fs92', 211)" class="p">Office</span> <span class="s">&quot;646 555-4567&quot;</span>
@@ -694,7 +694,7 @@ different types can represent the same data.</p>
 the same amount of data. We can easily proof that by calculating the Cardinality.</p>
 <ol>
 <li>
-For <code>Line</code> it looks like <code>(i * i) * (i * i)</code> that turns into <code>(i ^ 2) * (i ^ 2)</code> and this 
+For <code>Line</code> it looks like <code>(i * i) * (i * i)</code> that turns into <code>(i ^ 2) * (i ^ 2)</code> and this
 again turns into <code>i ^ 4</code>.
 </li>
 <li><code>Line2</code> is <code>i * i * i * i</code> and directly turns into <code>i ^ 4</code>.</li>
@@ -1129,13 +1129,13 @@ a single element and a Left and a Right Node.</p>
 <span class="c">//  2   6</span>
 <span class="c">// 1 3 5 7</span>
 
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs184', 487)" onmouseover="showTip(event, 'fs184', 487)" class="i">tree</span> <span class="o">=</span> 
-    <span onmouseout="hideTip(event, 'fs183', 488)" onmouseover="showTip(event, 'fs183', 488)" class="p">Node</span>(<span class="n">4</span>, 
-        <span onmouseout="hideTip(event, 'fs183', 489)" onmouseover="showTip(event, 'fs183', 489)" class="p">Node</span>(<span class="n">2</span>, 
-            <span onmouseout="hideTip(event, 'fs183', 490)" onmouseover="showTip(event, 'fs183', 490)" class="p">Node</span>(<span class="n">1</span>, <span onmouseout="hideTip(event, 'fs182', 491)" onmouseover="showTip(event, 'fs182', 491)" class="p">Leaf</span>, <span onmouseout="hideTip(event, 'fs182', 492)" onmouseover="showTip(event, 'fs182', 492)" class="p">Leaf</span>), 
-            <span onmouseout="hideTip(event, 'fs183', 493)" onmouseover="showTip(event, 'fs183', 493)" class="p">Node</span>(<span class="n">3</span>, <span onmouseout="hideTip(event, 'fs182', 494)" onmouseover="showTip(event, 'fs182', 494)" class="p">Leaf</span>, <span onmouseout="hideTip(event, 'fs182', 495)" onmouseover="showTip(event, 'fs182', 495)" class="p">Leaf</span>)), 
-        <span onmouseout="hideTip(event, 'fs183', 496)" onmouseover="showTip(event, 'fs183', 496)" class="p">Node</span>(<span class="n">6</span>, 
-            <span onmouseout="hideTip(event, 'fs183', 497)" onmouseover="showTip(event, 'fs183', 497)" class="p">Node</span>(<span class="n">5</span>, <span onmouseout="hideTip(event, 'fs182', 498)" onmouseover="showTip(event, 'fs182', 498)" class="p">Leaf</span>, <span onmouseout="hideTip(event, 'fs182', 499)" onmouseover="showTip(event, 'fs182', 499)" class="p">Leaf</span>), 
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs184', 487)" onmouseover="showTip(event, 'fs184', 487)" class="i">tree</span> <span class="o">=</span>
+    <span onmouseout="hideTip(event, 'fs183', 488)" onmouseover="showTip(event, 'fs183', 488)" class="p">Node</span>(<span class="n">4</span>,
+        <span onmouseout="hideTip(event, 'fs183', 489)" onmouseover="showTip(event, 'fs183', 489)" class="p">Node</span>(<span class="n">2</span>,
+            <span onmouseout="hideTip(event, 'fs183', 490)" onmouseover="showTip(event, 'fs183', 490)" class="p">Node</span>(<span class="n">1</span>, <span onmouseout="hideTip(event, 'fs182', 491)" onmouseover="showTip(event, 'fs182', 491)" class="p">Leaf</span>, <span onmouseout="hideTip(event, 'fs182', 492)" onmouseover="showTip(event, 'fs182', 492)" class="p">Leaf</span>),
+            <span onmouseout="hideTip(event, 'fs183', 493)" onmouseover="showTip(event, 'fs183', 493)" class="p">Node</span>(<span class="n">3</span>, <span onmouseout="hideTip(event, 'fs182', 494)" onmouseover="showTip(event, 'fs182', 494)" class="p">Leaf</span>, <span onmouseout="hideTip(event, 'fs182', 495)" onmouseover="showTip(event, 'fs182', 495)" class="p">Leaf</span>)),
+        <span onmouseout="hideTip(event, 'fs183', 496)" onmouseover="showTip(event, 'fs183', 496)" class="p">Node</span>(<span class="n">6</span>,
+            <span onmouseout="hideTip(event, 'fs183', 497)" onmouseover="showTip(event, 'fs183', 497)" class="p">Node</span>(<span class="n">5</span>, <span onmouseout="hideTip(event, 'fs182', 498)" onmouseover="showTip(event, 'fs182', 498)" class="p">Leaf</span>, <span onmouseout="hideTip(event, 'fs182', 499)" onmouseover="showTip(event, 'fs182', 499)" class="p">Leaf</span>),
             <span onmouseout="hideTip(event, 'fs183', 500)" onmouseover="showTip(event, 'fs183', 500)" class="p">Node</span>(<span class="n">7</span>, <span onmouseout="hideTip(event, 'fs182', 501)" onmouseover="showTip(event, 'fs182', 501)" class="p">Leaf</span>, <span onmouseout="hideTip(event, 'fs182', 502)" onmouseover="showTip(event, 'fs182', 502)" class="p">Leaf</span>)))
 
 <span class="k">let</span> <span onmouseout="hideTip(event, 'fs185', 503)" onmouseover="showTip(event, 'fs185', 503)" class="f">fold</span> <span onmouseout="hideTip(event, 'fs186', 504)" onmouseover="showTip(event, 'fs186', 504)" class="f">f</span> <span onmouseout="hideTip(event, 'fs187', 505)" onmouseover="showTip(event, 'fs187', 505)" class="i">acc</span> <span onmouseout="hideTip(event, 'fs188', 506)" onmouseover="showTip(event, 'fs188', 506)" class="i">tree</span> <span class="o">=</span>
@@ -1185,7 +1185,7 @@ HTML and so on. We could use it to represent a document in the Markdown Structur
 <span class="l">7: </span>
 <span class="l">8: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs200', 549)" onmouseover="showTip(event, 'fs200', 549)" class="i">document</span> <span class="o">=</span> 
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs200', 549)" onmouseover="showTip(event, 'fs200', 549)" class="i">document</span> <span class="o">=</span>
     <span onmouseout="hideTip(event, 'fs199', 550)" onmouseover="showTip(event, 'fs199', 550)" class="p">Block</span> [
         <span onmouseout="hideTip(event, 'fs196', 551)" onmouseover="showTip(event, 'fs196', 551)" class="p">Literal</span> <span class="s">&quot;Hello&quot;</span>; <span onmouseout="hideTip(event, 'fs197', 552)" onmouseover="showTip(event, 'fs197', 552)" class="p">Bold</span> <span class="s">&quot;World!&quot;</span>; <span onmouseout="hideTip(event, 'fs195', 553)" onmouseover="showTip(event, 'fs195', 553)" class="p">NewLine</span>
         <span onmouseout="hideTip(event, 'fs196', 554)" onmouseover="showTip(event, 'fs196', 554)" class="p">Literal</span> <span class="s">&quot;InlineCode of&quot;</span>; <span onmouseout="hideTip(event, 'fs198', 555)" onmouseover="showTip(event, 'fs198', 555)" class="p">InlineCode</span> <span class="s">&quot;let sum x y = x + y&quot;</span>; <span onmouseout="hideTip(event, 'fs195', 556)" onmouseover="showTip(event, 'fs195', 556)" class="p">NewLine</span>

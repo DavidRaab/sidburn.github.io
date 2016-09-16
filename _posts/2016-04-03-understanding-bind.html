@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Understanding bind"
-tags: [functor,applicative,monad,option,cps]
+tags: [F#,functor,applicative,monad,option,cps]
 description: "Gives an introduction to the bind function"
 keywords: f#, fsharp, bind, monad, continuation, cps, option, maybe
 ---
@@ -364,7 +364,7 @@ was successful or not.</p>
 </tr>
 </table>
 <p>If the user input was <code>10</code> for example, we will see <code>The area of a circle is 314.159265</code>, but if we provide
-an invalid input, we just see <code>User Input was not a valid number</code>. In our example we first had a<br />
+an invalid input, we just see <code>User Input was not a valid number</code>. In our example we first had a
 <code>option</code> value and passed it to <code>Option.bind</code> with <code>|&gt;</code>. This happens often, that is why we created
 <code>&gt;&gt;=</code> previously.</p>
 <p>Let's extend that example. We now ask the user for three inputs. And we will calculate the volume
@@ -537,7 +537,7 @@ implement <code>map</code> through <code>return</code> and <code>apply</code>. B
 <span class="l">25: </span>
 </pre></td>
 <td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="c">// map with bind operator</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs70', 207)" onmouseover="showTip(event, 'fs70', 207)" class="f">map</span> <span onmouseout="hideTip(event, 'fs16', 208)" onmouseover="showTip(event, 'fs16', 208)" class="f">f</span> <span onmouseout="hideTip(event, 'fs17', 209)" onmouseover="showTip(event, 'fs17', 209)" class="i">opt</span> <span class="o">=</span> 
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs70', 207)" onmouseover="showTip(event, 'fs70', 207)" class="f">map</span> <span onmouseout="hideTip(event, 'fs16', 208)" onmouseover="showTip(event, 'fs16', 208)" class="f">f</span> <span onmouseout="hideTip(event, 'fs17', 209)" onmouseover="showTip(event, 'fs17', 209)" class="i">opt</span> <span class="o">=</span>
     <span onmouseout="hideTip(event, 'fs17', 210)" onmouseover="showTip(event, 'fs17', 210)" class="i">opt</span> <span class="o">&gt;</span><span class="o">&gt;</span><span class="o">=</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs18', 211)" onmouseover="showTip(event, 'fs18', 211)" class="i">x</span> <span class="k">-&gt;</span> <span class="c">// unbox option</span>
         <span onmouseout="hideTip(event, 'fs49', 212)" onmouseover="showTip(event, 'fs49', 212)" class="f">retn</span> (<span onmouseout="hideTip(event, 'fs16', 213)" onmouseover="showTip(event, 'fs16', 213)" class="f">f</span> <span onmouseout="hideTip(event, 'fs18', 214)" onmouseover="showTip(event, 'fs18', 214)" class="i">x</span>)    <span class="c">// execute (f x) and box result</span>
     )

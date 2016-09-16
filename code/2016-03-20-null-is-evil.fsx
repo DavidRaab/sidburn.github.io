@@ -2,9 +2,9 @@
 \---
 layout: post
 title: null is Evil
-tags: ["null",option,evil]
+tags: [F#,C#,"null",option,evil]
 description: "Explains why we consider null as a mistake, and shows alternatives to it"
-keywords: null, mistake, billion-dollar, tony hoare, option, maybe, monad 
+keywords: null, mistake, billion-dollar, tony hoare, option, maybe, monad
 \---
 *)
 
@@ -35,7 +35,7 @@ two kinds of problems that could happen.
 
 So how do we solve that problem? Hoare's answer was the invention of the *null-reference*. A
 *null-reference* is compatible with any other type. So instead of returning a `Person` we just
-could return a `null` instead. 
+could return a `null` instead.
 
 Our client code calling our function just need to check whether it is `null` or not. As easy as
 this sound, this easiness is exactly what leads to numerous errors and problems.
@@ -82,7 +82,7 @@ do that checking on every function. We only check those function that we know th
 Or in other words. We probably rely on *documentation*. Because we all know that *documentation* is always
 correct, never has mistakes, and everyone who writes documentation always adds the information if
 a function call could return `null` or not. And sure, we as programmers always re-check the whole documentation
-for every Class, Method or Function once we updated a library to ensure that the behaviour of all functions 
+for every Class, Method or Function once we updated a library to ensure that the behaviour of all functions
 still remains the same!
 
 Jokes aside, sure we don't do that. Not doing that doesn't mean we are bad programmers. The problem is
@@ -112,7 +112,7 @@ actually really want is sure we want to code like "Happ-Path", we want to cover 
 errors as possible. But we don't want to include some kind of checking and validation throughout
 our whole code, nearly at every line, after every function call.
 
-Usually what we want is just write code as if there are no errors (Happy-Path). And only at the end of a 
+Usually what we want is just write code as if there are no errors (Happy-Path). And only at the end of a
 chain we want to check if some-kind of error happened, or probably at selected points inside our chain.
 So ideally we want that we are forced to check, but only at specific places where we explicitly want it.
 But `null` doesn't provide that. We sure can leave the checks, but then our program will be buggy. As a
@@ -159,7 +159,7 @@ So what we really have is not a function `PersonId -> Person` we really have:
 
     PersonId -> Person option
 
-Or in other words. A function taking a `PersonId` that returns an `option` that either can 
+Or in other words. A function taking a `PersonId` that returns an `option` that either can
 contain a `Person` or don't contain anything. The first improvement is now that we can see
 clearly which functions can return a value or not. We don't have to rely on documentation
 anymore. Code itself is the best documentation at all! So lets assume we want to
@@ -173,7 +173,7 @@ print the Name of a person, what do we have to write now?
 At first, this doesn't look like an improvement over the `if` checking. We still have to check for
 either `Some` or `None`. So why is that better?
 
-1. The important point is, not every function returns an `option`. You only have to add this check if 
+1. The important point is, not every function returns an `option`. You only have to add this check if
    a function returns an optional.
 1. You are *forced* by the language at *compile-time* to add the checks if a function returns an `option`.
 
@@ -233,7 +233,7 @@ you can automate this process, but we will look later at this in more detail.
 
 We can pass `option` as a valid value. But only to those function that expects a `option`. We
 cannot implicitly pass it. And a function expecting an `option` as a value also must *Pattern Match*
-the argument. 
+the argument.
 
 So it cannot happen that values sometimes are `option` or not. Either they are, and we must check. Or
 we don't have to check at all.
@@ -273,7 +273,7 @@ and now we want to add them together. Ideally in a *Happy-Path* coding we could 
 
     let result = x + y + z
 
-But the problem is that `x`, `y` and `z` are `int optional`. So we cannot add `optional` values. 
+But the problem is that `x`, `y` and `z` are `int optional`. So we cannot add `optional` values.
 We first have to unwrap them. And it makes sense that we cannot do it. What for example should the
 the result be if some of the parsing failed? Should it just add those that where valid? Should
 the whole *computation* be aborted as soon one was invalid? Let's stick for the last one. As soon
@@ -332,7 +332,7 @@ Now we have a function with the function signature
 
     int -> int -> int -> int
 
-Or in other words, a function taking three `int` as an argument, and returning an `int`. But as learned 
+Or in other words, a function taking three `int` as an argument, and returning an `int`. But as learned
 so far we could not just call.
 
     let result = addThree x y z
@@ -386,7 +386,7 @@ function. You have to Pattern Match.
 ### Maybe Monad
 
 Another solution is the so called *Maybe Monad*. F# supports a feature named *Computation Expression*
-that are syntactic sugar for this kind of computations. Let's just look how our code could look like 
+that are syntactic sugar for this kind of computations. Let's just look how our code could look like
 with a *Maybe Monad*.
 
 *)
@@ -407,11 +407,11 @@ let resultWithMaybeA = maybe {
 
 (**
 As you see, we just can wrap our code inside a `maybe { ... }`. What you now see is a special
-syntax only available in a *Computation Expression*. You can write `let!` instead of just `let`. 
-A `let!` basically does the *unwrapping* of a value for you. 
+syntax only available in a *Computation Expression*. You can write `let!` instead of just `let`.
+A `let!` basically does the *unwrapping* of a value for you.
 
 Remember that `tryParse` actually returned an `int option`. But if you hover over `x` it is
-just an `int`. `let!` basically can turn a `int option` to an ordinary `int` for you. So you 
+just an `int`. `let!` basically can turn a `int option` to an ordinary `int` for you. So you
 can work with the result of `tryParse` just as if it is a normal value. But
 overall `resultWithMaybeA` is still an `int optional`. In those case it will be `Some 60`.
 
@@ -431,7 +431,7 @@ will abort the `maybe` construct at this point, and it would overall just return
 
 ## Summary
 
-`null` is evil, because you have to add a lot of checking to get it right, a language like C# don't 
+`null` is evil, because you have to add a lot of checking to get it right, a language like C# don't
 support you in trying to find all places where you forgot or have to add checking to get a correct
 program.
 

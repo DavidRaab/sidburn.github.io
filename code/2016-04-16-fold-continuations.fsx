@@ -2,7 +2,7 @@
 \---
 layout: post
 title: "Continuations and foldBack"
-tags: [fold,list,cps,recursion]
+tags: [F#,fold,list,cps,recursion]
 description: This article shows how you can implement List.foldBack with a continuation function
 keywords: f#, fsharp, fold, continuation, foldback, fold, list
 \---
@@ -98,7 +98,7 @@ The general *logic* is that we traverse a list backwards. Instead of starting wi
 accumulator and fetching `1` from the last, we start by fetching `4` from the end. Then `3`, `2`
 and last but not least `1`. The general logic how `foldBack` works is like that.
 
-     list      | acc        | x | (f x) :: acc 
+     list      | acc        | x | (f x) :: acc
     -----------+------------+---+--------------
      [1;2;3;4] | []         | 4 | [16]
        [1;2;3] | [16]       | 3 | [9;16]
@@ -126,7 +126,7 @@ far it calculated `0 + 4 + 3`.
 
 The only problem we have. We cannot go backwards through a list. That was the whole reason why we
 reversed the list before we looped/recurs through it. We only can go from left to right.
-And that is bad. Because we have to start with `1` and we need to pass an `acc` to the `f` 
+And that is bad. Because we have to start with `1` and we need to pass an `acc` to the `f`
 function that we don't have at that point in time!
 
 Uhm wait! Isn't that exactly what we discussed previously? What do we do if we expect to work
@@ -143,7 +143,7 @@ first write the basic template to loop through a list first.
         let rec loop cont list =
             match list with
             | []      -> ???
-            | x::list -> 
+            | x::list ->
                 let newCont = ???
                 loop newCont list
         loop ??? list
@@ -169,13 +169,13 @@ call the `f` function.
 But is that right? Let's think what would happen. In our first recursion we get `1` from
 `[1;2;3;4]` and save it in `x`. We then create a function that basically does.
 
-    let newCont racc = 
+    let newCont racc =
         f 1 racc
 
 We pass that function as `cont` to the next iteration. In the next recursion we extract `2`
 from the remaining list `[2;3;4]`, now we create a new `newCont` that basically does.
 
-    let newCont racc = 
+    let newCont racc =
         f 2 racc
 
 Then this new function is used as our `cont`. But this behaviour is wrong. We loop through
@@ -213,7 +213,7 @@ we just ended with `let compose f g x = g (f x)`. We now shorten our call to:
 Our `f` function takes two arguments, but otherwise it is the same idea. The whole *loop-body* part
 in our example now looks like this:
 
-    | x::list -> 
+    | x::list ->
         let newCont racc = cont (f x racc)
         loop newCont list
 
@@ -223,7 +223,7 @@ But we are not done yet, we still have to fill out two missing parts.
 
 One remaining part is the logic we have to do once we finished our looping. Let's actually try to
 understand what we exactly build. In every step we create a new function
-that expects the *right-accumulator* with this and the current `x` we calculate the 
+that expects the *right-accumulator* with this and the current `x` we calculate the
 *right-accumulator* for the previous function. In our first loop we create.
 
     let cont1 racc = initCont (f 1 racc)
@@ -312,7 +312,7 @@ let foldBack f list (acc:'State) =
     let rec loop cont list =
         match list with
         | []      -> cont acc
-        | x::list -> 
+        | x::list ->
             let newCont racc = cont (f x racc)
             loop newCont list
     loop id list
@@ -360,11 +360,11 @@ But at this point I also want to mention *mutability*. In functional programming
 we don't care how a function works. Functions are black-boxes. We only care for the input and
 the output of a function. It doesn't matter how it works, as long we have a *pure* function
 and it expect and returns *immutable-data* everything is fine. Even if a function uses
-loops, mutation or other kind of stuff. This is absolutely fine! 
+loops, mutation or other kind of stuff. This is absolutely fine!
 
 Controlled or limited *mutation* inside a function is absolutely okay. As long as that function
 is *pure* and only takes and returns *immutable-data*. That doesn't mean everything i said
-is useless. 
+is useless.
 
 It just explains the overall concept that is in general good to know and is useable in
 different scenarios.

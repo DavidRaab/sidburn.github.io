@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Sequence and Traverse"
-tags: [functor,applicative,list,option]
+tags: [F#,functor,applicative,list,option]
 description: Explains the sequence and traverse functions
 keywords: f#, fsharp, list, applicative, sequence, traverse, functional, programming
 ---
@@ -63,7 +63,7 @@ just <code>option</code>.</p>
 <p>We now have a list containing:</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp">[<span onmouseout="hideTip(event, 'fs11', 22)" onmouseover="showTip(event, 'fs11', 22)" class="p">Some</span> <span class="n">1</span>; <span onmouseout="hideTip(event, 'fs11', 23)" onmouseover="showTip(event, 'fs11', 23)" class="p">Some</span> <span class="n">100</span>; <span onmouseout="hideTip(event, 'fs11', 24)" onmouseover="showTip(event, 'fs11', 24)" class="p">Some</span> <span class="n">12</span>; <span onmouseout="hideTip(event, 'fs11', 25)" onmouseover="showTip(event, 'fs11', 25)" class="p">Some</span> <span class="n">5789</span>] 
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp">[<span onmouseout="hideTip(event, 'fs11', 22)" onmouseover="showTip(event, 'fs11', 22)" class="p">Some</span> <span class="n">1</span>; <span onmouseout="hideTip(event, 'fs11', 23)" onmouseover="showTip(event, 'fs11', 23)" class="p">Some</span> <span class="n">100</span>; <span onmouseout="hideTip(event, 'fs11', 24)" onmouseover="showTip(event, 'fs11', 24)" class="p">Some</span> <span class="n">12</span>; <span onmouseout="hideTip(event, 'fs11', 25)" onmouseover="showTip(event, 'fs11', 25)" class="p">Some</span> <span class="n">5789</span>]
 </code></pre></td>
 </tr>
 </table>
@@ -299,7 +299,7 @@ using the <code>id</code> function with <code>traverse</code>.</p>
 <span class="k">let</span> <span onmouseout="hideTip(event, 'fs46', 160)" onmouseover="showTip(event, 'fs46', 160)" class="f">printSum</span> <span onmouseout="hideTip(event, 'fs47', 161)" onmouseover="showTip(event, 'fs47', 161)" class="i">opt</span> <span class="o">=</span>
     <span class="k">match</span> <span onmouseout="hideTip(event, 'fs47', 162)" onmouseover="showTip(event, 'fs47', 162)" class="i">opt</span> <span class="k">with</span>
     | <span onmouseout="hideTip(event, 'fs9', 163)" onmouseover="showTip(event, 'fs9', 163)" class="p">None</span>     <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs48', 164)" onmouseover="showTip(event, 'fs48', 164)" class="f">printfn</span> <span class="s">&quot;Error: Some inputs were not numbers!&quot;</span>
-    | <span onmouseout="hideTip(event, 'fs11', 165)" onmouseover="showTip(event, 'fs11', 165)" class="p">Some</span> <span onmouseout="hideTip(event, 'fs49', 166)" onmouseover="showTip(event, 'fs49', 166)" class="i">sum</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs48', 167)" onmouseover="showTip(event, 'fs48', 167)" class="f">printfn</span> <span class="s">&quot;Sum: </span><span class="pf">%d</span><span class="s">&quot;</span> <span onmouseout="hideTip(event, 'fs49', 168)" onmouseover="showTip(event, 'fs49', 168)" class="i">sum</span>    
+    | <span onmouseout="hideTip(event, 'fs11', 165)" onmouseover="showTip(event, 'fs11', 165)" class="p">Some</span> <span onmouseout="hideTip(event, 'fs49', 166)" onmouseover="showTip(event, 'fs49', 166)" class="i">sum</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs48', 167)" onmouseover="showTip(event, 'fs48', 167)" class="f">printfn</span> <span class="s">&quot;Sum: </span><span class="pf">%d</span><span class="s">&quot;</span> <span onmouseout="hideTip(event, 'fs49', 168)" onmouseover="showTip(event, 'fs49', 168)" class="i">sum</span>
 
 <span onmouseout="hideTip(event, 'fs46', 169)" onmouseover="showTip(event, 'fs46', 169)" class="f">printSum</span> (<span onmouseout="hideTip(event, 'fs41', 170)" onmouseover="showTip(event, 'fs41', 170)" class="f">sum</span> <span onmouseout="hideTip(event, 'fs12', 171)" onmouseover="showTip(event, 'fs12', 171)" class="i">validInput</span>)
 <span onmouseout="hideTip(event, 'fs46', 172)" onmouseover="showTip(event, 'fs46', 172)" class="f">printSum</span> (<span onmouseout="hideTip(event, 'fs41', 173)" onmouseover="showTip(event, 'fs41', 173)" class="f">sum</span> <span onmouseout="hideTip(event, 'fs13', 174)" onmouseover="showTip(event, 'fs13', 174)" class="i">invalidInput</span>)
@@ -361,7 +361,7 @@ extend the <code>Async</code> module with the needed functions.</p>
 </pre></td>
 <td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">module</span> <span onmouseout="hideTip(event, 'fs51', 181)" onmouseover="showTip(event, 'fs51', 181)" class="t">Async</span> <span class="o">=</span>
     <span class="k">let</span> <span onmouseout="hideTip(event, 'fs53', 182)" onmouseover="showTip(event, 'fs53', 182)" class="f">retn</span> <span onmouseout="hideTip(event, 'fs29', 183)" onmouseover="showTip(event, 'fs29', 183)" class="i">x</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs54', 184)" onmouseover="showTip(event, 'fs54', 184)" class="i">async</span> { <span class="k">return</span> <span onmouseout="hideTip(event, 'fs29', 185)" onmouseover="showTip(event, 'fs29', 185)" class="i">x</span> }
-    
+
     <span class="k">let</span> <span onmouseout="hideTip(event, 'fs55', 186)" onmouseover="showTip(event, 'fs55', 186)" class="f">apply</span> <span onmouseout="hideTip(event, 'fs56', 187)" onmouseover="showTip(event, 'fs56', 187)" class="i">af</span> <span onmouseout="hideTip(event, 'fs57', 188)" onmouseover="showTip(event, 'fs57', 188)" class="i">ax</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs54', 189)" onmouseover="showTip(event, 'fs54', 189)" class="i">async</span> {
         <span class="c">// We start both async task in Parallel</span>
         <span class="k">let!</span> <span onmouseout="hideTip(event, 'fs58', 190)" onmouseover="showTip(event, 'fs58', 190)" class="i">pf</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs51', 191)" onmouseover="showTip(event, 'fs51', 191)" class="t">Async</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs59', 192)" onmouseover="showTip(event, 'fs59', 192)" class="f">StartChild</span> <span onmouseout="hideTip(event, 'fs56', 193)" onmouseover="showTip(event, 'fs56', 193)" class="i">af</span>
@@ -372,7 +372,7 @@ extend the <code>Async</code> module with the needed functions.</p>
         <span class="c">// Finally we execute (f x)</span>
         <span class="k">return</span> <span onmouseout="hideTip(event, 'fs28', 202)" onmouseover="showTip(event, 'fs28', 202)" class="f">f</span> <span onmouseout="hideTip(event, 'fs29', 203)" onmouseover="showTip(event, 'fs29', 203)" class="i">x</span>
     }
-    
+
     <span class="k">let</span> (<span class="o">&lt;*&gt;</span>)   <span class="o">=</span> <span onmouseout="hideTip(event, 'fs55', 204)" onmouseover="showTip(event, 'fs55', 204)" class="f">apply</span>
     <span class="k">let</span> <span onmouseout="hideTip(event, 'fs61', 205)" onmouseover="showTip(event, 'fs61', 205)" class="f">map</span> <span onmouseout="hideTip(event, 'fs28', 206)" onmouseover="showTip(event, 'fs28', 206)" class="f">f</span> <span onmouseout="hideTip(event, 'fs62', 207)" onmouseover="showTip(event, 'fs62', 207)" class="i">x</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs53', 208)" onmouseover="showTip(event, 'fs53', 208)" class="f">retn</span> <span onmouseout="hideTip(event, 'fs28', 209)" onmouseover="showTip(event, 'fs28', 209)" class="f">f</span> <span class="o">&lt;*&gt;</span> <span onmouseout="hideTip(event, 'fs62', 210)" onmouseover="showTip(event, 'fs62', 210)" class="i">x</span>
 

@@ -2,7 +2,7 @@
 \---
 layout: post
 title: Optionals
-tags: ["null",option]
+tags: [F#,"null",option]
 description: "Describes Optionals as an alternative to null"
 keywords: f#, fsharp, functional, option, null
 \---
@@ -18,7 +18,7 @@ which benefits they have.
 
 ## `null` is not the problem
 
-At first, I will state that `null` itself is not even the problem. 
+At first, I will state that `null` itself is not even the problem.
 
 Let's assume we write a application and we need to read some *Product* entries from a
 database. We just have a simple *id* as an `int` to identify a product.
@@ -70,7 +70,7 @@ a `bool` that either can be `true` or `false`. Here we have an `option` that eit
 or `None`. The difference is that the `Some` case can carry an additional value. Something
 that an *enum* or a `bool` cannot do.
 
-The `Some` or `None` are basically constructors. In the same sense that `true` or `false` are 
+The `Some` or `None` are basically constructors. In the same sense that `true` or `false` are
 constructors that creates a `bool`. As `None` don't carry any value, you just can write `None`,
 the same you just can write `null`. But, if a function has a path that returns `None`, you
 must ensure that all code paths return an `option` type. As we cannot create functions with
@@ -166,7 +166,7 @@ and their signatures to get a overview of the code.
 
 So let's just go through some of the interesting parts. At first, i added a `Option.IfNone`
 function. It either returns a value if present or the provided value. It is just a call
-to `defaultArg`. I created `ifNone` because the default argument order of `defaultArg` 
+to `defaultArg`. I created `ifNone` because the default argument order of `defaultArg`
 doesn't work nicely with piping.
 *)
 
@@ -288,7 +288,7 @@ the typical `null` checks to get it safe.
 
     let updateId f key db =
         let value = db |> getById key
-        if value <> null 
+        if value <> null
         then update key (f value) db
         else db
 
@@ -348,7 +348,7 @@ case looks like this.
     | [| LC "price"; Int id; Decimal price |] ->
 
 We *Pattern Match* and only if we have an Array with three elements and the second element can
-successfully transformed into an `int` and the third element can be turned into a `Decimal`, 
+successfully transformed into an `int` and the third element can be turned into a `Decimal`,
 only then the case successfully matches. `id` and `price` are also `int` and `decimal`
 not `option`.
 *)
@@ -435,7 +435,7 @@ module App =
 
     [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
     module Product =
-        let create id name price = 
+        let create id name price =
             {Id=id; Name=name; Price=price}
 
         let withName newName product =
@@ -448,7 +448,7 @@ module App =
         let getById id db =
             Map.tryFind id db
 
-        let getAll db = 
+        let getAll db =
             db |> Map.toList |> List.sortBy fst |> List.map snd
 
         let containsId id db =
@@ -470,7 +470,7 @@ module App =
             Map.add key value db
 
         let updateId f key db =
-            db 
+            db
             |> getById key
             |> Option.map (fun value -> update key (f value) db)
             |> Option.ifNone db
@@ -488,7 +488,7 @@ module App =
             | Exit
 
         // Parsing string to Command
-        let (|Int|_|) input = 
+        let (|Int|_|) input =
             match Int32.TryParse input with
             | false,_ -> None
             | true,x  -> Some x
@@ -501,8 +501,8 @@ module App =
         let (|LC|) (str:string) = str.ToLowerInvariant()
 
         let parseCommand (input:string) =
-            let args = 
-                Regex.Matches(input, "(?:\"(?<str>[^\"]+)\"|(?<str>\S+))") 
+            let args =
+                Regex.Matches(input, "(?:\"(?<str>[^\"]+)\"|(?<str>\S+))")
                 |> Seq.cast<Match>
                 |> Seq.map (fun m -> m.Groups.["str"].Value)
                 |> Seq.toArray
@@ -570,7 +570,7 @@ module App =
         ()
 
     // Start with some default entries
-    let storage = 
+    let storage =
         Map.ofList [
             1, Product.create 1 "TV" 499.99m
             2, Product.create 2 "A Book" 29.99m
@@ -601,7 +601,7 @@ type Product = {
 (*** define:module-product ***)
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
 module Product =
-    let create id name price = 
+    let create id name price =
         {Id=id; Name=name; Price=price}
 
     let withName newName product =
@@ -616,7 +616,7 @@ module DB =
         Map.tryFind id db
 (*** define:getall ***)
 
-    let getAll db = 
+    let getAll db =
         db |> Map.toList |> List.sortBy fst |> List.map snd
 
     let containsId id db =
@@ -639,7 +639,7 @@ module DB =
         Map.add key value db
 
     let updateId f key db =
-        db 
+        db
         |> getById key
         |> Option.map (fun value -> update key (f value) db)
         |> Option.ifNone db
@@ -659,7 +659,7 @@ module CLI =
         | Exit
 (*** define:active-patterns ***)
     // Parsing string to Command
-    let (|Int|_|) input = 
+    let (|Int|_|) input =
         match Int32.TryParse input with
         | false,_ -> None
         | true,x  -> Some x
@@ -673,8 +673,8 @@ module CLI =
 
 (*** define:parseCommand ***)
     let parseCommand (input:string) =
-        let args = 
-            Regex.Matches(input, "(?:\"(?<str>[^\"]+)\"|(?<str>\S+))") 
+        let args =
+            Regex.Matches(input, "(?:\"(?<str>[^\"]+)\"|(?<str>\S+))")
             |> Seq.cast<Match>
             |> Seq.map (fun m -> m.Groups.["str"].Value)
             |> Seq.toArray
@@ -713,7 +713,7 @@ module CLI =
         let product = Product.create id name price
         DB.insert id product db
 
-(*** define:update2 ***)    
+(*** define:update2 ***)
     let updateName db id newName =
         DB.updateId (Product.withName newName) id db
 
@@ -749,7 +749,7 @@ let main db =
 
 (*** define:start ***)
 // Start with some default entries
-let storage = 
+let storage =
     Map.ofList [
         1, Product.create 1 "TV" 499.99m
         2, Product.create 2 "A Book" 29.99m

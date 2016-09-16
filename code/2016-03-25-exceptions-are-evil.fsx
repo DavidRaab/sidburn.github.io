@@ -85,7 +85,7 @@ it. You also cannot implicitly pass an `Exception` as a valid value to a functio
 `null` you can do that, that's why we have to also add `null` checks for function arguments.
 
 So it seems we are not affected if we throw exceptions. But that is wrong. An object itself contains *methods*.
-And every method on an object could throw an exception. 
+And every method on an object could throw an exception.
 
 With `null` you have to check every argument if it is `null`. With *exceptions* you have to additional add
 try/catch blocks if you call a method on an object. Because you pass objects around, and objects have *methods*

@@ -2,7 +2,7 @@
 \---
 layout: post
 title: "Algebraic Data-Types"
-tags: [types,data,units-of-measure]
+tags: [F#,types,data,units-of-measure]
 description: An Introduction to algebraic data-types in F#
 keywords: f#, fsharp, algebraic, data, types, functional, programming
 \---
@@ -116,7 +116,7 @@ In those examples we don't want to define types all the time before-hand.
 ## Records
 
 A *records* is also a *Product-type*. But we must define a type before-hand.
-*Records* are also often named *Named Tuples*. 
+*Records* are also often named *Named Tuples*.
 
 One advantage of a *Record-type* over a tuple is that we can use names to describe the
 different fields. We could for example create a Person with fields like *First-name*,
@@ -158,7 +158,7 @@ let me = {
 printfn "%s %s has %s hair" me.FirstName me.LastName me.HairColor
 // David Raab has Blond hair
 
-(** 
+(**
 A Record is immutable by default and has value semantic by default. That means we can compare those.
 *)
 
@@ -185,7 +185,7 @@ me < markus // true
 
 (**
 As we can see, as long all fields are the same we get a `true`. But how does `me < markus` work?
-By default it uses the order of the fields. It starts comparing `FirstName`. Because "D" from 
+By default it uses the order of the fields. It starts comparing `FirstName`. Because "D" from
 "David" is smaller than "M" from "Markus" we get `true`. If `FirstName` would be the same,
 it would compare `LastName` and so on.
 
@@ -277,14 +277,14 @@ let contact = {
     LastName  = "Smith"
     IsAlive   = true
     Age       = 25
-    Address   = 
+    Address   =
         {
             StreetAddress = "21 2nd Street"
             City          = "New York"
             State         = "NY"
             PostalCode    = "10021-3100"
         }
-    PhoneNumbers = 
+    PhoneNumbers =
         [
         {
             Type   = "Home"
@@ -387,14 +387,14 @@ let contactWithDU = {
     LastName  = "Smith"
     IsAlive   = true
     Age       = 25
-    Address   = 
+    Address   =
         {
             StreetAddress = "21 2nd Street"
             City          = "New York"
             State         = "NY"
             PostalCode    = "10021-3100"
         }
-    PhoneNumbers = 
+    PhoneNumbers =
         [
             Home   "212 555-1234"
             Office "646 555-4567"
@@ -492,7 +492,7 @@ module Cardinality =
     let line2 = 0,0,10,10
 
 (**
-`Line` and `Line2` are two different types. 
+`Line` and `Line2` are two different types.
 
 1. `Line` contains **two Tuples** and each of those Tuple contain two `int`.
 1. `Line2` on the other hand is a single tuple with four `int`.
@@ -500,9 +500,9 @@ module Cardinality =
 Even if their are of different shapes, we can easily see that both types can save
 the same amount of data. We can easily proof that by calculating the Cardinality.
 
-1. For `Line` it looks like `(i * i) * (i * i)` that turns into `(i ^ 2) * (i ^ 2)` and this 
+1. For `Line` it looks like `(i * i) * (i * i)` that turns into `(i ^ 2) * (i ^ 2)` and this
    again turns into `i ^ 4`.
-1. `Line2` is `i * i * i * i` and directly turns into `i ^ 4`. 
+1. `Line2` is `i * i * i * i` and directly turns into `i ^ 4`.
 
 With this we now know that we can transform any `Line` into a `Line2` or vice-versa.
 This is important, because in programming it is important to choose the right data-format.
@@ -612,9 +612,9 @@ is by far more readable and understandable. A function like:
 
 let getBirthday (Person (_,_,_,bd,_)) = bd
 
-(** 
+(**
 Now also has the Type Signature `Person -> Birthday`. We would easily spot errors like this
-one. 
+one.
 *)
 
 let getBirthday (Person (_,_,bd,_,_)) = bd
@@ -639,7 +639,7 @@ to compare those different types at all.
 Using primitive types like `string`, `float` throughout your code is also what we
 name [Primitive Obsession](http://enterprisecraftsmanship.com/2015/03/07/functional-c-primitive-obsession/).
 
-With DUs we can easily get rid of *Primitive Obsession* and 
+With DUs we can easily get rid of *Primitive Obsession* and
 [eliminate a lot of bugs](http://reidev275.azurewebsites.net/eliminating-bugs-with-single-case-discriminated-unions/).
 
 <a name="units-of-measure"></a>
@@ -674,7 +674,7 @@ the code more readable by having types like `meter`, `km`, `feet` and so on, ins
 
 type Size = Cm of float
 
-(** 
+(**
 Now a definition like `Cm 172.0` makes it clear that we have `172` *centimeter*. We also
 cannot easily add a float to a `Size` anymore. Because they are of different types.
 
@@ -700,9 +700,9 @@ let sizeB = 10.0<miles>
 When we now do something like
 
     let result = sizeA + sizeB
-   
+
 We get a compile-time error telling us that *meter* and *miles* doesn't match up. The benefit is
-that we can work with those numbers without unwrapping them. 
+that we can work with those numbers without unwrapping them.
 *)
 
 let doubleSize   = sizeA * 2.0
@@ -835,13 +835,13 @@ type Tree<'a> =
 //  2   6
 // 1 3 5 7
 
-let tree = 
-    Node(4, 
-        Node(2, 
-            Node(1, Leaf, Leaf), 
-            Node(3, Leaf, Leaf)), 
-        Node(6, 
-            Node(5, Leaf, Leaf), 
+let tree =
+    Node(4,
+        Node(2,
+            Node(1, Leaf, Leaf),
+            Node(3, Leaf, Leaf)),
+        Node(6,
+            Node(5, Leaf, Leaf),
             Node(7, Leaf, Leaf)))
 
 let fold f acc tree =
@@ -876,7 +876,7 @@ type Markdown =
 
 (** We then can generate a structure like this: *)
 
-let document = 
+let document =
     Block [
         Literal "Hello"; Bold "World!"; NewLine
         Literal "InlineCode of"; InlineCode "let sum x y = x + y"; NewLine

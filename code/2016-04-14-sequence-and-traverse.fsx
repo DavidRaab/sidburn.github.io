@@ -2,7 +2,7 @@
 \---
 layout: post
 title: "Sequence and Traverse"
-tags: [functor,applicative,list,option]
+tags: [F#,functor,applicative,list,option]
 description: Explains the sequence and traverse functions
 keywords: f#, fsharp, list, applicative, sequence, traverse, functional, programming
 \---
@@ -13,7 +13,7 @@ module Main
 type Uri = System.Uri
 
 (**
-One problem that appears from time to time is that we we have some kind of 
+One problem that appears from time to time is that we we have some kind of
 collection (I use `list` here) and we want to `map` every element with a
 *monadic function* `'a -> M<'b>`. This then returns a `list<M<'a>>`. But
 often we want a `M<list<'a>>`.
@@ -64,10 +64,10 @@ The first step is easy, as we could just `map` the list.
 
 let validInts = List.map tryParseInt validInput
 
-(** 
-We now have a list containing: 
+(**
+We now have a list containing:
 
-    [Some 1; Some 100; Some 12; Some 5789] 
+    [Some 1; Some 100; Some 12; Some 5789]
 
 The problem starts in how we determine that every element is valid. We sure could
 use `fold` to loop through our list. Starting with a `bool` set to `true` and as soon
@@ -75,10 +75,10 @@ we encounter a `None` we set the `bool` to `false`.
 
 But we already have `Option` for this kind of purpose. With `Option` we still can
 return the idea of `true` (Some) and `false` (None), but additional we also can return
-a value. 
+a value.
 
 Instead of just getting a boolean flag like `true` and `false` we just return `Some`
-with a new list that has all the `option` values stripped instead. For the valid 
+with a new list that has all the `option` values stripped instead. For the valid
 input case we just expect:
 
     Some [1; 100; 12; 5789]
@@ -133,7 +133,7 @@ let (<*>) = apply
 
 (**
 There is also another problem here. It doesn't matter which type we use. We always have
-to lift an empty list. In this case we did `Some []` for the accumulator. But in a 
+to lift an empty list. In this case we did `Some []` for the accumulator. But in a
 `Async` case we just want an empty list inside an `Async`. So we always just want to
 `return` a list for the context. It just means: We always can create a `sequence`
 function as long our type provides a `return` and `apply` function. Or in other words,
@@ -183,7 +183,7 @@ at all. Instead we will implement `traverse`. So how is `traverse` different fro
 
 As you have seen so far. Even with `sequence` there is one *pattern* that is always the same.
 You first `map` a list, then you use `sequence` on it. `traverse` is just the idea to combine
-both operations into a single operation. 
+both operations into a single operation.
 
 If that sounds complicated, it isn't at all! Just think for a moment. `map` just means we apply
 a function to every element before we use `sequence`. So the only thing we need to
@@ -247,7 +247,7 @@ let sum input =
 let printSum opt =
     match opt with
     | None     -> printfn "Error: Some inputs were not numbers!"
-    | Some sum -> printfn "Sum: %d" sum    
+    | Some sum -> printfn "Sum: %d" sum
 
 printSum (sum validInput)
 printSum (sum invalidInput)
@@ -284,7 +284,7 @@ extend the `Async` module with the needed functions.
 
 module Async =
     let retn x = async { return x }
-    
+
     let apply af ax = async {
         // We start both async task in Parallel
         let! pf = Async.StartChild af
@@ -295,7 +295,7 @@ module Async =
         // Finally we execute (f x)
         return f x
     }
-    
+
     let (<*>)   = apply
     let map f x = retn f <*> x
 
@@ -326,7 +326,7 @@ wrote for the `option` type. We just have to set `retn` and `<*>` to functions t
 with `Async`.
 
 ## Further Reading
- 
+
  * [Understanding traverse and sequence](http://fsharpforfunandprofit.com/posts/elevated-world-4/)
  * [[Haskell] Traversable](https://en.wikibooks.org/wiki/Haskell/Traversable)
 *)

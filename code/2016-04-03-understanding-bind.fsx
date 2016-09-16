@@ -2,7 +2,7 @@
 \---
 layout: post
 title: "Understanding bind"
-tags: [functor,applicative,monad,option,cps]
+tags: [F#,functor,applicative,monad,option,cps]
 description: "Gives an introduction to the bind function"
 keywords: f#, fsharp, bind, monad, continuation, cps, option, maybe
 \---
@@ -13,7 +13,7 @@ module Main
 open System
 
 (**
-In [Understanding map]({% post_url 2016-03-27-understanding-map %}) we learned that implementing 
+In [Understanding map]({% post_url 2016-03-27-understanding-map %}) we learned that implementing
 a `map` function is what we call a *Functor*. In [Understanding apply]({% post_url 2016-03-31-applicative-functors %})
 we extended that idea with the `return` and `apply` function and we call the result an *Applicative Functor*.
 The next important function in our toolset is the `bind` function.
@@ -37,7 +37,7 @@ what is `bind` supposed to do?
 
 Up to this point we only upgraded functions that had normal unboxed input and output types. We always
 faced functions like `'a -> 'b`, but never functions like `'a -> option<'b>`, `'a -> Async<'b>`
-or `'a -> list<'b>`. But in practice, the latter are quite common. 
+or `'a -> list<'b>`. But in practice, the latter are quite common.
 
 A simple example is a function that tries to parse a `string` to a `float`. Because parsing of
 a string to a float could fail we usually expect a return type like `option<float>`. Usually we
@@ -57,7 +57,7 @@ We now have a function `Double.tryParse` with the signature.
 
     string -> option<float>
 
-I will call such functions *Monadic functions* from now on. All *Monadic functions* expect 
+I will call such functions *Monadic functions* from now on. All *Monadic functions* expect
 normal input arguments, but return a boxed type, like `option<'a>`, `list<'a>`, `Async<'a>`
 and so on.
 
@@ -88,13 +88,13 @@ already covered this function in [Understanding apply]({% post_url 2016-03-31-ap
 
 ## Implementing `bind`
 
-We can implement `bind` in two different ways. It is good to know both as depending on which type we 
+We can implement `bind` in two different ways. It is good to know both as depending on which type we
 have, sometimes the one or the other can be easier.
 
 1. The obvious way. You directly write a `bind` function that is similar to `map`, but instead
    of wrapping the output, you just return the output of the function as-is.
 1. You first write a `join`, `concat` or `flatten` function (The exact name of such a function
-   usually depends on the type you have). The idea of such a function is to resolve two 
+   usually depends on the type you have). The idea of such a function is to resolve two
    boxed types just into a single box. After this you just `map` and then `join` the result
    to create `bind`.
 
@@ -270,7 +270,7 @@ functions. We just could `map` or `apply` all other functions that are not compa
 But instead of doing that, let's pass the resulting `option<float>` directly to `bind`. We then
 provide a continuation function to `bind` that only will be executed if we have `Some value`.
 The advantage is that our `f` function only sees a `float`, not a `option<float>`. We now
-can do something with that `float`. 
+can do something with that `float`.
 
 Let's write an example where the user inputs the radius of a circle, and we calculate the
 area of that circle.
@@ -323,7 +323,7 @@ match area with
 
 (**
 If the user input was `10` for example, we will see `The area of a circle is 314.159265`, but if we provide
-an invalid input, we just see `User Input was not a valid number`. In our example we first had a  
+an invalid input, we just see `User Input was not a valid number`. In our example we first had a
 `option` value and passed it to `Option.bind` with `|>`. This happens often, that is why we created
 `>>=` previously.
 
@@ -366,7 +366,7 @@ Do you spot the similarities?
 1. In the first example: We only have `=` for assignment, and we assign the result to `let x`.
 1. In the second example: We have `>>= (fun x` as we assign the result of the expression to `x`.
 
-So what is the difference between both? 
+So what is the difference between both?
 
 The first difference is that the statements are just flipped. With `let` we have something like
 
@@ -441,14 +441,14 @@ the second solution I showed in the [null is Evil]({% post_url 2016-03-20-null-i
 
 ## Defining `map` and `apply` through `bind`
 
-The combination of `return` and `bind` is really powerful. In 
+The combination of `return` and `bind` is really powerful. In
 [Understanding apply]({% post_url 2016-03-31-applicative-functors %}) we already saw that we can
 implement `map` through `return` and `apply`. But with `return` and `bind` we can easily implement
 `map` and `apply`.
 *)
 
 // map with bind operator
-let map f opt = 
+let map f opt =
     opt >>= (fun x -> // unbox option
         retn (f x)    // execute (f x) and box result
     )
@@ -589,7 +589,7 @@ to a boxed value. A function like `int -> string -> float -> int` can thus be tu
     'a -> M<'a>
 
 It just boxes a `'a`
-    
+
 
 ### `bind`
 

@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "The Option Module"
-tags: [option]
+tags: [F#,option]
 description: Explains some lesser known functions in the Option Module
 keywords: f#, fsharp, functional, programming, option
 ---
@@ -137,7 +137,7 @@ unchanged. Otherwise we get <code>None</code>.</p>
 <td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs23', 57)" onmouseover="showTip(event, 'fs23', 57)" class="f">isValid</span> <span onmouseout="hideTip(event, 'fs24', 58)" onmouseover="showTip(event, 'fs24', 58)" class="i">x</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs24', 59)" onmouseover="showTip(event, 'fs24', 59)" class="i">x</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs12', 60)" onmouseover="showTip(event, 'fs12', 60)" class="t">Option</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs16', 61)" onmouseover="showTip(event, 'fs16', 61)" class="f">exists</span> (<span class="k">fun</span> _ <span class="k">-&gt;</span> <span class="k">true</span>)
 <span class="k">let</span> <span onmouseout="hideTip(event, 'fs25', 62)" onmouseover="showTip(event, 'fs25', 62)" class="f">isEven</span> <span onmouseout="hideTip(event, 'fs17', 63)" onmouseover="showTip(event, 'fs17', 63)" class="i">x</span>  <span class="o">=</span> <span onmouseout="hideTip(event, 'fs17', 64)" onmouseover="showTip(event, 'fs17', 64)" class="i">x</span> <span class="o">%</span> <span class="n">2</span> <span class="o">=</span> <span class="n">0</span>
 
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs15', 65)" onmouseover="showTip(event, 'fs15', 65)" class="i">input</span> <span class="o">=</span> 
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs15', 65)" onmouseover="showTip(event, 'fs15', 65)" class="i">input</span> <span class="o">=</span>
     <span onmouseout="hideTip(event, 'fs5', 66)" onmouseover="showTip(event, 'fs5', 66)" class="p">Some</span> <span class="n">6</span>
     <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs12', 67)" onmouseover="showTip(event, 'fs12', 67)" class="t">Option</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs26', 68)" onmouseover="showTip(event, 'fs26', 68)" class="f">filter</span> (<span onmouseout="hideTip(event, 'fs21', 69)" onmouseover="showTip(event, 'fs21', 69)" class="f">greater</span> <span class="n">0</span>)
     <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs12', 70)" onmouseover="showTip(event, 'fs12', 70)" class="t">Option</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs26', 71)" onmouseover="showTip(event, 'fs26', 71)" class="f">filter</span> (<span onmouseout="hideTip(event, 'fs18', 72)" onmouseover="showTip(event, 'fs18', 72)" class="f">smaller</span> <span class="n">10</span>)

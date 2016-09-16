@@ -2,7 +2,7 @@
 \---
 layout: post
 title: "Higher-kinded Polymorphism: What is it, why you want it"
-tags: [polymorphism]
+tags: [F#,polymorphism]
 description: "Explains Higher-Kinded Polymorphism"
 keywords: f#, fsharp, type classes, polymorphism, higher-kinded
 \---
@@ -66,7 +66,7 @@ We now have `add` with the signature `float -> float -> float`. But it is still 
     let r1 = add 1.3 2.1
     let r2 = add 3 4
 
-will create errors at line 3 saying that `3` and `4` was expected to be of type `float` 
+will create errors at line 3 saying that `3` and `4` was expected to be of type `float`
 but we provided `int` as a value.
 
 The problem we have is that `add` itself is not polymorphic at all. But let's consider, why do we have
@@ -76,7 +76,7 @@ but this is not what F# does by default. At default it tries to get concrete typ
 types. But it cannot automatically create Polymorphic functions that accepts all types that can be
 added (+), for instance.
 
-But as said before, F# supports this kind of stuff partly. Indeed we can fix this problem 
+But as said before, F# supports this kind of stuff partly. Indeed we can fix this problem
 very easily with the `inline` keyword.
 *)
 
@@ -115,7 +115,7 @@ The problem with this code is. You cannot add two generic variables! What you re
 to say: Allow any type that supports the `+` operation.
 
 Probably you will say: Okay but i don't need to write the `int` version. As `int` can implicitly convert
-to `float`, so the `float` version also works with `int`. That might be right, but it is not the same, 
+to `float`, so the `float` version also works with `int`. That might be right, but it is not the same,
 your return type will also be `float` not `int` anymore. We could argue with *floating-point inaccuracy*
 on why it is not the same, but there is a better way to show the difference. What do you do if your type
 supports `+` but don't support a conversion to `float`?
@@ -128,10 +128,10 @@ type Vector3 = {X:float; Y:float; Z:float} with
     static member create x y z = {X=x; Y=y; Z=z}
     static member (+) (a,b)    = Vector3.create (a.X + b.X) (a.Y + b.Y) (a.Z + b.Z)
     static member Zero         = Vector3.create 0.0 0.0 0.0
-    static member DivideByInt(a,b) = 
-        Vector3.create 
-            (LanguagePrimitives.DivideByInt a.X b) 
-            (LanguagePrimitives.DivideByInt a.Y b) 
+    static member DivideByInt(a,b) =
+        Vector3.create
+            (LanguagePrimitives.DivideByInt a.X b)
+            (LanguagePrimitives.DivideByInt a.Y b)
             (LanguagePrimitives.DivideByInt a.Z b)
 
 (**
@@ -191,14 +191,14 @@ operations. A truly polymorphic `average` would then look like this.
 let inline average (xs:'a list) =
     let mutable amount = 0
     let mutable sum    = LanguagePrimitives.GenericZero<'a>
-    for x in xs do 
+    for x in xs do
         sum    <- sum + x
         amount <- amount + 1
     LanguagePrimitives.DivideByInt sum amount
 
-(** 
+(**
 To use our `Vector3` type with `average` we have to add the remaining polymorphic `Zero` and
-`DivideByInt` members. 
+`DivideByInt` members.
  *)
 
 (*** include:vector3 ***)
@@ -218,18 +218,18 @@ If `average` itself only uses polymorphic functions, then it means `average` its
 be polymorphic.
 
 But this also means that whenever we create a new type with the correct implementations, we
-actually can get a lot of functions for free. Every type that we create that supports `+`, 
+actually can get a lot of functions for free. Every type that we create that supports `+`,
 `Zero` and a `DivideByInt` automatically gets an `average` function for free!
 
 Or in other words. Higher-kinded polymorphism is about code reuse. By just implementing the
 right *glue-functions* it can be that you get hundreds of already pre-defined functions!
 
-As an example you probably heard that `fold` and `foldBack` are very powerful functions, 
-and just with `fold` you can implement a lot of other functions like `List.filter`, 
+As an example you probably heard that `fold` and `foldBack` are very powerful functions,
+and just with `fold` you can implement a lot of other functions like `List.filter`,
 `List.collect`, `List.map` and so on. This is interesting as it means, you could theoretically
 provide a single polymorphic `filter` function, and it would work with all types that
 implements a `fold` function. The same is true for all other functions that could be
-implemented through `fold`. 
+implemented through `fold`.
 
 This basically would mean you never have to implement dozens of functions that you see in
 the `List` module. You just need to implement `fold` and you would get dozens of functions

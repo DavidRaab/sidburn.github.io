@@ -3,7 +3,7 @@
 layout: post
 title: Applying Structured Programming
 date: 2016-03-09 01:00:00
-tags: [list,refactoring,immutability,structured]
+tags: [F#,list,refactoring,immutability,structured]
 description: "Shows how applying the idea of Structured Programming can improve the code"
 keywords: f#, fsharp, programming, functional, structured, looping, list
 \---
@@ -13,8 +13,8 @@ keywords: f#, fsharp, programming, functional, structured, looping, list
 module Main
 
 (**
-In my previous post about [Structured Programming]({% post_url 2016-03-09-structured-programming %}) I 
-talked about that basic looping constructs, `fold` and so on are basically just still to powerful. 
+In my previous post about [Structured Programming]({% post_url 2016-03-09-structured-programming %}) I
+talked about that basic looping constructs, `fold` and so on are basically just still to powerful.
 In the sense of readability we should try to eliminate them with more specific ones. In this post
 i go through a *toy example* to show the various ways on how to refactor some code.
 
@@ -26,9 +26,9 @@ assume that every attack of an player has a 16% chance to be critical. We only n
 a random number between 0 and 99 (or 0 to 1) and test if that number is lower than 16 (or 0.16).
 
 Let's assume we want to test if that really is true. We would just generate some random numbers.
-Test if that number is a critical hit. And either increase a *critical hit* variable or some 
+Test if that number is a critical hit. And either increase a *critical hit* variable or some
 *normal hit* variable. After 1000 tries we just calculate the average and see if
-we really have around 16% or around 160 hits. 
+we really have around 16% or around 160 hits.
 
 ## Solution 1
 
@@ -70,7 +70,7 @@ for i in 1..10 do
     Crit: 1653 Normal: 8347 Percentage: 16.530000
     Crit: 1613 Normal: 8387 Percentage: 16.130000
 
-Actually we now have proven that the idea works, as around 16% of our attacks are now critical. 
+Actually we now have proven that the idea works, as around 16% of our attacks are now critical.
 But now let's actually look if we can improve our `calculateChance` function. As stated in the
 beginning. It is a toy example, so we usually wouldn't waste any time in improving this particular
 function. But by going through a toy example it can help to get the general concept on
@@ -84,7 +84,7 @@ sense just looping and you can turn any kind of loop into recursion. The differe
 and recursion is just what is explicit and what is implicit.
 
 In Looping we implicitly move to the next step, and we can explicitly break/abort a loop. In recursion
-we implicitly abort, and we have to explicitly move to the next step, by calling our function recursively. 
+we implicitly abort, and we have to explicitly move to the next step, by calling our function recursively.
 
 Mutable variables outside of a loop turn into function parameters. This way we can turn any kind of
 loop into a recursive function and eliminate mutable variables all together.
@@ -110,13 +110,13 @@ Either in both ways we will call `loop` again, but with an increment `count`. If
 is `false` we have a normal hit, so we increase `normalHit` by one, otherwise we increase `criticalHit`
 by one.
 
-We continue our recursive call as long we have `count < 1000`. But as soon that condition is `false` 
+We continue our recursive call as long we have `count < 1000`. But as soon that condition is `false`
 we end up with just `criticalHit, normalHit` that will return both variables as a tuple.
 
 The question overall is. Is that version better as *Solution 1*?
 
 Well it depends. We eliminated the mutable variables, but actually at least I am someone that
-has nothing against mutable variables in a limited scope. If you are a programmer that primarily 
+has nothing against mutable variables in a limited scope. If you are a programmer that primarily
 uses an imperative language and are used to looping then you will probably prefer Solution 1. If you
 are in the state of learning *functional programing* you should try to replace looping
 constructs in this kind of way to get used to it. This is especially important for the later Solutions
@@ -139,7 +139,7 @@ exactly what `fold` is about! The question that starts to beg is. Can we replace
 by using a `fold`?
 
 The answer is *yes*. But which kind of `fold` do we need? Or in other words, over what exactly do
-we loop? We don't loop over a data-structure like an `Array` or `List`. So what is it that 
+we loop? We don't loop over a data-structure like an `Array` or `List`. So what is it that
 we are looping over?
 
 When we examine our code we could say we loop over `count`. But that isn't true. Our
@@ -164,7 +164,7 @@ let calculateChance chance =
     randomSeq 0 100
     |> Seq.take 1000
     |> Seq.fold (fun (criticalHit,normalHit) random ->
-        if   random < chance 
+        if   random < chance
         then (criticalHit+1),normalHit
         else criticalHit,(normalHit+1)
     ) (0,0)
@@ -182,15 +182,15 @@ eliminate `fold`?
 
 ## Solution 4
 
-We actually can eliminate `fold`. But for that we need to go and look back at what we are actually 
+We actually can eliminate `fold`. But for that we need to go and look back at what we are actually
 doing. What we really was interested in was the percentage if we really get the right amount of
-*critical-hits* this way. What we really need is to split it into two parts. We need some function 
+*critical-hits* this way. What we really need is to split it into two parts. We need some function
 that test whether we have a critical hit or not. We could turn it into `true` and `false` values.
 But later we need to turn those somehow into a formula to calculate the average.
 
 But by thinking separetely about it we easily can recognise that we can easily achive both things in
 one step. By just turning a critical-hit into `1.0` and a normal hit into `0.0`. By calculating the
-average we would automatically get a percentage that ranges bewteen `0.0` and `1.0`. We could multiply it by 
+average we would automatically get a percentage that ranges bewteen `0.0` and `1.0`. We could multiply it by
 `100.0` or we also could use `100.0` and `0.0` instead of `1.0` and `0.0`.
 *)
 
@@ -207,10 +207,10 @@ let calculateChance chance =
     |> Seq.take 1000
     |> Seq.averageBy (fun x -> if x < chance then 100.0 else 0.0)
 
-(** 
+(**
 ## Conclusion
 
-When we compare the final code with what we started I think we have reached a good refactoring. 
+When we compare the final code with what we started I think we have reached a good refactoring.
 
 We started with:
 *)

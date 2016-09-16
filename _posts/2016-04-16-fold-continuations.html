@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Continuations and foldBack"
-tags: [fold,list,cps,recursion]
+tags: [F#,fold,list,cps,recursion]
 description: This article shows how you can implement List.foldBack with a continuation function
 keywords: f#, fsharp, fold, continuation, foldback, fold, list
 ---
@@ -117,7 +117,7 @@ and last but not least <code>1</code>. The general logic how <code>foldBack</cod
 <span class="l">6: </span>
 <span class="l">7: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"> <span onmouseout="hideTip(event, 'fs20', 52)" onmouseover="showTip(event, 'fs20', 52)" class="i">list</span>      | <span class="i">acc</span>        | <span class="i">x</span> | (<span class="i">f</span> <span class="i">x</span>) <span class="o">::</span> <span class="i">acc</span> 
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"> <span onmouseout="hideTip(event, 'fs20', 52)" onmouseover="showTip(event, 'fs20', 52)" class="i">list</span>      | <span class="i">acc</span>        | <span class="i">x</span> | (<span class="i">f</span> <span class="i">x</span>) <span class="o">::</span> <span class="i">acc</span>
 <span class="o">-----------+------------+---+--------------</span>
  [<span class="n">1</span>;<span class="n">2</span>;<span class="n">3</span>;<span class="n">4</span>] | []         | <span class="n">4</span> | [<span class="n">16</span>]
    [<span class="n">1</span>;<span class="n">2</span>;<span class="n">3</span>] | [<span class="n">16</span>]       | <span class="n">3</span> | [<span class="n">9</span>;<span class="n">16</span>]
@@ -167,7 +167,7 @@ first write the basic template to loop through a list first.</p>
     <span class="k">let</span> <span class="k">rec</span> <span class="i">loop</span> <span class="i">cont</span> <span onmouseout="hideTip(event, 'fs20', 60)" onmouseover="showTip(event, 'fs20', 60)" class="i">list</span> <span class="o">=</span>
         <span class="k">match</span> <span onmouseout="hideTip(event, 'fs20', 61)" onmouseover="showTip(event, 'fs20', 61)" class="i">list</span> <span class="k">with</span>
         | []      <span class="k">-&gt;</span> <span class="o">??</span><span class="o">?</span>
-        | <span class="i">x</span><span class="o">::</span><span onmouseout="hideTip(event, 'fs20', 62)" onmouseover="showTip(event, 'fs20', 62)" class="i">list</span> <span class="k">-&gt;</span> 
+        | <span class="i">x</span><span class="o">::</span><span onmouseout="hideTip(event, 'fs20', 62)" onmouseover="showTip(event, 'fs20', 62)" class="i">list</span> <span class="k">-&gt;</span>
             <span class="k">let</span> <span class="i">newCont</span> <span class="o">=</span> <span class="o">??</span><span class="o">?</span>
             <span class="i">loop</span> <span class="i">newCont</span> <span onmouseout="hideTip(event, 'fs20', 63)" onmouseover="showTip(event, 'fs20', 63)" class="i">list</span>
     <span class="i">loop</span> <span class="o">??</span><span class="o">?</span> <span onmouseout="hideTip(event, 'fs20', 64)" onmouseover="showTip(event, 'fs20', 64)" class="i">list</span>
@@ -200,7 +200,7 @@ call the <code>f</code> function.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">newCont</span> <span class="i">racc</span> <span class="o">=</span> 
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">newCont</span> <span class="i">racc</span> <span class="o">=</span>
     <span class="i">f</span> <span class="n">1</span> <span class="i">racc</span>
 </code></pre></td>
 </tr>
@@ -210,7 +210,7 @@ from the remaining list <code>[2;3;4]</code>, now we create a new <code>newCont<
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">newCont</span> <span class="i">racc</span> <span class="o">=</span> 
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">newCont</span> <span class="i">racc</span> <span class="o">=</span>
     <span class="i">f</span> <span class="n">2</span> <span class="i">racc</span>
 </code></pre></td>
 </tr>
@@ -264,7 +264,7 @@ in our example now looks like this:</p>
 <span class="l">2: </span>
 <span class="l">3: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp">| <span class="i">x</span><span class="o">::</span><span onmouseout="hideTip(event, 'fs20', 66)" onmouseover="showTip(event, 'fs20', 66)" class="i">list</span> <span class="k">-&gt;</span> 
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp">| <span class="i">x</span><span class="o">::</span><span onmouseout="hideTip(event, 'fs20', 66)" onmouseover="showTip(event, 'fs20', 66)" class="i">list</span> <span class="k">-&gt;</span>
     <span class="k">let</span> <span class="i">newCont</span> <span class="i">racc</span> <span class="o">=</span> <span class="i">cont</span> (<span class="i">f</span> <span class="i">x</span> <span class="i">racc</span>)
     <span class="i">loop</span> <span class="i">newCont</span> <span onmouseout="hideTip(event, 'fs20', 67)" onmouseover="showTip(event, 'fs20', 67)" class="i">list</span>
 </code></pre></td>
@@ -416,7 +416,7 @@ we start our <code>loop</code> with <code>loop id list</code>.</p>
     <span class="k">let</span> <span class="k">rec</span> <span onmouseout="hideTip(event, 'fs26', 72)" onmouseover="showTip(event, 'fs26', 72)" class="f">loop</span> <span onmouseout="hideTip(event, 'fs27', 73)" onmouseover="showTip(event, 'fs27', 73)" class="f">cont</span> <span onmouseout="hideTip(event, 'fs24', 74)" onmouseover="showTip(event, 'fs24', 74)" class="i">list</span> <span class="o">=</span>
         <span class="k">match</span> <span onmouseout="hideTip(event, 'fs24', 75)" onmouseover="showTip(event, 'fs24', 75)" class="i">list</span> <span class="k">with</span>
         | []      <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs27', 76)" onmouseover="showTip(event, 'fs27', 76)" class="f">cont</span> <span onmouseout="hideTip(event, 'fs25', 77)" onmouseover="showTip(event, 'fs25', 77)" class="i">acc</span>
-        | <span onmouseout="hideTip(event, 'fs9', 78)" onmouseover="showTip(event, 'fs9', 78)" class="i">x</span><span class="o">::</span><span onmouseout="hideTip(event, 'fs24', 79)" onmouseover="showTip(event, 'fs24', 79)" class="i">list</span> <span class="k">-&gt;</span> 
+        | <span onmouseout="hideTip(event, 'fs9', 78)" onmouseover="showTip(event, 'fs9', 78)" class="i">x</span><span class="o">::</span><span onmouseout="hideTip(event, 'fs24', 79)" onmouseover="showTip(event, 'fs24', 79)" class="i">list</span> <span class="k">-&gt;</span>
             <span class="k">let</span> <span onmouseout="hideTip(event, 'fs28', 80)" onmouseover="showTip(event, 'fs28', 80)" class="f">newCont</span> <span onmouseout="hideTip(event, 'fs29', 81)" onmouseover="showTip(event, 'fs29', 81)" class="i">racc</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs27', 82)" onmouseover="showTip(event, 'fs27', 82)" class="f">cont</span> (<span onmouseout="hideTip(event, 'fs23', 83)" onmouseover="showTip(event, 'fs23', 83)" class="f">f</span> <span onmouseout="hideTip(event, 'fs9', 84)" onmouseover="showTip(event, 'fs9', 84)" class="i">x</span> <span onmouseout="hideTip(event, 'fs29', 85)" onmouseover="showTip(event, 'fs29', 85)" class="i">racc</span>)
             <span onmouseout="hideTip(event, 'fs26', 86)" onmouseover="showTip(event, 'fs26', 86)" class="f">loop</span> <span onmouseout="hideTip(event, 'fs28', 87)" onmouseover="showTip(event, 'fs28', 87)" class="f">newCont</span> <span onmouseout="hideTip(event, 'fs24', 88)" onmouseover="showTip(event, 'fs24', 88)" class="i">list</span>
     <span onmouseout="hideTip(event, 'fs26', 89)" onmouseover="showTip(event, 'fs26', 89)" class="f">loop</span> <span onmouseout="hideTip(event, 'fs30', 90)" onmouseover="showTip(event, 'fs30', 90)" class="f">id</span> <span onmouseout="hideTip(event, 'fs24', 91)" onmouseover="showTip(event, 'fs24', 91)" class="i">list</span>

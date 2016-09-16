@@ -82,7 +82,7 @@ constructs we achieve a better more clean code. A result of this is also that co
 more specific less powerful constructs. Or in other words, in programming we always should prefer the least powerful concept to implement
 something.</p>
 <p>Sure you can implement filtering a <code>List</code> with a <code>foreach</code> loop. Go through every element, push it into a new <code>List</code> based on some condition.
-But why not abstract such a common task? <code>List.filter</code> does exactly that. It is less powerful, because it just can filter, nothing more,<br />
+But why not abstract such a common task? <code>List.filter</code> does exactly that. It is less powerful, because it just can filter, nothing more,
 but we only need to provide the logic for filtering. We have less code after we have a construct like <code>List.filter</code>. The intention is more clearer.
 Reading a <code>List.filter</code> is easier as to basically try to understand filtering through a series of commands expressed within a <code>foreach</code>
 loop.</p>
@@ -98,5 +98,3 @@ structs!</p>
 <ul>
 <li><a href="https://blog.8thlight.com/uncle-bob/2015/09/23/a-little-structure.html">Uncle Bob - A Little Structure</a></li>
 </ul>
-
-

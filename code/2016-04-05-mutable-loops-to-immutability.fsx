@@ -2,7 +2,7 @@
 \---
 layout: post
 title: "From mutable loops to immutable folds"
-tags: [immutability,list,fold,recursion]
+tags: [F#,immutability,list,fold,recursion]
 description: "Explains the shift from imperative loops to more functional folds"
 keywords: f#, fsharp, list, loops, looping, fold, folds, recursion, immutability, data-structures
 \---
@@ -48,7 +48,7 @@ We now have two `ResizeArray`. `numbers` still contains `1`, `2` and `3` while `
 contains `1`, `4`, `9`. So while this behaves like *immutability*, it still isn't exactly
 *immutable*. We also see that in the `map` implementation. In `map` we first create
 an empty *mutable* `newArray`. While we loop over `oldArray` we *mutate* `newArray` by adding
-the result of the transformation `f x` to `newArray`. But the only reason why we could do that 
+the result of the transformation `f x` to `newArray`. But the only reason why we could do that
 is because `newArray` is *mutable*!
 
 But what do we do if we have a true *immutable list* like the built-in F# list? We cannot start with
@@ -70,7 +70,7 @@ let mapWithImmutableList f (list:_ list) =
     acc
 
 (**
-It doesn't mean we created a *mutable list* here. We still only have *immutable lists*. 
+It doesn't mean we created a *mutable list* here. We still only have *immutable lists*.
 But `acc` itself is *mutable* and can be changed to point to a new *immutable list*.
 
 With `(f x) :: acc` we always create a whole new *immutable list* by using the `acc`
@@ -155,9 +155,9 @@ loop 0 // infinity loop
 Sure, we now have another problem, as we currently have an infinity loop. We now *always* call `loop i+1`.
 So we have to add some condition when we really want to loop.
 *)
- 
+
 let rec loop i =
-    if i < 10 then 
+    if i < 10 then
         printfn "%d" i
         loop (i+1)
 
@@ -236,7 +236,7 @@ pass `sum` as an argument to our `f` function. As we cannot *mutate* `sum` insid
 
 let forLoop start stop f =
     let rec loop i sum =
-        if i < stop then 
+        if i < stop then
             // create the next sum
             let nextSum = f i sum
             // next recursive call with updated "i" and "sum"
@@ -265,7 +265,7 @@ of the same type. This way, the *initial-value* can be generic.
 
 let rec forLoop start stop init f =
     let rec loop i acc =
-        if i < stop then 
+        if i < stop then
             let nextAcc = f i acc
             loop (i+1) nextAcc
         else
@@ -365,7 +365,7 @@ let sum = fold (fun acc x -> acc + x) 0 [1 .. 9] // 45
 (**
 So, what is `fold` exactly? `fold` is just the idea of looping through a *data-structure*
 in an *immutable way*. Instead of accessing a *mutable variable* that you access and *mutate* while
-you are looping, you provide a function as the *loop-body* and an *initial-accumulator*. 
+you are looping, you provide a function as the *loop-body* and an *initial-accumulator*.
 
 In looping you then have access to the current element and a *mutable variable* that you can
 modify. In `fold` your `f` function you get the current element and the last state as
@@ -383,7 +383,7 @@ recursive loop function anymore to traverse a list! We just can use `fold` for t
 A first attempt to build `map` could look like that.
 *)
 
-let map f list = 
+let map f list =
     fold (fun acc x -> // foreach (var x in list )
         (f x) :: acc   //     nextAcc <- (f x) :: acc
     ) [] list          // Start with "[]" as "acc" and go through "list"
@@ -423,7 +423,7 @@ Probably you wonder why we choose different argument orders for `fold` and `fold
 arguments for the `f` function. In `fold` we first have `acc` then `x`, in `foldBack` it is reversed.
 `x` then `acc`. The reason is, the position of `acc` *resembles* the order how we traverse the list.
 
-In `fold` we go from left to right. We start with the initial `acc`, we extract the first value 
+In `fold` we go from left to right. We start with the initial `acc`, we extract the first value
 from our list and we somehow *combine* it with the already present `acc`. Let's visualize the
 steps that code like this do:
 *)
@@ -465,7 +465,7 @@ those functions yourself.
 *)
 
 // Length
-let length xs = 
+let length xs =
     fold (fun acc x -> acc + 1) 0 xs
 
 length [1..10] // 10

@@ -2,7 +2,7 @@
 \---
 layout: post
 title: Understanding Immutability and Pure Functions (for OOP)
-tags: [immutability,oop]
+tags: [F#,immutability,oop]
 description: "Explains what immutability and pure functions are, and how we design proper immutable objects"
 keywords: f#, fsharp, c#, csharp, programming, immutability, immutable objects, objects, oop, pure, pure functions
 \---
@@ -16,13 +16,13 @@ One important concept in functional programming is immutability. But also in
 object-oriented programming immutability and so called *immutable objects* getting
 more attention. The problem that I see especially from object-oriented programmers
 are really bad explanations. A lot of explanation I had see described it like this:
-*Just create a class and make all fields readonly (final or const) and 
+*Just create a class and make all fields readonly (final or const) and
 you have an immutable object*.
 
 Explanations like these are **horrible**. Such explanations are so simplified that I
 would even call them *wrong*. So why are they so horrible? Because they don't really
 explain anything at all. A programmer new to this concept will just immediately
-think: *Uhm, but I want to change things! I want to add data to an array, I want to 
+think: *Uhm, but I want to change things! I want to add data to an array, I want to
 modify things. I want to do some kind of calculations. I don't want to have static non
 changing things. Immutability sounds not practical at all!*
 
@@ -48,7 +48,7 @@ the question that arise is more: *Why should that be better?*
 Before we go into all kinds of explanations we first have to address OO programming. At first,
 talking about immutability and OO at the same time is actually a bad idea. The problem is
 that immutability doesn't really fit in the OO world. Because of that we should first focus
-on immutability and how it works in a functional language. This will be several magnitudes 
+on immutability and how it works in a functional language. This will be several magnitudes
 easier. Once we understand it there, we go back to the OO world and look how everything
 fits in the OO world.
 
@@ -80,8 +80,8 @@ You actually should be familiar with this because it even feels natural that `in
 have a lot of operations like `+`, `-`,`*`, `*`, and some more in the `Math` class. All of those
 operations take some number, do some kind of operation with it and return something new instead.
 
-`x` stays the same, instead `+` takes two arguments, and produces a new result. We can actually 
-treat `+` just as a function that takes two `int` and produces a whole new `int`. As a result 
+`x` stays the same, instead `+` takes two arguments, and produces a new result. We can actually
+treat `+` just as a function that takes two `int` and produces a whole new `int`. As a result
 we get `z` that is `15`. We wouldn't expect that `x` or `y` also get modified at all.
 
 ### `string` is immutable
@@ -147,7 +147,7 @@ operation for us.
     let data  = [1;2;3;4;5]
     let data2 = List.map (fun x -> x * 2) data
 
-After executing we once again have two lists. `data` that still contains `[1;2;3;4;5]` and 
+After executing we once again have two lists. `data` that still contains `[1;2;3;4;5]` and
 `data2` that now contains `[2;4;6;8;10]`.
 
 ### Records are immutable
@@ -176,7 +176,7 @@ let me = {
     Likes    = ["Pizza"]
 }
 
-(** 
+(**
 This is a record in F#, and like all other data-types it is also *immutable* by default.
 So now let's assume we want to change some parts.I like "dark chocolate" and "tea" so
 let's add them. Because we cannot change our data, we have to create a new record instead.
@@ -213,7 +213,7 @@ language construct for it. We also could have written.
 
     let me2 = {me with Likes = "Tea" :: "Dark Chocolate" :: me.Likes}
 
-So *immutability* is about data that cannot be changed. But when we want to change something 
+So *immutability* is about data that cannot be changed. But when we want to change something
 we usually call a function that can create something new for us. Let's actually simplify
 our example even more. Let's create a `addLike` function instead of using the `copy & update`
 mechanism all over our code.
@@ -234,7 +234,7 @@ let me3 = addLike "Tea" me2
 In this example we call `addLike` with `Dark Chocolate` and `me`. And we get a new `Person` back
 with our change applied. Then we use `addLike` on `me2` to create our final `me3`.
 
-It can feel a little awkward to create a lot of intermediate variables, but we can get rid of them 
+It can feel a little awkward to create a lot of intermediate variables, but we can get rid of them
 by chaining functions with `|>`. So we also could have written it like this.
 *)
 
@@ -251,7 +251,7 @@ new `Person` object, instead of modifying some `private` fields. in C# this woul
 something like this
 
     [lang=csharp]
-    var me2 = 
+    var me2 =
         me
         .AddLike("Dark Chocolate")
         .AddLike("Tea");
@@ -261,13 +261,13 @@ But the important point is that `me` as an object don't get modified. `AddLike` 
 a whole new `Person` object with your operation applied. Because it is once again a `Person`
 you can chain methods. You also can get a *fluent-interface* by just returning *this* after
 each modification. It would look the same. But in the end `me` and `me2` would be references
-to the same object, and `me` would be changed. 
+to the same object, and `me` would be changed.
 
 ## Pure functions
 
 In a *functional-only* language we could probably stop at this point. *Data* and *functions*
 are clearly separated, immutability is only about *data* that does not change. The big problem
-arises if a language also supports classes. Because a class is about *hiding data* 
+arises if a language also supports classes. Because a class is about *hiding data*
 and additionally contains *functions*, it introduces a lot of complexity. To understand
 the reason of this complexity, we first need to talk about *pure* and *impure* functions on
 its own.
@@ -276,7 +276,7 @@ its own.
 
 *Pure* functions are only those functions that don't have any kind of side-effects. So
 what exactly is a *side-effect*? A simple explanation would be: *A function only can
-depend on its input*. Calling a function with the same input, *always* has to produce the 
+depend on its input*. Calling a function with the same input, *always* has to produce the
 same output. No matter how often, or at what time you call it. We can view `+` as a pure function.
 
     let x = 3 + 5
@@ -298,10 +298,10 @@ often face *impure* functions and we usually also want them. Examples of *impure
 To deeper understand why they are impure. Which arguments would a function have that returns
 a random number? Usually we would say: *Such a function don't need any input*. And that is a problem.
 It means, whenever we call a function with no input. It always have to return the same output.
-So it just means, we cannot return *random numbers*, because otherwise that statement wouldn't be 
-true. That's is also true for the other functions. We cannot for example implement a 
-`readFile "file.txt"` function that returns the content of `"file.txt"`. Because that content 
-could change every time. And whenever the content of the file changes. `readFile "file.txt"` would 
+So it just means, we cannot return *random numbers*, because otherwise that statement wouldn't be
+true. That's is also true for the other functions. We cannot for example implement a
+`readFile "file.txt"` function that returns the content of `"file.txt"`. Because that content
+could change every time. And whenever the content of the file changes. `readFile "file.txt"` would
 return something different.
 
 But currently we only only know half of the truth. Because a *function* still can be impure even
@@ -344,7 +344,7 @@ One interesting aspect is that both concepts are completely orthogonal. That mea
 any combination of those. We can have pure functions that take mutable or immutable data, and return
 mutable or immutable data. And we can have impure functions that take and return mutable or immutable
 data. The thing is, mutability or immutability doesn't change whether a function is pure or not. This
-is important to understand that both concepts don't relate to each other. Let's for example look 
+is important to understand that both concepts don't relate to each other. Let's for example look
 again at the above impure functions.
 
 * A random number generator returns an immutable int/float
@@ -367,14 +367,14 @@ We could come to the conclusion that this is an impure function as another varia
 side-effects gets changed. But actually, such a function fulfil all rules we have above. Even
 the fact that it mutates some variable. It doesn't really matter, as such a function will still
 always return the exact same results to its input. And we always also could replace the function
-call with its output. 
+call with its output.
 
 This is important because people all to often try to look at implementations, but the implementation
 itself shouldn't matter at all. The only thing that should matter is how a function behaves. If
 a function behaves like a pure function it is a pure function. The same is also true for
 mutability. A lot of people try hard to get rid of mutability, sometimes that can lead to
 bad performance or in general can make the code harder to understand. For example it is also
-fine to have a function with internal mutable state. As long as that function behaves like a pure 
+fine to have a function with internal mutable state. As long as that function behaves like a pure
 function and even gets/returns immutable data, it is absolutely fine to have mutable local variables.
 
 I would even state that this is a big advantage of F#! For example a lot
@@ -398,7 +398,7 @@ know what `x` is, so we don't know what `y` is. But what does that overall mean?
 Usually we are told that functions, or also classes, methods should be treated as *block-boxes*.
 So we should never have to look at how something is implemented. But the thing is, as long we
 have mutable data, that concept cannot work. Because as long we have mutable data it means that
-a function could do more as documented. We actually can never be sure that `x` don't get changed 
+a function could do more as documented. We actually can never be sure that `x` don't get changed
 until we look at how `someFunction` is implemented. Lets look at another problem.
 
     if value.isValid then
@@ -450,7 +450,7 @@ Some people think that *copying* is the often problem or *memory*, but that isn'
 let's look at the list example. A lot of people assume that by adding an element to a list a whole
 list itself has to be copied. But that isn't true at all. For example adding an element to the top
 is an *O(1)* operation. It only can be made so efficient *because* of immutability. An immutable list
-is really just a data-structure that contains an element and a reference to another list. 
+is really just a data-structure that contains an element and a reference to another list.
 
 That's why adding/removing from the top is efficient, instead of adding/removing at the end like
 many people knew it from types like `List<T>` in C#. The only reason why you could safely reference
@@ -467,8 +467,8 @@ them incrementally. A List with 1 Million elements is really build just as
     let x = 1 :: 2 :: 3 :: 4 :: ... :: []
 
 or in other words. a lot of copy and create options. Sure a compiler or a runtime could have
-some optimization. F# probably have them for lists, but that overall doesn't change that 
-immutability can sometimes lead to such problems. That is also the very reason why we have 
+some optimization. F# probably have them for lists, but that overall doesn't change that
+immutability can sometimes lead to such problems. That is also the very reason why we have
 a `StringBuilder`.
 
 Also a `String` is immutable but concatenating a lot of strings can create a lot of garbage
@@ -495,8 +495,8 @@ An object is not about asking it form some data, we usually just call a method t
 tell it that it should *do* something.
 
 Or in other words. Objects are just collection of functions. And here starts the problem. We
-actually learned that immutability has nothing to-do with functions at all! Immutability is 
-about data not functions! Functions sure can be *pure* or *impure* but once again, we also 
+actually learned that immutability has nothing to-do with functions at all! Immutability is
+about data not functions! Functions sure can be *pure* or *impure* but once again, we also
 learned that it doesn't matter at all for immutability. In fact we even consider it as good
 if we have side-effects that returns immutable data. That is how to solve the problem of
 side-effects. But just having data is usually discouraged in OO. OO has even it's own term
@@ -524,7 +524,7 @@ itself changed at all! From the outside it looks like an immutable object!
 
 Sure we have knowledge on how a random class works. Usually we have an internal private field
 that holds the last generated number, with this the next number will be created when we call
-`Next`. But the point is, we cannot see that. Theoretically the implementation could also 
+`Next`. But the point is, we cannot see that. Theoretically the implementation could also
 use no mutable field at all. It could just use the current time to generate a random number
 instead. So that `Next` is impure, but don't have any mutable field.
 
@@ -572,7 +572,7 @@ had an immutable class. And actually that things is just silly. Both version don
 differ at all!
 
 What is the difference between a `Text` field that always can return another string after
-we called `Download`, or a `Text` method that directly return a new string whenever 
+we called `Download`, or a `Text` method that directly return a new string whenever
 we call the method? There is no difference at all between both version. The problem
 is that `Text` always can return something different. If it
 is either a mutable field or an impure method doesn't matter at all! Actually it even could
@@ -636,7 +636,7 @@ through getters. All methods are *pure*.
 1. As we learned at the beginning, immutability is not about forbidding change, so an immutable
 objects should have a lot of methods that gives us easy ways to create new objects with our needed
 modification. If you don't provide them, it will probably painful to work with your objects. You
-can look again at `DateTime`. We have rich ways like `Add`, `AddDays`, `AddHours`, `AddMinutes` to 
+can look again at `DateTime`. We have rich ways like `Add`, `AddDays`, `AddHours`, `AddMinutes` to
 create new DateTime objects. All of those methods return a new `DateTime` instead of mutating a field.
 
 So let's reconsider the `Site` class above. How should an immutable `Site` class looks like?

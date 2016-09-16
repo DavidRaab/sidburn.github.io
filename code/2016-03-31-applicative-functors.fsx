@@ -2,7 +2,7 @@
 \---
 layout: post
 title: "Understanding apply"
-tags: [functor,applicative,option]
+tags: [F#,functor,applicative,option]
 description: "Explains the apply Function (Applicative Functors) with the option type"
 keywords: f#, fsharp, functor, applicative, option, null, apply
 \---
@@ -15,7 +15,7 @@ module Main
 In my previous blog "[Understanding map]({% post_url 2016-03-27-understanding-map %})" I
 introduced the `map` function and described that implementing `map` and fulfilling two laws
 we get what we call a *Functor*. In this Post we discuss the `apply` function that
-we can view as an extension to the `map` function.  
+we can view as an extension to the `map` function.
 
 ## Problem with `map`
 
@@ -74,8 +74,8 @@ The generic `'a` will be replaced with `int`, while `'b` will be replaces with `
 
 And probably it now makes sense on why we get our result. Remember that what we get back from `map` is
 just the input and output wraped with our type. So when we call `Option.map` with one argument, we
-get a function back with it's input and output wrapped. 
-        
+get a function back with it's input and output wrapped.
+
     option<'a> -> option<'b>
 
 So when we pass `int -> int -> int` then we pass `int` as the type for `'a` and `int -> int` for `'b`.
@@ -132,7 +132,7 @@ The question is, how can we achieve that? We sure could start writing a `map2`, 
 function. But those functions would probably end up in being much the same. Not only that, it also
 can get harder and harder to write a function that handles three, four or more `option` at the
 same time. On top of that, it doesn't really feel so much flexible, isn't there some better way
-so we can handle functions with arbitrary arguments? Sure there is! 
+so we can handle functions with arbitrary arguments? Sure there is!
 
 ## Introducing `apply`
 
@@ -159,14 +159,14 @@ There are two ways we can handle this construct.
    and the next argument `string`, and we execute our functions inside the `option`.
 1. Transform the whole `option<(string -> string)>` just into `option<string> -> option<string>`
 
-So which one seems easier or more useful? The funny answer is, both operations are the same! 
+So which one seems easier or more useful? The funny answer is, both operations are the same!
 
 Let's go over the first idea. Should we expect just a `string` or an `option<string>`? The whole idea
 with `map` so far was that we can apply `option` values to function that don't support them. So
-it makes more sense when we expect a `option<string>`. If we would expect normal values we 
+it makes more sense when we expect a `option<string>`. If we would expect normal values we
 wouldn't need to `map` a function in the first place! So what we need to implement is a function
 expecting `option<(string -> string)>` as the first argument, and `option<string>` as the
-second argument. What do we return? As we just execute the first argument, we will return 
+second argument. What do we return? As we just execute the first argument, we will return
 `option<string>`. So overall we get
 
     option<(string -> string)> -> option<string> -> option<string>
@@ -272,7 +272,7 @@ make the execution more readable.
 
 ## Defining your own Operators
 
-In F# we can define our own operators. Operators are basically just two argument function. But instead of 
+In F# we can define our own operators. Operators are basically just two argument function. But instead of
 writing `f x y` an operator is written between (infix) two arguments `x f y`. The value
 left of the operator is the first argument, the value right of an operator is the second argument.
 So instead of calling `Option.map f x` let's create an operator for `Option.map`.
@@ -353,7 +353,7 @@ let lift4 f x y z w = f <!> x <*> y <*> z <*> w
 (**
 What we now get are the following functions.
 
-    ('a -> 'b -> 'c)             -> option<'a> -> option<'b> -> option<'c> 
+    ('a -> 'b -> 'c)             -> option<'a> -> option<'b> -> option<'c>
     ('a -> 'b -> 'c -> 'd)       -> option<'a> -> option<'b> -> option<'c> -> option<'d>
     ('a -> 'b -> 'c -> 'd -> 'e) -> option<'a> -> option<'b> -> option<'c> -> option<'d> -> option<'e>
 
@@ -365,7 +365,7 @@ into a new function where every argument should be a `option`.
 
 Implementing `apply` is more helpful as we can directly `map` and `apply` any function with arbitrary
 arguments, without *Partial Applying* functions. And we still can create easily `lift2`, `lift3` or
-`lift4` functions to upgrade functions as a whole. 
+`lift4` functions to upgrade functions as a whole.
 
 Some note if it is not obvious. Usually we don't implement a `lift1` because that is what `map` does!
 
@@ -380,7 +380,7 @@ of *constructor* that does that for us?
 
 Based on the context such a function is usually called `pure` or `return`. Even if `return` seems
 a little bit strange we will pick this one. Later in some other blogs it will become more obvious why
-we name it `return`. 
+we name it `return`.
 
 But because `pure` and `return` are both reserved words in F#, we have to slightly
 change the name. So we just use `retn`. The *type-signature* of a `retn` function always looks like
@@ -456,7 +456,7 @@ that I described in [null is Evil]({% post_url 2016-03-20-null-is-evil %}). The 
 it with `option` has some advantages, as you only have to check for `Some|None` if you
 also expected a `option`. So you only need checking where you expect it. But this can be still
 to tedious. Often we want to write code and don't bother with `null` or `option` at all.
-Our `mul` and `repeat` functions are such examples. We just expect arguments that are 
+Our `mul` and `repeat` functions are such examples. We just expect arguments that are
 `int` and `string`. But what happens if for some reasons you have option values and you still
 want to use them with `mul` or `repeat`? Without the idea of our *Applicative Functor*
 we either have to:
@@ -479,7 +479,7 @@ match x with
 | Some x ->
     match y with
     | None   -> printfn "None"
-    | Some y -> 
+    | Some y ->
         // Finally we can use `mul`
         printfn "Result: %d" (mul x y)
 
@@ -500,7 +500,7 @@ Both solutions seems dull. The first solution becomes annoying. Even if we only 
 add checks for functions/types that are `option`. It still is an annoying task mostly
 because it is a repetitive task. The second solution is even more worse
 as we don't have any code-reuse at all. We just have to write the whole function from scratch
-again. 
+again.
 
 The bad part is, that such a function contains more `option` handling to what it even does.
 So with our *Applicative Functor* we just can write a normal function, that knows nothing about
@@ -519,7 +519,7 @@ once if you got `Some value` or `None`. Theoretically it means you can write you
 program, and it only contains a single `option` check at the end.
 *)
 
-let parseInt str = 
+let parseInt str =
     match System.Int32.TryParse str with
     | false,_ -> None
     | true,x  -> Some x
@@ -539,8 +539,8 @@ an input that can be converted to an `int` we will see: `Error: User Input was n
 
 The whole idea is probably why some people don't see the benefit of `option`. Most
 people just see: *Okay instead of checking for `null` I do check for `Some` or `None`.
- Why is that better?* 
- 
+ Why is that better?*
+
 Well, using `option` already provides some benefits, as you can't
 forget the checks, but the real advantage is that they are values on it's own, and you
 can write such an *Applicative Functor* around `option` that supports upgrading any function
@@ -658,7 +658,7 @@ ox = oy // Both must be the same
 We started with `map` as a general function to *upgrade/lift/box* normal functions into
 some other types. But `map` only handles one argument functions in a way we would expect.
 But because we have currying, and there only exists one argument functions anyway, we still
-could pass functions with *more than one-argument* to our `map` function. But instead of 
+could pass functions with *more than one-argument* to our `map` function. But instead of
 a value, we get a lifted function back instead. To handle lifted functions we came up
 with a `apply` function.
 
@@ -678,5 +678,5 @@ have written a solution to the [null is Evil]({% post_url 2016-03-20-null-is-evi
 
  * [Understanding map and apply](http://fsharpforfunandprofit.com/posts/elevated-world/)
  * [The Apply Pattern](http://www.davesquared.net/2015/07/apply-pattern.html)
- 
+
 *)

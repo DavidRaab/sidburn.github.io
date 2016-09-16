@@ -2,7 +2,7 @@
 \---
 layout: post
 title: "Understanding map"
-tags: [functor,list,option]
+tags: [F#,functor,list,option]
 description: "Explains the map function and what a Functor is"
 keywords: f#, fsharp, programming, functional, functor, map
 \---
@@ -27,7 +27,7 @@ You will often see examples like this:
     // C#
     var xs = Enumerable.Range(1,5).Select(x => x * 2) // Select is `map`
 
-    // JavaScript    
+    // JavaScript
     var xs = [1,2,3,4,5].map(function(x) { return x * 2 })
 
 All examples start with some kind of array collection that contains the numbers from 1 to 5.
@@ -41,7 +41,7 @@ a `map` function for every type you create (if possible). When you have a `Resul
 also provide a `Result.map`. Also a `Async.map` is a good idea. So if you only knew `map` from the idea of
 going through a collection you will probably suffer to understand what `map` is about. If you try to implement
 `map` for yourself, you will probably even wonder what `map` anyway should do for an arbitrary type? What is
-for example the purpose of `Async.map`? 
+for example the purpose of `Async.map`?
 
 To explain what `map` really is about, let's forget about what you already know and start from scratch again.
 
@@ -102,7 +102,7 @@ let add10List xs =
 
 (**
 Besides that the code is anyway not really nice or functional to begin with, the big problem is that we basically
-have written two completely identical functions! The only difference between those two functions is line 4. 
+have written two completely identical functions! The only difference between those two functions is line 4.
 The only thing that is different is the function we call to compute `res`.
 
 Because we like DRY (Don't Repeat Yourself) we do what functional programmers always tell
@@ -332,7 +332,7 @@ is telling us. We have to write a function with the signature
 
     ('a -> 'b) -> Async<'a> -> Async<'b>
 
-1. That means a function with two arguments. The first arguments is a *function* `'a -> 'b`, the second 
+1. That means a function with two arguments. The first arguments is a *function* `'a -> 'b`, the second
    is an `Async<'a>`, and we have to return an `Async<'b>`.
 1. Because we have to return an `Async` we start with `async { ... }`.
 1. Now `op` is an `Async<'a>`, with `let! x = op` we run the the async operation.
@@ -349,14 +349,14 @@ by an `Async` operation.
 To be more concrete. Let's assume we have some kind of async operation that downloads from a website
 (The Async layer). This tries to Parse a table on a website that contains numbers (The List Layer).
 But because parsing could fail, for example a table entry is not a number, we wrap it in a `Option`
-(The Optional Layer). 
+(The Optional Layer).
 
 Let's write a *mock* function that returns this kind of data.
 *)
 
 let downloadPage = async {
     // Simulating Download, wait 1 second
-    do! Async.Sleep 1000 
+    do! Async.Sleep 1000
     // A list of optionals list<option<int>>
     let numbers = [Some 1; Some 2; None; Some 3; None; None; Some 10]
     // return it: This adds async<> layer

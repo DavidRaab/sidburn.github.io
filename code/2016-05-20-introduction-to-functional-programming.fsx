@@ -2,7 +2,7 @@
 \---
 layout: post
 title: "Introduction to Functional Programming"
-tags: [intro,data,oop]
+tags: [F#,C#,intro,data,oop,currying,closure]
 description: "Gives an introduction to functional programming and shows how the ideas relates to object-oriented programming"
 keywords: f#, fsharp, introduction, functional, programming, oop, closures, currying, combinators
 \---
@@ -16,7 +16,7 @@ In this article I want to give a general introduction to some of the fundamental
 functional programming. I just start with the idea of function as data, and explain
 why functions are viewed as data and why it makes sense to pass functions as arguments.
 
-When we understand this concept, I start explaining lambda expression, 
+When we understand this concept, I start explaining lambda expression,
 currying, partial application and closures. All of this ideas built on each other.
 
 But I don't stop at functional programming. Instead I will go back to OO programming
@@ -74,7 +74,7 @@ do with that idea.
 <a name="fp-function"></a>
 ## What is a function?
 
-Before we go deeper we have to ask ourself: What is a function anyway? Depending 
+Before we go deeper we have to ask ourself: What is a function anyway? Depending
 on the language there are also multiple terms for the word function. Terms
 like procedures, static methods or subroutines.
 
@@ -132,7 +132,7 @@ into the following way:
 *)
 
 let squareM x =
-    let output = 
+    let output =
         Map.ofList [
             (1, 1)
             (2, 4)
@@ -158,9 +158,9 @@ square 100000 // 1410065408
 (**
 we also get a wrong result. The problem is that we have an integer overflow here.
 `square` is also not correct, it only happens that our first `square` function returns
-right result for a lot more arguments, but still not for all inputs. 
+right result for a lot more arguments, but still not for all inputs.
 
-But the more important idea is that we could replace a function just with a data-structure. 
+But the more important idea is that we could replace a function just with a data-structure.
 A functions just maps some input to its output. That is exactly what the `Map` data-structure
 does.
 
@@ -216,7 +216,7 @@ let rec map data list =
     | x::list -> (Map.find x data) :: (map data list)
 
 // We pre-compute the squares from 1 to 10000
-let squares = 
+let squares =
     Map.ofList [
         for x in 1..10000 do
             yield x, (square x)
@@ -267,7 +267,7 @@ the length of it. Even when we just consider the stone-age view that they are on
 1.180.591.620.717.411.303.424 possible input strings we need to handle.
 
 Creating a data-structure that contains all possible input strings that maps it to the
-length is theoretically possible. But already for 10 characters and just considering ASCII 
+length is theoretically possible. But already for 10 characters and just considering ASCII
 we have such a large amount of possible input strings that it just exceeds the amount of memory
 a single computer could have.
 
@@ -307,7 +307,7 @@ This is the same as creating a function inside a function and returning it.
 
 When we look at `generateAdd` then we see the following. We loop over the number from `1` to `5`.
 Those represents the inputs of a function we pre-calculate. With `yield` we return the mapping
-`i` to `(i + x)`. 
+`i` to `(i + x)`.
 
 When we want to turn it into a function we just need to return the code `(i + x)` somehow.
 So how do we return a function with that code? That is the purpose of *lambda*. *lambda*
@@ -317,7 +317,7 @@ a function/lambda.
 
 let generateAdd x = fun i -> i + x
 let add10         = generateAdd 10
- 
+
 add10 1   // 11
 add10 2   // 12
 add10 5   // 15
@@ -326,7 +326,7 @@ add10 100 // 120
 (**
 Instead of pre-calculating `i + x` for a dozen of numbers, now we just return the whole
 computation itself. When we call `generateAdd 10` we now get a new function back that
-can turn any input `int` into an output `int` where we added `10` to it. 
+can turn any input `int` into an output `int` where we added `10` to it.
 
 As you can see, both versions with a data-structure or the functions are quite similar.
 But the last version still contains some interesting things that are worth to talk about.
@@ -338,7 +338,7 @@ When we want to create an `int`. How do we do that? Well we just write it. For e
 just `5`. We can work with `5` however we want. We can pass it to a function, use it in
 calculations and so on.
 
-This works with any number, but when we for example want to work with `587452198` then 
+This works with any number, but when we for example want to work with `587452198` then
 always rewriting this number can become annoying and tedious. Instead of working with numbers
 directly we can bind a number to a symbol and give it a name. We bind something to
 a name with `let`.
@@ -437,7 +437,7 @@ argument. There only exists functions with one arguments. So what do you do when
 example want to add two numbers?
 *)
 
-let add = 
+let add =
     fun x ->
         fun y ->
             x + y
@@ -550,7 +550,7 @@ is important to mention.
 But there is an even more fundamental idea that emerges from that example. How long do
 we need to keep `x` in memory? The answer is, as long we have some code that still refers
 to it. In our case `add10` refers to `x`, we always must keep `x` in memory, as long
-we have access to `add10`. 
+we have access to `add10`.
 
 This is also the reason why the first Lisp compiler already provided automatic memory
 management with garbage collection (invented 1962). More precisely I don't even know
@@ -579,7 +579,7 @@ input. In this case we just return `None`. We could write `smaller` and `greater
 let smaller min x =
     match x with
     | None        -> None
-    | Some number -> 
+    | Some number ->
         if   number < min
         then Some number
         else None
@@ -587,7 +587,7 @@ let smaller min x =
 let greater max x =
     match x with
     | None        -> None
-    | Some number -> 
+    | Some number ->
         if   number > max
         then Some number
         else None
@@ -600,7 +600,7 @@ greater 10 (Some 11) // Some 11
 (**
 But when we look closer, `smaller` and `greater` are nearly identical functions. The only
 difference is the `if` check itself. But what does the `if` anyway? The `if` itself
-just turns a `number` somehow into a boolean value. 
+just turns a `number` somehow into a boolean value.
 
 Instead of hard-coding the `if` behaviour we also could call a function that we give the number
 and returns us a boolean. This way we could get rid of the whole code-duplication. We just
@@ -613,7 +613,7 @@ With such a new function we then could easily rewrite `smaller` and `greater`.
 let is predicate x =
     match x with
     | None        -> None
-    | Some number -> 
+    | Some number ->
         if   predicate number
         then Some number
         else None
@@ -934,7 +934,7 @@ a class with the members (methods) and a private field. Defining a class is shor
 So a class is a poor man closures because it did not add anything more useful as what a
 function with closure already gives you (functional languages, lambdas, closures and so
 on already existed before OO). But on the other hand, OO optimized this use-case in such
-a way that Closures are really "poor man objects". 
+a way that Closures are really "poor man objects".
 
 As F# also supports classes, if you really want to write something like this i would suggest you
 also should create a class, and not use a record with functions and a closure. A class is just
@@ -1146,7 +1146,7 @@ We also can easily define <code>curry</code> functions.
 ## Exercise
 
 Previously I provided a small exercise with validation, but I leave the task to implement it
-in your favourite language. Up to this point you should know enough about currying and 
+in your favourite language. Up to this point you should know enough about currying and
 partial application. Most languages today also support lambda statements. Not every language
 has automatic currying, but I showed how to create a curry function in F# and C#.
 
@@ -1162,7 +1162,7 @@ As a full overview, here is the full F# code.
 let is f x =
     match x with
     | None        -> None
-    | Some number -> 
+    | Some number ->
         if   f number
         then Some number
         else None
@@ -1215,7 +1215,7 @@ And often `,` is used to separate the arguments.
 
     [lang=csharp]
     is(between(0,10),
-      is(even, 
+      is(even,
         Some(4)))
 
 Writing it in a sequential style is possible in every language that also supports lambdas. In C#

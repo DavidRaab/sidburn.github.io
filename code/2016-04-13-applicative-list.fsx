@@ -2,7 +2,7 @@
 \---
 layout: post
 title: "Applicative: Lists"
-tags: [applicative,list]
+tags: [F#,applicative,list]
 description: Building an Applicative Functor for the list type
 keywords: f#, fsharp, list, applicative, functor, functional, programming
 \---
@@ -62,7 +62,7 @@ let apply lf lx = [
         yield f x
 ]
 
-let (<*>) = apply 
+let (<*>) = apply
 
 (**
 ## Working with `apply`
@@ -109,15 +109,15 @@ expands to:
 ## How `apply` works
 
 At this point it is interesting to see how `apply` actually works to get a better understanding
-why we get those results. First we should remember how the operator `<*>` works. Our 
+why we get those results. First we should remember how the operator `<*>` works. Our
 apply operator is just a infix function. It uses the the thing on the left-side as the
 first argument, and the thing on the right-side as the second argument. Instead of
 
     [lang=fsharp]
     [f] <*> [1;2;3]
 
-we also could write 
-    
+we also could write
+
     apply [f] [1;2;3]
 
 When we have a term like `[add2] <*> [1;2;3] <*> [10;20]` it means, first `[add2] <*> [1;2;3]`
@@ -224,16 +224,16 @@ The last call executes the functions, so we get the result.
 
 In general what we can do with an *Applicative* for a list is that we can get the result
 of all possible input combinations for a function, no matter how many arguments that
-function has. 
+function has.
 
 We also can easily create [Cartesian Products](https://en.wikipedia.org/wiki/Cartesian_product)
 for a set of data. For example we could create all possible Playing cards in a game this way.
 *)
 
-type Suit = 
+type Suit =
     | Club | Diamond | Heart | Spade
 
-type Rank = 
+type Rank =
     | Ace | Two | Three | Four | Five | Six | Seven | Eight | Nine | Ten
     | Jack | Queen | King
 
@@ -303,7 +303,7 @@ let likes = [
 
 (** We now can create the *Cartesian Product* of those Data. And afterwards filter it. *)
 
-let likesTea = 
+let likesTea =
     [fun p l -> p,l] <*> persons <*> likes
     |> List.filter (fun (person,like) -> person.Id = like.PersonId)
     |> List.filter (fun (person,like) -> like.Name = "Tea")
@@ -324,4 +324,4 @@ Sure, most stuff is basically *List-Processing* at this point, but `apply` is ju
 functions in a tool-set that opens up some possibilities. And at this point you probably
 even see the connection between functional list processing and SQL, or in general the
 C# LINQ Feature.
-*)  
+*)
