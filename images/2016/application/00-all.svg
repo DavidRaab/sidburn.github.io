@@ -37,9 +37,9 @@
      showgrid="false"
      inkscape:current-layer="layer1"
      inkscape:document-units="px"
-     inkscape:cy="482.87233"
-     inkscape:cx="352.70002"
-     inkscape:zoom="0.89707979"
+     inkscape:cy="513.42842"
+     inkscape:cx="169.39923"
+     inkscape:zoom="1.7941596"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0"
      borderopacity="1.0"
@@ -1282,7 +1282,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
         <cc:license
            rdf:resource="http://creativecommons.org/publicdomain/zero/1.0/" />
       </cc:Work>
@@ -1601,7 +1601,7 @@
              y="421.93982"
              x="119.05695"
              id="tspan29710"
-             sodipodi:role="line">4.0</tspan></text>
+             sodipodi:role="line">1.41</tspan></text>
         <path
            style="fill:#ffffff;fill-rule:evenodd;stroke:#ffffff;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:url(#marker30075);marker-end:url(#marker30551)"
            d="m 225,406.36221 -65,0"

@@ -22,7 +22,7 @@ let x = sqrt 2.0
 
 (**
 The interesting part is how we read this example. In this case we read it from right-to-left.
-`2.0` is the input to `sqrt`, `sqrt` returns the value `4.0` this is then stored in `x`.
+`2.0` is the input to `sqrt`, `sqrt` returns the value `1.41` this is then stored in `x`.
 
 <div class="svg-code" style="width:50%; margin: 30px auto">
 <img src="/images/2016/application/sqrt.svg" alt="sqrt example that shows how we read a function from right-to-left" />
