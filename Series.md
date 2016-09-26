@@ -12,6 +12,7 @@ in different categories.
 * [Introduction to F#]({% post_url 2016-03-10-introduction-in-fsharp %})
 
 ## Basic Functional Toolset
+1. [Function Application and Composition]({% post_url 2016-09-25-function-application-and-composition %})
 1. [Understanding map]({% post_url 2016-03-27-understanding-map %})
 1. [Understanding apply]({% post_url 2016-03-31-applicative-functors %})
 1. [Understanding bind]({% post_url 2016-04-03-understanding-bind %})
@@ -42,7 +43,7 @@ in different categories.
 
 ## X is evil
 * [Null is evil]({% post_url 2016-03-20-null-is-evil %})
-* [Exceptions are Evil]({% post_url 2016-03-25-exceptions-are-evil %}) 
+* [Exceptions are Evil]({% post_url 2016-03-25-exceptions-are-evil %})
 
 ## Ungrouped
 * [Higher-Kinded Polymorphism]({% post_url 2016-03-24-higher-kinded-polymorphism %})
