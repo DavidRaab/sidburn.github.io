@@ -37,9 +37,9 @@
      showgrid="false"
      inkscape:current-layer="layer1"
      inkscape:document-units="px"
-     inkscape:cy="513.42842"
-     inkscape:cx="169.39923"
-     inkscape:zoom="1.7941596"
+     inkscape:cy="281.60187"
+     inkscape:cx="584.65764"
+     inkscape:zoom="0.8970798"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0"
      borderopacity="1.0"
@@ -1303,7 +1303,7 @@
      inkscape:groupmode="layer"
      inkscape:label="Layer 1">
     <g
-       transform="matrix(1.4144424,0,0,1.4144424,-45.75377,-131.91796)"
+       transform="matrix(1.4144424,0,0,1.4144424,-54.671594,-154.21252)"
        id="g43896">
       <text
          xml:space="preserve"
@@ -2333,7 +2333,7 @@
     </g>
     <g
        id="g4677"
-       transform="translate(-141.00421,-122.3169)">
+       transform="translate(-232.41191,-129.00527)">
       <g
          id="g4641">
         <text
@@ -3455,7 +3455,8 @@
       </g>
     </g>
     <g
-       id="g4797">
+       id="g4797"
+       transform="translate(-4.4589121,-133.76736)">
       <text
          sodipodi:linespacing="100%"
          id="text4720"
@@ -3672,6 +3673,197 @@
            sodipodi:type="star" />
       </g>
     </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;line-height:100%;font-family:Calibri;-inkscape-font-specification:'Calibri, Normal';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="853.45807"
+       y="685.07739"
+       id="text4768"
+       sodipodi:linespacing="100%"><tspan
+         sodipodi:role="line"
+         id="tspan4770"
+         x="853.45807"
+         y="685.07739"
+         style="fill:#ffffff">225 % 10 = <tspan
+   style="fill:#6699ff"
+   id="tspan4782">5</tspan></tspan><tspan
+         sodipodi:role="line"
+         x="853.45807"
+         y="700.07739"
+         id="tspan4772"
+         style="fill:#ffffff">(225 - 5) / 10 = 22</tspan><tspan
+         sodipodi:role="line"
+         x="853.45807"
+         y="715.07739"
+         style="fill:#ffffff"
+         id="tspan4788" /><tspan
+         sodipodi:role="line"
+         x="853.45807"
+         y="730.07739"
+         id="tspan4774"
+         style="fill:#ffffff">22 % 10 = <tspan
+   style="fill:#6699ff"
+   id="tspan4784">2</tspan></tspan><tspan
+         sodipodi:role="line"
+         x="853.45807"
+         y="745.07739"
+         id="tspan4776"
+         style="fill:#ffffff">(22 - 2) / 10 = 2</tspan><tspan
+         sodipodi:role="line"
+         x="853.45807"
+         y="760.07739"
+         style="fill:#ffffff"
+         id="tspan4790" /><tspan
+         sodipodi:role="line"
+         x="853.45807"
+         y="775.07739"
+         id="tspan4778"
+         style="fill:#ffffff">2 % 10 = <tspan
+   style="fill:#6699ff"
+   id="tspan4786">2</tspan></tspan><tspan
+         sodipodi:role="line"
+         x="853.45807"
+         y="790.07739"
+         id="tspan4780"
+         style="fill:#ffffff">(2 - 2) / 10 = 0</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;line-height:100%;font-family:Calibri;-inkscape-font-specification:'Calibri, Normal';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="1006.1238"
+       y="684.32758"
+       id="text4792"
+       sodipodi:linespacing="100%"><tspan
+         sodipodi:role="line"
+         id="tspan4794"
+         x="1006.1238"
+         y="684.32758"
+         style="fill:#ffffff">225 % 2 = <tspan
+   style="fill:#6699ff"
+   id="tspan4841">1</tspan></tspan><tspan
+         sodipodi:role="line"
+         x="1006.1238"
+         y="699.32758"
+         id="tspan4796"
+         style="fill:#ffffff">(225 - 1) / 2 = 112</tspan><tspan
+         sodipodi:role="line"
+         x="1006.1238"
+         y="714.32758"
+         style="fill:#ffffff"
+         id="tspan4826" /><tspan
+         sodipodi:role="line"
+         x="1006.1238"
+         y="729.32758"
+         id="tspan4798"
+         style="fill:#ffffff">112 % 2 = <tspan
+   style="fill:#6699ff"
+   id="tspan4843">0</tspan></tspan><tspan
+         sodipodi:role="line"
+         x="1006.1238"
+         y="744.32758"
+         id="tspan4800"
+         style="fill:#ffffff">(112 - 0) / 2 = 56</tspan><tspan
+         sodipodi:role="line"
+         x="1006.1238"
+         y="759.32758"
+         style="fill:#ffffff"
+         id="tspan4828" /><tspan
+         sodipodi:role="line"
+         x="1006.1238"
+         y="774.32758"
+         id="tspan4802"
+         style="fill:#ffffff">56 % 2 = <tspan
+   style="fill:#6699ff"
+   id="tspan4845">0</tspan></tspan><tspan
+         sodipodi:role="line"
+         x="1006.1238"
+         y="789.32758"
+         id="tspan4804"
+         style="fill:#ffffff">(56 - 0) / 2 = 28</tspan><tspan
+         sodipodi:role="line"
+         x="1006.1238"
+         y="804.32758"
+         style="fill:#ffffff"
+         id="tspan4830" /><tspan
+         sodipodi:role="line"
+         x="1006.1238"
+         y="819.32758"
+         id="tspan4806"
+         style="fill:#ffffff">28 % 2 = <tspan
+   style="fill:#6699ff"
+   id="tspan4847">0</tspan></tspan><tspan
+         sodipodi:role="line"
+         x="1006.1238"
+         y="834.32758"
+         id="tspan4808"
+         style="fill:#ffffff">(28 - 0) / 2 = 14</tspan><tspan
+         sodipodi:role="line"
+         x="1006.1238"
+         y="849.32758"
+         style="fill:#ffffff"
+         id="tspan4832" /><tspan
+         sodipodi:role="line"
+         x="1006.1238"
+         y="864.32758"
+         id="tspan4810"
+         style="fill:#ffffff">14 % 2 = <tspan
+   style="fill:#6699ff"
+   id="tspan4849">0</tspan></tspan><tspan
+         sodipodi:role="line"
+         x="1006.1238"
+         y="879.32758"
+         id="tspan4812"
+         style="fill:#ffffff">(14 - 0) / 2 = 7</tspan><tspan
+         sodipodi:role="line"
+         x="1006.1238"
+         y="894.32758"
+         style="fill:#ffffff"
+         id="tspan4835" /><tspan
+         sodipodi:role="line"
+         x="1006.1238"
+         y="909.32758"
+         id="tspan4814"
+         style="fill:#ffffff">7 % 2 = <tspan
+   style="fill:#6699ff"
+   id="tspan4851">1</tspan></tspan><tspan
+         sodipodi:role="line"
+         x="1006.1238"
+         y="924.32758"
+         id="tspan4816"
+         style="fill:#ffffff">(7 - 1) / 2 = 3</tspan><tspan
+         sodipodi:role="line"
+         x="1006.1238"
+         y="939.32758"
+         style="fill:#ffffff"
+         id="tspan4837" /><tspan
+         sodipodi:role="line"
+         x="1006.1238"
+         y="954.32758"
+         id="tspan4818"
+         style="fill:#ffffff">3 % 2 = <tspan
+   style="fill:#6699ff"
+   id="tspan4853">1</tspan></tspan><tspan
+         sodipodi:role="line"
+         x="1006.1238"
+         y="969.32758"
+         id="tspan4820"
+         style="fill:#ffffff">(3 - 1) / 2 = 1</tspan><tspan
+         sodipodi:role="line"
+         x="1006.1238"
+         y="984.32758"
+         style="fill:#ffffff"
+         id="tspan4839" /><tspan
+         sodipodi:role="line"
+         x="1006.1238"
+         y="999.32758"
+         id="tspan4822"
+         style="fill:#ffffff">1 % 2 = <tspan
+   style="fill:#6699ff"
+   id="tspan4855">1</tspan></tspan><tspan
+         sodipodi:role="line"
+         x="1006.1238"
+         y="1014.3276"
+         id="tspan4824"
+         style="fill:#ffffff">(1 - 1) / 2 = 0</tspan></text>
   </g>
   <g
      id="g28771" />

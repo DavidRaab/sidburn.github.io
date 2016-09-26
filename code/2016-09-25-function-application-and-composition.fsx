@@ -474,7 +474,7 @@ List.append
 
 (**
 Also notice that in the last version, the parenthesis at the right of `<|` are still important
-and the whole order of `List.map add1` and `List.sub1` changed!
+and the whole order of `List.map add1` and `List.map sub1` changed!
 
 Before we go further lets formalize why this kind of code is so hard to write with piping.
 We have this problem because we don't have a single chain of computations anymore. We have two paths
@@ -562,13 +562,9 @@ by the base means we remove zeros.
 
 So the step to transform 225 into a string are:
 
-    [lang=none]
-    225 % 10 = 5
-    (225 - 5) / 10 = 22
-    22 % 10 = 2
-    (22 - 2) / 10 = 2
-    2 % 10 = 2
-    (2 - 2) / 10 = 0
+<div class="svg-code" style="width:25%; margin: 0 0 1rem 30px">
+<img src="/images/2016/application/algorithm-decimal.svg" alt="Shows the steps to transform 255 into a decimal string" />
+</div>
 
 As you can see. Every modulo operation returns the right most digit of a number. By subtracting that
 digit and dividing by 10. We get a new number. We just repeat that process until we end up at zero.
@@ -576,23 +572,9 @@ digit and dividing by 10. We get a new number. We just repeat that process until
 As said at the beginning. This algorithm works for any base. If we want to convert a number into a
 binary representation we just do modulo 2 and divide by 2.
 
-    [lang=none]
-    225 % 2 = 1
-    (225 - 1) / 2 = 112
-    112 % 2 = 0
-    (112 - 0) / 2 = 56
-    56 % 2 = 0
-    (56 - 0) / 2 = 28
-    28 % 2 = 0
-    (28 - 0) / 2 = 14
-    14 % 2 = 0
-    (14 - 0) / 2 = 7
-    7 % 2 = 1
-    (7 - 1) / 2 = 3
-    3 % 2 = 1
-    (3 - 1) / 2 = 1
-    1 % 2 = 1
-    (1 - 1) / 2 = 0
+<div class="svg-code" style="width:25%; margin: 0 0 1rem 30px">
+<img src="/images/2016/application/algorithm-binary.svg" alt="Shows the steps to transform 255 into a binary string" />
+</div>
 
 If we concatenate the modulo operation we get "1110 0001" as the result. So, how do we transform
 this algorithm into code? We could write the whole computations directly. But it is usually
