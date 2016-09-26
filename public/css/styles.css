@@ -172,7 +172,11 @@ table.pre code::before {
 
 /* SVG formatting for F# code */
 .svg-code {
-  background: rgba(30,30,30,1);
-  border: 20px rgba(30,30,30,1) solid;
+  background: rgb(30,30,30);
+  border: 10px rgb(30,30,30) solid;
   border-radius: 10px;
+}
+
+.svg-code img {
+  margin: 10px;
 }
