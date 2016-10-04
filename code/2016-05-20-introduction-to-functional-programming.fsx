@@ -51,6 +51,7 @@ functional programming, but also widen your view on object-oriented programming.
     <li><a href="#oo-exercise">Exercise</a></li>
   </ul>
   <li><a href="#summary">Summary</a></li>
+  <li><a href="#reading">Further Reading</a></li>
   <li><a href="#comments">Comments</a></li>
 </ul>
 
@@ -1254,6 +1255,11 @@ to Object-Oriented programming and why closures and objects are the same.
 
 I overall hope that this introduction helped you not only in understanding functional programming
 better, but also widen your view on object-oriented programming.
+
+<a name="reading"></a>
+## Further Reading
+
+* [So You Want to be a Functional Programmer (Part 1)](https://medium.com/@cscalfani/so-you-want-to-be-a-functional-programmer-part-1-1f15e387e536)
 
 <a name="comments"></a>
 *)

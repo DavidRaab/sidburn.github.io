@@ -703,4 +703,6 @@ immutable `string`.
  * [The Case for Controlled Side Effects](http://two-wrongs.com/the-case-for-controlled-side-effects)
  * [Is your language unreasonable](http://fsharpforfunandprofit.com/posts/is-your-language-unreasonable/)
  * [Immutability, Purity, and Referential Transparency](https://blogs.msdn.microsoft.com/wesdyer/2007/03/01/immutability-purity-and-referential-transparency/)
+ * [So You Want to be a Functional Programmer (Part 1)](https://medium.com/@cscalfani/so-you-want-to-be-a-functional-programmer-part-1-1f15e387e536)
+ 
 *)
