@@ -477,8 +477,8 @@ Also notice that in the last version, the parenthesis at the right of `<|` are s
 and the whole order of `List.map add1` and `List.map sub1` changed!
 
 <div class="info">
-Do you understand why the computations of `add1` and `sub1` swapped? Consider
-the following function:
+Do you understand why <code>add1</code> and <code>sub1</code> needs to be swapped in the last example?
+Consider the following function:
 
     let sub x y = x - y
 
