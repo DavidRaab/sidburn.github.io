@@ -568,6 +568,42 @@ fine with piping.</p>
 </table>
 <p>Also notice that in the last version, the parenthesis at the right of <code>&lt;|</code> are still important
 and the whole order of <code>List.map add1</code> and <code>List.map sub1</code> changed!</p>
+<div class="info">
+Do you understand why the computations of `add1` and `sub1` swapped? Consider
+the following function:
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">sub</span> <span class="i">x</span> <span class="i">y</span> <span class="o">=</span> <span class="i">x</span> <span class="o">-</span> <span class="i">y</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Now look at those three definitions and their results:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="i">sub</span> <span class="n">5</span> <span class="n">3</span>       <span class="c">// 2</span>
+<span class="n">3</span> <span class="o">|&gt;</span> <span class="i">sub</span> <span class="n">5</span>    <span class="c">// 2</span>
+<span class="n">3</span> <span class="o">|&gt;</span> <span class="i">sub</span> <span class="o">&lt;|</span> <span class="n">5</span> <span class="c">// -2</span>
+</code></pre></td>
+</tr>
+</table>
+<p>In the first and second example <code>5</code> is the first argument to <code>sub</code>. It is also the
+first argument in the second example because function application has a higher precedence
+as <code>|&gt;</code>. In the last example there is no direct function application anymore and <code>3 |&gt; sub</code>
+is executed first and <code>3</code> becomes the first argument of <code>sub</code>. With explicit parenthesis, the code
+is interpreted like this:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="i">sub</span> <span class="n">5</span> <span class="n">3</span>         <span class="c">// 2</span>
+<span class="n">3</span> <span class="o">|&gt;</span> (<span class="i">sub</span> <span class="n">5</span>)    <span class="c">// 2</span>
+(<span class="n">3</span> <span class="o">|&gt;</span> <span class="i">sub</span>) <span class="o">&lt;|</span> <span class="n">5</span> <span class="c">// -2</span>
+</code></pre></td>
+</tr>
+</table>
+</div>
 <p>Before we go further lets formalize why this kind of code is so hard to write with piping.
 We have this problem because we don't have a single chain of computations anymore. We have two paths
 of computation that are different. When we call <code>List.append</code> it is just a way to combine
@@ -582,6 +618,16 @@ with parenthesis and embed the term where we need it. Look once again at the mat
 to understand this:</p>
 <div class="svg-code" style="width:50%; margin: 30px auto">
 <img src="/images/2016/application/math.svg" alt="A Math example" />
+</div>
+<p>If you don't see the tree in it. First consider that operators like <code>+</code>, <code>-</code> or <code>*</code> are just
+binary operators that expects two arguments. So a term like <code>5 + 5</code> also could be represented
+as a tree. <code>+</code> is the node with two arguments.</p>
+<div class="svg-code" style="width:25%; margin: 30px auto">
+<img src="/images/2016/application/add5-tree.svg" alt="Shows how 5 + 5 can be read as a tree" />
+</div>
+<p>You can apply this idea to the whole math formula <code>(5 + 5) * (3 + (6 * 2))</code>:</p>
+<div class="svg-code" style="width:100%; margin: 30px auto">
+<img src="/images/2016/application/math-tree.svg" alt="Visualize the math formula as a tree" />
 </div>
 <p>The only problem we have is to properly write those nesting so it is still readable. It isn't
 useful if a line expand further and further. We need to properly format the code so we can

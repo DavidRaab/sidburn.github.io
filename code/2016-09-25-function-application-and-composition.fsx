@@ -476,6 +476,29 @@ List.append
 Also notice that in the last version, the parenthesis at the right of `<|` are still important
 and the whole order of `List.map add1` and `List.map sub1` changed!
 
+<div class="info">
+Do you understand why the computations of `add1` and `sub1` swapped? Consider
+the following function:
+
+    let sub x y = x - y
+
+Now look at those three definitions and their results:
+
+    sub 5 3       // 2
+    3 |> sub 5    // 2
+    3 |> sub <| 5 // -2
+
+In the first and second example `5` is the first argument to `sub`. It is also the
+first argument in the second example because function application has a higher precedence
+as `|>`. In the last example there is no direct function application anymore and `3 |> sub`
+is executed first and `3` becomes the first argument of `sub`. With explicit parenthesis, the code
+is interpreted like this:
+
+    sub 5 3         // 2
+    3 |> (sub 5)    // 2
+    (3 |> sub) <| 5 // -2
+</div>
+
 Before we go further lets formalize why this kind of code is so hard to write with piping.
 We have this problem because we don't have a single chain of computations anymore. We have two paths
 of computation that are different. When we call `List.append` it is just a way to combine
@@ -493,6 +516,20 @@ to understand this:
 
 <div class="svg-code" style="width:50%; margin: 30px auto">
 <img src="/images/2016/application/math.svg" alt="A Math example" />
+</div>
+
+If you don't see the tree in it. First consider that operators like `+`, `-` or `*` are just
+binary operators that expects two arguments. So a term like `5 + 5` also could be represented
+as a tree. `+` is the node with two arguments.
+
+<div class="svg-code" style="width:25%; margin: 30px auto">
+<img src="/images/2016/application/add5-tree.svg" alt="Shows how 5 + 5 can be read as a tree" />
+</div>
+
+You can apply this idea to the whole math formula `(5 + 5) * (3 + (6 * 2))`:
+
+<div class="svg-code" style="width:100%; margin: 30px auto">
+<img src="/images/2016/application/math-tree.svg" alt="Visualize the math formula as a tree" />
 </div>
 
 The only problem we have is to properly write those nesting so it is still readable. It isn't
