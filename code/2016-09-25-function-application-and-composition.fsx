@@ -5,8 +5,12 @@ title: "Function Application and Composition"
 tags: [F#,composition,piping,recursion,immutability]
 description: "Describes the various ways on how to call a function and how to use function composition"
 keywords: f#, fsharp, functional, programming, application, function application, composition, piping
+twitter:
+\    card: "summary"
+\    image: "/images/2016/application/twitter.png"
 \---
 *)
+
 
 (*** hide ***)
 module Main
@@ -36,7 +40,7 @@ associated with it.
 ## Partial Application
 
 Partial application is one of those topics. If we pass all arguments to a function we name it
-*function application*. But if we only pass some arguments to a function we name it 
+*function application*. But if we only pass some arguments to a function we name it
 *partial application*.
 
 In some programming languages it is an error if we don't pass all arguments to a function, but
@@ -179,11 +183,11 @@ we can remove the parenthesis from the left-side of `|>` so we just end up with:
 This means the last version:
 *)
 
-let blub x = ((x |> sqrt) |> add10) |> square 
+let blub x = ((x |> sqrt) |> add10) |> square
 
 (** also can be written without any parenthesis: *)
 
-let blub x = x |> sqrt |> add10 |> square 
+let blub x = x |> sqrt |> add10 |> square
 
 (**
 This kind of style is often preferred in the F# community and can be read from left-to-right.
@@ -288,7 +292,7 @@ Probably that is what you **expect**. But this **isn't** how `<|` works! In fact
 will just give you a compile-time error. Because of this, piping with `<|` is just an exceptional
 bad idea. If you see code like this:
 
-    let blub x = x |> sqrt |> add10 |> square 
+    let blub x = x |> sqrt |> add10 |> square
 
 you would probably assume that `<|` just reverse the pipe:
 
@@ -322,7 +326,7 @@ But if we still continue to interpret this code, and ignore this error, we then 
 `sqrt` as an argument. Well, `square` does not return a function, so this also cannot work.
 
 And if we still ignore this error, we once again assume that this will return another new function
-as a result that we then finally pass `x` as a value. 
+as a result that we then finally pass `x` as a value.
 
 Already confused? And that's why `<|` is just an exceptional bad idea, and you never ever
 should use `<|`. `<|` is just broken, it isn't at all how someone thinks it works or should work.
@@ -352,7 +356,7 @@ The whole example is read like this:
 
 Overall `<|` is just another delimiter that you could use instead of parenthesis. But
 this kind of behaviour is not really how you would expect it to work. As left-piping with
-`|>` is used a lot, you would think `<|` just does the reverse. So in general right-piping 
+`|>` is used a lot, you would think `<|` just does the reverse. So in general right-piping
 only adds more confusion and it is better to not use it at all.
 
 <div class="info">
@@ -384,7 +388,7 @@ Piping is only a good idea if:
 2. A function only has a single argument that is the result of another function
 3. You need to chain multiple of those functions in one explicit order
 
-To understand those restriction better, let's talk about the List module. Why can we usually 
+To understand those restriction better, let's talk about the List module. Why can we usually
 chain most of the List functions? For example we can create something like this:
 *)
 
@@ -427,7 +431,7 @@ As a thumb of rule we can say: It is a good idea if the output type of a functio
 last argument is the same. Most of the functions from the List module are build that way. Most of those
 functions return a new list, and most of them also expect a list as the last argument. It is in some
 sense only natural that if you have dozens of functions that operate, transforms or create list that
-you want to compose these functions together. 
+you want to compose these functions together.
 
 Picking the correct last argument of a function is important, but that is not everything. The
 problem is, sometimes you don't have one clear value to put as the last argument, sometimes more
@@ -455,19 +459,19 @@ List.append
   (List.map square (List.map sub1 [1.0 .. 5.0]))
 
 // The same as above with partial piping...
-[1.0 .. 5.0] 
-|> List.map sub1 
-|> List.map square 
+[1.0 .. 5.0]
+|> List.map sub1
+|> List.map square
 |> List.append (List.map square (List.map add1 [1.0 .. 5.0]))
 
 // ...with even more piping
-[1.0 .. 5.0] 
-|> List.map sub1 
-|> List.map square 
+[1.0 .. 5.0]
+|> List.map sub1
+|> List.map square
 |> List.append ([1.0 .. 5.0] |> List.map add1 |> List.map square)
 
 // ...full piping including the evil <|
-[1.0 .. 5.0] 
+[1.0 .. 5.0]
 |> List.map add1   // <-- add1 instead of sub1!!!
 |> List.map square
 |> List.append <| ([1.0 .. 5.0] |> List.map sub1 |> List.map square)
@@ -555,7 +559,7 @@ formats are tree structures. You have a starting and an end-tag. Inside of a tag
 other tags to create hierachical structures. The rules you already use to properly indent
 and format HTML also can be used to format and indent nested code with parenthesis.
 
-Up so far we have seen two kinds of code. One kind is sequential. With sequential code we can 
+Up so far we have seen two kinds of code. One kind is sequential. With sequential code we can
 use piping for a better representation. But if we have tree like structures just normal
 nesting is quite better. The question we should ask is: Should we try to represent
 anything as a sequence?
@@ -577,7 +581,7 @@ algorithm I first show how we convert a number into decimal because it is a lot 
 
 In general the algorithm works by removing one digit from a number, convert it into a string
 and repeat that process for the remaining number. That description also already tell us that we
-have a recursive algorithm. 
+have a recursive algorithm.
 
 The first step is to remove one digit from a number. We achieve this by using the modulo operation.
 When we calculate `x % 10` we always get the right most digit of a number. This is just
@@ -627,7 +631,7 @@ let extract x = x % 2
 (** Once we have such a function, we actually need a way to transform the digits
 returned by `extract` to a string. *)
 
-let toString x = 
+let toString x =
     match x with
     | 0 -> "0"
     | 1 -> "1"
@@ -641,7 +645,7 @@ let rightShift x = (x - (extract x)) / 2
 
 (**
 Are we done? Well, let's try to create a binary convert at this point. We could come up with
-code like this: 
+code like this:
 
     let rec toBinary x =
         let rightEnd = toString (extract x)
@@ -652,15 +656,15 @@ So we calculate two values. First we extract the right most digit and convert it
 If we have `225` as input this would be the first step in our calculation and the string `"1"`
 is stored in `rightEnd`.
 
-When we call `rightShift x` the result is `112`. But what do we do with that? Well, this is the 
-reason why it is a recursive function. We need to repeat the calculation until we end up 
+When we call `rightShift x` the result is `112`. But what do we do with that? Well, this is the
+reason why it is a recursive function. We need to repeat the calculation until we end up
 with zero. That's why we pass the result to `toBinary` immediately.
 
 If you are not used to recursion it can probably be hard to understand what this will return.
 In recursion you just make the assumption the the recursive call just somehow works. So what is
 the result of `toBinary (rightShift 112)`? It is the string representation of the number `112`.
 
-So what do we have exactly? We have the first right most bit. It is stored inside `rightEnd`, 
+So what do we have exactly? We have the first right most bit. It is stored inside `rightEnd`,
 and in `rest` the rest of the transformation is saved. In our example this means:
 
     rightEnd = "1"
@@ -744,7 +748,7 @@ What we have seen so far is function application. Function application means to 
 a function, or in other words. Execute a function to get the result of a function. Function
 composition on the other hand is completely different. It means, combine two or more functions
 together to create a new function. Even if it seems like two different tasks in theory, in practice
-the difference isn't too big. 
+the difference isn't too big.
 
 Let's go back to our `blub` function. We started with:
 *)
@@ -829,12 +833,12 @@ like always, every person usually disagree with another 10%.
 ## Summary
 
 Overall we covered function application and composition. We saw function application with nesting
-or piping with operators like `|>` or `<|`. We also can use function composition with `<<` or 
+or piping with operators like `|>` or `<|`. We also can use function composition with `<<` or
 `>>` in certain situation.
 
 I hope in this article you learned how all of those operators work, and more important, when you should
 use which kind of style. Nesting, piping and function composition are three ways to either execute
-or compose functions. But not any of those are good in any situation. 
+or compose functions. But not any of those are good in any situation.
 
 Especially piping is overused in F# in my opinion. Not every problem can be expressed naturally
 in a sequential way of piping. So don't view any problem as a nail that you solve with a hammer.
