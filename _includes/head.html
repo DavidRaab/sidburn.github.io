@@ -22,13 +22,13 @@
   </title>
 
   <!-- Twitter Card -->
-  {% if page.twitter.card == "summary" %}
+  {% if page.twitter-card == "summary" %}
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:site" content="@David_Raab" />
   <meta name="twitter:title" content="{{ page.title }}" />
   <meta name="twitter:description" content="{{ page.description }}" />
-  {% if page.twitter.image %}
-  <meta name="twitter:image" content="{{ site.url }}{{ page.twitter.image }}" />
+  {% if page.twitter-image %}
+  <meta name="twitter:image" content="{{ site.url }}{{ page.twitter-image }}" />
   {% endif %}
   {% endif %}
 

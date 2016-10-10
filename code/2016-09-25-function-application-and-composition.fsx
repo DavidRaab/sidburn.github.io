@@ -5,9 +5,8 @@ title: "Function Application and Composition"
 tags: [F#,composition,piping,recursion,immutability]
 description: "Describes the various ways on how to call a function and how to use function composition"
 keywords: f#, fsharp, functional, programming, application, function application, composition, piping
-twitter:
-\    card: "summary"
-\    image: "/images/2016/application/twitter.png"
+twitter-card:  "summary"
+twitter-image: "/images/2016/application/twitter.png"
 \---
 *)
 
