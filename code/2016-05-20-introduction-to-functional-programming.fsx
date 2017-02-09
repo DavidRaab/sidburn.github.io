@@ -1259,6 +1259,7 @@ better, but also widen your view on object-oriented programming.
 <a name="reading"></a>
 ## Further Reading
 
+* [What's Functional Programming All About?](http://www.lihaoyi.com/post/WhatsFunctionalProgrammingAllAbout.html)
 * [So You Want to be a Functional Programmer (Part 1)](https://medium.com/@cscalfani/so-you-want-to-be-a-functional-programmer-part-1-1f15e387e536)
 
 <a name="comments"></a>
