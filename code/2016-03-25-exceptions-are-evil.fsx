@@ -118,4 +118,5 @@ of getting rid of `null`. The thing is, the same solutions also works for *Excep
  * [Railway Oriented Programming](http://fsharpforfunandprofit.com/rop/)
  * [Composition with an Either computation expression](http://blog.ploeh.dk/2016/03/21/composition-with-an-either-computation-expression/)
  * [Functional Error Handling in F# by Example](http://blog.leifbattermann.de/2016/04/09/functional-error-handling-in-fsharp-by-example/)
+ * [Joel on Software - Exceptions](https://www.joelonsoftware.com/2003/10/13/13/)
 *)
