@@ -38,8 +38,10 @@ in different categories.
 1. [Applying Structured Programming]({% post_url 2016-03-09-applying-structured-programming %})
 
 ## Immutability
-* [From mutable loops to immutability]({% post_url 2016-04-05-mutable-loops-to-immutability %})
 * [Immutability and Pure Functions]({% post_url 2016-03-14-immutability-and-pure-functions %})
+* [Mutability vs. Immutability: Valid objects]({% post_url 2017-02-27-mutability-vs-immutability-validation %})
+* [From mutable loops to immutability]({% post_url 2016-04-05-mutable-loops-to-immutability %})
+
 
 ## X is evil
 * [Null is evil]({% post_url 2016-03-20-null-is-evil %})

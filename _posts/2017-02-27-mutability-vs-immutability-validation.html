@@ -1,0 +1,1174 @@
+---
+layout: post
+title: "Mutability vs. Immutability: Valid objects"
+tags: [F#,C#,immutability,comparison]
+description: "At any time we want to maintain valid objects. In this article we see how hard/easy it is with mutability or immutability."
+keywords: f#, c#, fsharp, csharp, mutability, immutability, comparison
+twitter-card:  "summary"
+---
+
+<p>I already wrote <a href="{% post_url 2016-03-14-immutability-and-pure-functions %}">an article that explains immutability</a>,
+but one thing I hand-waved was the benefits of immutability and why you should
+program with immutable values.</p>
+<p>In this article I talk about those benefits by trying to maintaining valid
+objects at all time and show how we can achieve it with mutability and
+immutability.</p>
+<p>One question might be why I'm not just showing the immutable part. I could do
+this, but the problem I see is that it isn't so obvious how hard the mutable
+part really is.</p>
+<p>Because of this, first I show all the things you have to keep in mind if you work
+with mutability. Then we see how immutability helps us.</p>
+<h2>About this article</h2>
+<p>Throughout this article I will use C# and F#. All mutable examples will use
+C# code while all immutable examples use F#. There are multiple reason for this
+decision:</p>
+<ol>
+<li>
+Mutability is best handled by classes and C# is built around that concepts
+and everything by default is mutable.
+</li>
+<li>
+Immutability is best handled by immutable data-types and functions that
+operate on them. In F# everything is immutable by default.
+</li>
+<li>
+If you are new to F#, probably this article can help a little bit if
+you see how C# code translates to F#.
+</li>
+</ol>
+<p>There are also some words I want to mention to avoid confusion:</p>
+<ol>
+<li><strong>State</strong>: State, mutable objects or mutability is just used interchangeable.</li>
+<li>
+<strong>Object</strong>: The word <em>object</em> is not limited to OOP. In general it just means
+<em>a thing</em>. Also immutable data-types like records, unions or tuples are just
+objects.
+</li>
+<li>
+<strong>Function</strong>: Anything that you somehow execute is a function. This includes
+class constructors, methods, static methods and so on.
+</li>
+<li>
+<strong>Constructors</strong>: A <em>constructor</em> is any <em>function</em> that creates a new
+<em>object</em> if you don't already have one.
+</li>
+</ol>
+<p>With immutability a constructor might seems a little blurry because every function
+returns a new object. The important detail is <strong>if you don't already have one</strong>.
+As an example <code>List.map</code>, <code>List.filter</code> or <code>List.fold</code> are not considered as
+constructors. All those functions already expect a List that they operator on.
+If you don't already have a list, you cannot use those functions.</p>
+<p>In F# there are multiple ways to create a list, like the special List syntax
+<code>[1;2;3]</code> or the cons operator <code>1 :: 2</code> or functions like <code>List.unfold</code>. All
+of those things create a list without that you need one beforehand and
+thus are considered <em>constructors</em>.</p>
+<p>It is not a C# vs. F# or a OO vs. FP comparison if you think that way. You
+also can create immutable object in C# and get the same benefits as in the F#
+examples. Or you can create mutable classes in F# and get the same disadvantages
+as in the C# examples.</p>
+<h2>Mutability: The MinMax example</h2>
+<p>We start with a really small and simple example. A <code>MinMax</code> class that only has
+the purpose to keep a <em>current</em> value between a defined <em>minimum</em> and <em>maximum</em>.
+A C# class could look like this:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+<span class="l">16: </span>
+<span class="l">17: </span>
+<span class="l">18: </span>
+<span class="l">19: </span>
+<span class="l">20: </span>
+<span class="l">21: </span>
+<span class="l">22: </span>
+<span class="l">23: </span>
+<span class="l">24: </span>
+<span class="l">25: </span>
+<span class="l">26: </span>
+<span class="l">27: </span>
+<span class="l">28: </span>
+<span class="l">29: </span>
+<span class="l">30: </span>
+<span class="l">31: </span>
+<span class="l">32: </span>
+<span class="l">33: </span>
+<span class="l">34: </span>
+<span class="l">35: </span>
+<span class="l">36: </span>
+<span class="l">37: </span>
+<span class="l">38: </span>
+<span class="l">39: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="csharp"><span class="k">public</span> MinMax {
+    <span class="k">public</span> <span class="k">int</span> Minimum { get; <span class="k">private</span> set; }
+    <span class="k">public</span> <span class="k">int</span> Maximum { get; <span class="k">private</span> set; }
+    <span class="k">public</span> <span class="k">int</span> Current { get; <span class="k">private</span> set; }
+
+    <span class="k">public</span> MinMax(<span class="k">int</span> minimum, <span class="k">int</span> maximum, <span class="k">int</span> current) {
+        <span class="k">this</span>.Minimum <span class="o">=</span> minimum;
+        <span class="k">this</span>.Maximum <span class="o">=</span> maximum;
+        <span class="k">this</span>.Current <span class="o">=</span> current;
+
+        <span class="k">this</span>.CheckMinMax();
+        <span class="k">this</span>.CheckCurrent();
+    }
+
+    <span class="k">private</span> <span class="k">void</span> CheckMinMax() {
+        <span class="k">if</span> ( <span class="k">this</span>.Minimum <span class="o">&gt;</span> <span class="k">this</span>.Maximum ) {
+            <span class="k">throw</span> <span class="k">new</span> Exception(<span class="s">"Minimum greater than Maximum"</span>);
+        }
+    }
+
+    <span class="k">private</span> <span class="k">void</span> CheckCurrent() {
+        <span class="k">if</span> ( <span class="k">this</span>.Current <span class="o">&gt;</span> <span class="k">this</span>.Maximum ) {
+            <span class="k">this</span>.Current <span class="o">=</span> <span class="k">this</span>.Maximum;
+        }
+        elif ( <span class="k">this</span>.Current <span class="o">&lt;</span> <span class="k">this</span>.Minimum ) {
+            <span class="k">this</span>.Current <span class="o">=</span> <span class="k">this</span>.Minimum;
+        }
+    }
+
+    <span class="k">public</span> <span class="k">void</span> Add(<span class="k">int</span> amount) {
+        <span class="k">this</span>.Current <span class="o">+</span><span class="o">=</span> amount;
+        <span class="k">this</span>.CheckCurrent();
+    }
+
+    <span class="k">public</span> <span class="k">void</span> Subtract(<span class="k">int</span> amount) {
+        <span class="k">this</span>.Current <span class="o">-</span><span class="o">=</span> amount;
+        <span class="k">this</span>.CheckCurrent();
+    }
+}
+</code></pre></td></tr></table>
+<p>We start by only providing methods to change the <em>current</em> value. When we
+look closer we also could define our <code>MinMax</code> class as two distinct rules.</p>
+<ol>
+<li>The minimum value must be smaller or equal to maximum. <code>CheckMinMax()</code></li>
+<li>The current value must be between minimum and maximum. <code>CheckCurrent()</code></li>
+</ol>
+<p>Often people argue that we don't need to re-check all rules, only those that
+are somehow affected. As an example the <code>Add</code> and <code>Subtract</code> functions
+only call <code>CheckCurrent()</code>. Obviously, we don't need to call <code>CheckMinMax()</code>
+if we don't change those values.</p>
+<p>While this is true, for more complex objects it can be hard to determine
+what is affected and what's not. Imagine we add a <code>SetMaximum</code> function to
+mutate the maximum. Would it be enough to just call <code>CheckMinMax()</code>
+because only maximum changed?</p>
+<p>Well no, otherwise this code would create an invalid state:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="csharp"><span class="k">var</span> v <span class="o">=</span> <span class="k">new</span> MinMax(<span class="n">0</span>, <span class="n">100</span>, <span class="n">80</span>);
+v.SetMaximum(<span class="n">50</span>);
+<span class="c">// Minimum=0; Maximum=50; Current=80</span>
+</code></pre></td></tr></table>
+<p>In a very easy example like this it might be obvious that you must re-check
+both rules and call <code>CheckMinMax()</code> <strong>and</strong> <code>CheckCurrent()</code>. In a more complex
+class determining what needs to be called can be a lot harder.</p>
+<p>As our goal is to always keep a valid object, why not make up some rules like
+a coding-standard that when we strictly follow it, we can be sure objects always
+stay valid.</p>
+<p>So as our first rule we just simply say:</p>
+<blockquote>
+<p>First Rule: Always re-validate every rule to ensure the correctness of an object.</p>
+</blockquote>
+<p>As a conclusion of the first rule we could create a single function like <code>IsValid()</code>
+instead of multiple functions like <code>CheckMinMax()</code> and <code>CheckCurrent()</code>. But
+in this example, lets just call both. Following our rule, now imagine we
+implement <code>SetMaximum()</code> in this way:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="csharp"><span class="k">public</span> <span class="k">void</span> SetMaximum(<span class="k">int</span> max) {
+    <span class="k">this</span>.Maximum <span class="o">=</span> max;
+    <span class="k">this</span>.CheckMinMax();
+    <span class="k">this</span>.CheckCurrent();
+}
+</code></pre></td></tr></table>
+<p><strong>Question:</strong> Is this implementation correct, or not? What is the state of <code>v</code> at the end of
+this code example?</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="csharp"><span class="k">var</span> v <span class="o">=</span> <span class="k">new</span> MinMax(<span class="n">0</span>, <span class="n">100</span>, <span class="n">80</span>);
+<span class="k">try</span> {
+    v.SetMaximum(<span class="n">-100</span>);
+}
+v.Add(<span class="n">10</span>);
+</code></pre></td></tr></table>
+<p><strong>Answer:</strong> The <code>SetMaximum</code> is not correct and the state of <code>v</code> will be:
+<code>Minimum=0; Maximum=-100; Current=-100</code>. Mutating a field before we know
+a change is valid is a problem. Our next rule:</p>
+<blockquote>
+<p>Second Rule: You always must validate before mutating.</p>
+</blockquote>
+<p>The interesting part is. Before we implemented <code>SetMaximum()</code> this was not
+a problem! <code>Add</code> and <code>Subtract</code> both check after we mutate the <code>Current</code>
+value. So what is the difference? Why does it work with <code>Add</code> and <code>Subtract</code>
+but not with <code>SetMaximum</code>?</p>
+<p>One reason is that we only called <code>CheckMinMax</code> from the constructor. The
+exception in <code>CheckMinMax</code> aborts the whole creation of an object. But when
+we already have an object and call it from a method that isn't enough.</p>
+<p>So as an exception we could add another rule:</p>
+<blockquote>
+<p>Third Rule: The second rule don't need to be followed in a constructor. In
+a constructor you always are allowed to mutate and validate afterwards.</p>
+</blockquote>
+<p>But that still doesn't explain why first mutating and the checking is no
+problem in <code>Add</code> and <code>Subtract</code>. On top with our current rules so far we are not
+allowed to write <code>Add</code> and <code>Subtract</code> in the way it is currently written.</p>
+<p>The reason why we can do this is because our <code>CheckCurrent()</code> not just validates
+and throws an error in the case there is something invalid. It actually <strong>fixes</strong>
+the problem.</p>
+<p>If the <code>Current</code> becomes bigger than <code>Maximum</code>, and thus makes the objects invalid,
+it fixes the problem by setting <code>Current</code> to the <code>Maximum</code> value. So whenever
+we can <strong>fix</strong> an invalid object and there is a way to turn it back into
+a valid object, we actually are allowed to mutate and check afterwards.</p>
+<blockquote>
+<p>Fourth Rule: If there is a way to <em>fix</em> an invalid object, you
+are allowed to mutate and validate even outside of an constructor.</p>
+</blockquote>
+<p>We also could applied this kind of <strong>fixing</strong> to <code>Minimum</code> and <code>Maximum</code>.
+For example i could add the following rules:</p>
+<ul>
+<li>If Minimum gets mutated and is bigger than Maximum. Also set Maximum to the same value.</li>
+<li>If Maximum gets mutated and is smaller than Minimum. Also set Minimum to the same value.</li>
+</ul>
+<p>The problem with rules like these are that they can become hard to remember.
+When we have a MinMax object like this:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip"><code lang="console">Minimum=0; Maximum=100; Current=50
+</code></pre></td></tr></table>
+<p>and we set the <code>Maximum</code> to <code>-100</code> we could either return an error or return a
+MinMax like this:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip"><code lang="console">Minimum=-100; Maximum=-100; Current=-100
+</code></pre></td></tr></table>
+<p>We also have the same choice when we <code>Add</code> or <code>Subtract</code>. When we start
+with:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip"><code lang="console">Minimum=0; Maximum=100; Current=50
+</code></pre></td></tr></table>
+<p>and try to add <code>200</code> to it we also could throw an error instead of <strong>fixing</strong>
+and returning:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip"><code lang="console">Minimum=0; Maximum=100; Current=100
+</code></pre></td></tr></table>
+<p>There isn't a right or wrong approach. But depending which
+approach you pick you have other rules you must follow. If you pick the approach
+to throw/return errors then you should validate before mutating. If you fix
+invalid objects you are allowed to mutate and call your <strong>fix</strong> function afterwards.</p>
+<div class="info">
+It might be true that we cannot label one as <strong>right</strong> or <strong>wrong</strong>,
+nevertheless I suggest we should avoid a solution that fixes something automatically
+most of the time. Those things are usually hard to remember. Returning an error, no matter how
+you do it exactly (null / Options / Results / Exceptions), is most of the time
+more flexible, and easier to comprehend.
+</div>
+<p>Once we decided for the one way or the other and follow the rules, is it then impossible
+that an object will never be in an invalid state? The answer is actually, no. But
+we need another example to demonstrate this.</p>
+<p>The <code>MinMax</code> class uses three mutable fields. While the fields itself are mutable
+this is not true for the <code>int</code> itself. An <code>int</code> is an immutable type. So we also
+must consider a case where the objects themselves are mutable.</p>
+<p>For our new example let's consider a <code>Product</code> class with two fields <code>Name</code>
+and <code>Price</code>. To make it easy, we just assume every <code>Name</code> and <code>Price</code> is valid.
+Instead we focus on a <code>ProductsPriceOver</code> class. The purpose of this class
+is to maintain a list of <code>Product</code>s with one rule. Every <code>Product</code> must
+be more expensive then a defined minimum.</p>
+<p>The final usage of those two classes could look like this:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+<span class="l">7: </span>
+<span class="l">8: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="csharp"><span class="k">var</span> a <span class="o">=</span> <span class="k">new</span> Product(<span class="s">"A"</span>, <span class="n">9.99</span>);
+<span class="k">var</span> b <span class="o">=</span> <span class="k">new</span> Product(<span class="s">"B"</span>, <span class="n">19.99</span>);
+<span class="k">var</span> c <span class="o">=</span> <span class="k">new</span> Product(<span class="s">"C"</span>, <span class="n">49.99</span>);
+
+<span class="k">var</span> ppo  <span class="o">=</span> <span class="k">new</span> ProductsPriceOver(<span class="n">10.00</span>);
+ppo.add(a);
+ppo.add(b);
+ppo.add(c);
+</code></pre></td></tr></table>
+<p>First we create an <code>ProductsPriceOver</code> object that only accepts Products more expensive than <code>10.00</code>.
+When we implement <code>ProductsPriceOver</code> it means the <code>add</code> method must check the <code>Price</code>
+of every <code>Product</code>. When the above code gets executed we assume only product "B"
+and "C" are inside <code>ProductsPriceOver</code>.</p>
+<p>If we assume <code>add</code> is the only method <code>ProductsPriceOver</code> will ever implement. Will
+<code>ProductsPriceOver</code> always be valid?</p>
+<p>The answer is no. We can invalidate <code>ProductsPriceOver</code> by just changing the Price
+of an Product.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="csharp">b.Price <span class="o">=</span> <span class="n">5.00</span>
+</code></pre></td></tr></table>
+<p>The problem is that we reference Product B directly in <code>ProductsPriceOver</code> and we
+also never get a notification if one of the products changes.</p>
+<p>There are two ways how we can fix that. We could choose only one, so i consider
+both as the fifth rule.</p>
+<blockquote>
+<p>Fifth Rule A: Mutable objects must have some kind of notification mechanism
+once they changed.</p>
+</blockquote>
+<p>As an example. We could add a <code>Changed</code> event to every mutable object that gets
+fired as soon an object changes.</p>
+<p>This way the <code>ppo.add(x)</code> function can add an event handler to every product.
+If a product changes it price, it re-checks if the new price is high enough
+to still be part of the <code>ppo</code> object.</p>
+<blockquote>
+<p>Fifth Rule B: Mutable objects must have a <code>Copy</code> function that can create
+deep copies of an object.</p>
+</blockquote>
+<p>This technique is often named <em>defensive copies</em>. When <code>ppo.add(x)</code> is
+called it doesn't save a reference to the same object. It creates a copy
+of the whole object and only keeps the copy in its internal list.</p>
+<p>When we do this, even after we execute <code>b.Price = 5.00</code> the product in <code>ppo</code>
+will still be <code>19.99</code> instead of <code>5</code>. This way every <code>ProductsPriceOver</code> object
+stay valid, but we need a way to update the price in <code>ProductsPriceOver</code>.
+I will cover this problem when I talk about immutability.</p>
+<p>In some way <em>defensive copies</em> and <em>immutability</em> are the same. Because
+sharing an mutable object can cause problems, defensive copying creates
+copies of objects and try to avoid sharing. With immutable objects
+sharing is no problem, but we create copies of objects when we want to
+change something.</p>
+<p>The difference is only at which point we create copies. Defensive copies
+creates copies before-hand, immutability creates copies only in the exact
+moment something is changing.</p>
+<p>But after all, we are still not safe! Rule Five only covers things we
+could describe as <em>Input</em>. It only covers those cases when our current
+object receives another object that was created outside of our current
+object.</p>
+<p>Another problem that can occur is when we return mutable objects from
+methods. Or in some sense when we return them as <em>Output</em>.</p>
+<p>Our <code>ProductsPriceOver</code> object only has an <code>add</code> method at this point,
+and in fact is pretty useless. We assume that the <code>ProductsPriceOver</code>
+object has an internal mutable list to keep track of all its Products.
+This list is usually created when we create an <code>ProductsPriceOver</code> object
+and is not passed from the outside.</p>
+<p>But when we return those internal mutable objects, then our object can be
+easily invalidated. Let's assume our <code>ppo</code> has a <code>Products</code> field that
+directly returns the products as a <code>List&lt;Product&gt;</code>. We could then write
+something like this:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+<span class="l">16: </span>
+<span class="l">17: </span>
+<span class="l">18: </span>
+<span class="l">19: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="csharp"><span class="k">var</span> a <span class="o">=</span> <span class="k">new</span> Product(<span class="s">"A"</span>, <span class="n">9.99</span>);
+<span class="k">var</span> b <span class="o">=</span> <span class="k">new</span> Product(<span class="s">"B"</span>, <span class="n">19.99</span>);
+<span class="k">var</span> c <span class="o">=</span> <span class="k">new</span> Product(<span class="s">"C"</span>, <span class="n">49.99</span>);
+
+<span class="k">var</span> ppo  <span class="o">=</span> <span class="k">new</span> ProductsPriceOver(<span class="n">10.00</span>);
+ppo.add(a);
+ppo.add(b);
+ppo.add(c);
+
+<span class="c">// list only contains "b" and "c" at this point</span>
+
+List&lt;Product&gt; products <span class="o">=</span> ppo.Products
+products.Add(a)
+
+<span class="c">// list now contains "a", "b" and "c"!!!</span>
+
+<span class="c">// By directly accessing the internal mutable array</span>
+<span class="c">// we bypass the `ppo.add()` method including its</span>
+<span class="c">// enforcement of the rules</span>
+</code></pre></td></tr></table>
+<p>We can solve this problem in the exact same way we did with Rule Five.</p>
+<blockquote>
+<p>Sixth Rule A: Every mutable object we return must have a Changed event
+that gets fired when an object was mutated.</p>
+</blockquote>
+<p>If the internal mutable list has an event that gets fired whenever the list
+somehow mutates. Then our <code>ProductsPriceOver</code> class could add an event-handler
+that re-checks if all elements inside the list are valid.</p>
+<blockquote>
+<p>Sixth Rule B: Never return mutable objects directly. Return defensive
+copies instead.</p>
+</blockquote>
+<p>If <code>ppo.Products</code> just returns a copy then the caller can manipulate
+the returning list in any possible way, but it doesn't affect <code>ppo</code>.</p>
+<p>But for the output case, there exists a third way.</p>
+<blockquote>
+<p>Sixth Rule C: Don't allow access to internal mutable objects at all.</p>
+</blockquote>
+<p>This rule is probably the most used one in practice. And in my opinion it
+is the worst rule of all. This rule is so bad that in my opinion most problems
+of OO programming are connected to this idea. This rule alone deserves a
+whole article on its own to describe its evilness. Yes, I'm serious and this
+is not a joke!</p>
+<p>I left it to he reader to figure out how many implications this has.
+You can start with the question: <em>When you cannot access the <code>Products</code>
+list of an <code>ProductsPriceOver</code> object. How do you implement new functionality?</em></p>
+<p>Now that we have Rule Five and Six, lets talk about these. Actually you cannot
+freely decide if you either use events or defensive copies. Events are
+<em>reactive</em>. They get fired <em>after</em> a mutation happened. So you only can use
+events if there is a way to fix an object after it became invalid.</p>
+<p>If there is no way to fix an invalid object, you must use defensive copies!</p>
+<p>Even though this is not directly a rule. I think it is important enough
+to still consider it as a rule.</p>
+<blockquote>
+<p>Seventh Rule: Events can only be used if there is always a way to fix
+an invalid object. If there is no way to fix an invalid object, use
+defensive copies.</p>
+</blockquote>
+<p>Straight away, here is my last rule without much explanation as
+it should be self-explanatory.</p>
+<blockquote>
+<p>Eighth Rule: If your mutable objects are accessed by multiple threads
+(mutable shared state). You also must add synchronization primitives
+to avoid race conditions that can bring an object into an invalid
+state.</p>
+</blockquote>
+<p>And here is a bonus rule for the eighth rule.</p>
+<blockquote>
+<p>Bonus Rule: Just because every method of an object has synchronization
+primitives doesn't mean it is thread-safe. Because of this, you probably
+want to ignore Rule Eight.</p>
+</blockquote>
+<p>Also this is worth its own article that i will probably write about in the future.</p>
+<p>Let's get an overview of all rules we have to follow so we can be sure state
+will always be valid.</p>
+<h2>All Rules to ensure a valid State</h2>
+<ol>
+<li><strong>First Rule:</strong> Always re-validate every rule to ensure the correctness of an object.</li>
+<li><strong>Second Rule:</strong> You always must validate before mutating.</li>
+<li>
+<strong>Third Rule:</strong> The second rule don't need to be followed in a constructor. In
+a constructor you always are allowed to mutate and validate afterwards.
+</li>
+<li>
+<strong>Fourth Rule:</strong> If there is a way to <em>fix</em> an invalid object, you
+are allowed to mutate and validate even outside of an constructor.
+</li>
+<li>
+<strong>Fifth Rule A:</strong> Mutable objects must have some kind of notification mechanism
+once they changed.
+</li>
+<li>
+<strong>Fifth Rule B:</strong> Mutable objects must have a <code>Copy</code> or <code>Clone</code> function
+that can create deep copies of an object.
+</li>
+<li>
+<strong>Sixth Rule A:</strong> Every mutable object we return must have a Changed event
+that gets fired when an object was mutated.
+</li>
+<li>
+<strong>Sixth Rule B:</strong> Never return mutable objects directly. Return defensive
+copies instead.
+</li>
+<li><strong>Sixth Rule C:</strong> Don't allow access to internal mutable objects at all.</li>
+<li>
+<strong>Seventh Rule:</strong> Events can only be used if there is always a way to fix
+an invalid object. If there is no way to fix an invalid object, use
+defensive copies.
+</li>
+<li>
+<strong>Eighth Rule:</strong> If your mutable objects are accessed by multiple threads
+(mutable shared state). You also must add synchronization primitives
+to avoid race conditions that can bring an object into an invalid
+state.
+</li>
+<li>
+<strong>Bonus Rule:</strong> Just because every method of an object has synchronization
+primitives doesn't mean it is thread-safe. Because of this, you probably
+want to ignore Rule Eighth.
+</li>
+</ol>
+<p>In fact, even now I'm not sure at all if I really covered everything! Besides
+the amount of rules you should follow to ensure an object is always valid,
+the problem is that nearly every rule either has an exception or special
+requirements when you should/can use them.</p>
+<p>This overall makes mutability pretty hard. Now that we covered the mutability
+part, lets so how immutability helps us.</p>
+<h2>Designing with Immutability</h2>
+<p>Our MinMax class can be easily represented by a record in F#. Records in F#
+are immutable by default and can group data together like classes do.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">type</span> <span onmouseout="hideTip(event, 'fs24', 100)" onmouseover="showTip(event, 'fs24', 100)" class="t">MinMax</span> <span class="o">=</span> {
+    <span onmouseout="hideTip(event, 'fs25', 101)" onmouseover="showTip(event, 'fs25', 101)" class="i">Minimum</span><span class="o">:</span> <span onmouseout="hideTip(event, 'fs4', 102)" onmouseover="showTip(event, 'fs4', 102)" class="t">int</span>
+    <span onmouseout="hideTip(event, 'fs26', 103)" onmouseover="showTip(event, 'fs26', 103)" class="i">Maximum</span><span class="o">:</span> <span onmouseout="hideTip(event, 'fs4', 104)" onmouseover="showTip(event, 'fs4', 104)" class="t">int</span>
+    <span onmouseout="hideTip(event, 'fs27', 105)" onmouseover="showTip(event, 'fs27', 105)" class="i">Current</span><span class="o">:</span> <span onmouseout="hideTip(event, 'fs4', 106)" onmouseover="showTip(event, 'fs4', 106)" class="t">int</span>
+}
+</code></pre></td>
+</tr>
+</table>
+<p>The problem is that up to this point we have no validation and can create a lot
+of invalid objects like:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs28', 107)" onmouseover="showTip(event, 'fs28', 107)" class="i">a</span> <span class="o">=</span> {<span class="i">Minimum</span><span class="o">=</span><span class="n">0</span>; <span class="i">Maximum</span><span class="o">=</span><span class="n">100</span>; <span class="i">Current</span><span class="o">=</span><span class="n">1000</span>}
+<span class="k">let</span> <span class="i">b</span> <span class="o">=</span> {<span class="i">Minimum</span><span class="o">=</span><span class="n">100</span>; <span class="i">Maximum</span><span class="o">=</span><span class="n">0</span>; <span class="i">Current</span><span class="o">=-</span><span class="n">1000</span>}
+</code></pre></td>
+</tr>
+</table>
+<p>We solve that problem by creating a module and make the record constructor private.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">module</span> <span onmouseout="hideTip(event, 'fs24', 108)" onmouseover="showTip(event, 'fs24', 108)" class="i">MinMax</span> <span class="o">=</span>
+    <span class="k">type</span> <span class="i">T</span> <span class="o">=</span> <span class="k">private</span> {
+        <span class="i">Minimum</span><span class="o">:</span> <span onmouseout="hideTip(event, 'fs4', 109)" onmouseover="showTip(event, 'fs4', 109)" class="i">int</span>
+        <span class="i">Maximum</span><span class="o">:</span> <span onmouseout="hideTip(event, 'fs4', 110)" onmouseover="showTip(event, 'fs4', 110)" class="i">int</span>
+        <span class="i">Current</span><span class="o">:</span> <span onmouseout="hideTip(event, 'fs4', 111)" onmouseover="showTip(event, 'fs4', 111)" class="i">int</span>
+    }
+</code></pre></td>
+</tr>
+</table>
+<p>But we cannot create a MinMax outside of our <code>MinMax</code> module. So we need at
+least one constructor. Because we want to eliminate the ability to create invalid
+<code>MinMax</code> objects we also add any validation we want to this constructor. Our
+final constructor <code>create</code> looks like this.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+<span class="l">7: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs29', 112)" onmouseover="showTip(event, 'fs29', 112)" class="f">create</span> <span onmouseout="hideTip(event, 'fs12', 113)" onmouseover="showTip(event, 'fs12', 113)" class="i">min</span> <span onmouseout="hideTip(event, 'fs13', 114)" onmouseover="showTip(event, 'fs13', 114)" class="i">max</span> <span onmouseout="hideTip(event, 'fs14', 115)" onmouseover="showTip(event, 'fs14', 115)" class="i">cur</span> <span class="o">=</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs30', 116)" onmouseover="showTip(event, 'fs30', 116)" class="f">create</span> <span onmouseout="hideTip(event, 'fs12', 117)" onmouseover="showTip(event, 'fs12', 117)" class="i">min</span> <span onmouseout="hideTip(event, 'fs13', 118)" onmouseover="showTip(event, 'fs13', 118)" class="i">max</span> <span onmouseout="hideTip(event, 'fs14', 119)" onmouseover="showTip(event, 'fs14', 119)" class="i">cur</span> <span class="o">=</span> {<span class="i">Minimum</span><span class="o">=</span><span onmouseout="hideTip(event, 'fs12', 120)" onmouseover="showTip(event, 'fs12', 120)" class="i">min</span>; <span class="i">Maximum</span><span class="o">=</span><span onmouseout="hideTip(event, 'fs13', 121)" onmouseover="showTip(event, 'fs13', 121)" class="i">max</span>; <span class="i">Current</span><span class="o">=</span><span onmouseout="hideTip(event, 'fs14', 122)" onmouseover="showTip(event, 'fs14', 122)" class="i">cur</span>}
+
+    <span class="k">if</span>   <span onmouseout="hideTip(event, 'fs12', 123)" onmouseover="showTip(event, 'fs12', 123)" class="i">min</span> <span class="o">&gt;</span> <span onmouseout="hideTip(event, 'fs13', 124)" onmouseover="showTip(event, 'fs13', 124)" class="i">max</span> <span class="k">then</span> <span onmouseout="hideTip(event, 'fs16', 125)" onmouseover="showTip(event, 'fs16', 125)" class="f">failwith</span> <span class="s">&quot;Minimum greater than Maximum&quot;</span>
+    <span class="k">elif</span> <span onmouseout="hideTip(event, 'fs14', 126)" onmouseover="showTip(event, 'fs14', 126)" class="i">cur</span> <span class="o">&gt;</span> <span onmouseout="hideTip(event, 'fs13', 127)" onmouseover="showTip(event, 'fs13', 127)" class="i">max</span> <span class="k">then</span> <span onmouseout="hideTip(event, 'fs30', 128)" onmouseover="showTip(event, 'fs30', 128)" class="f">create</span> <span onmouseout="hideTip(event, 'fs12', 129)" onmouseover="showTip(event, 'fs12', 129)" class="i">min</span> <span onmouseout="hideTip(event, 'fs13', 130)" onmouseover="showTip(event, 'fs13', 130)" class="i">max</span> <span onmouseout="hideTip(event, 'fs13', 131)" onmouseover="showTip(event, 'fs13', 131)" class="i">max</span>
+    <span class="k">elif</span> <span onmouseout="hideTip(event, 'fs14', 132)" onmouseover="showTip(event, 'fs14', 132)" class="i">cur</span> <span class="o">&lt;</span> <span onmouseout="hideTip(event, 'fs12', 133)" onmouseover="showTip(event, 'fs12', 133)" class="i">min</span> <span class="k">then</span> <span onmouseout="hideTip(event, 'fs30', 134)" onmouseover="showTip(event, 'fs30', 134)" class="f">create</span> <span onmouseout="hideTip(event, 'fs12', 135)" onmouseover="showTip(event, 'fs12', 135)" class="i">min</span> <span onmouseout="hideTip(event, 'fs13', 136)" onmouseover="showTip(event, 'fs13', 136)" class="i">max</span> <span onmouseout="hideTip(event, 'fs12', 137)" onmouseover="showTip(event, 'fs12', 137)" class="i">min</span>
+    <span class="k">else</span> <span onmouseout="hideTip(event, 'fs30', 138)" onmouseover="showTip(event, 'fs30', 138)" class="f">create</span> <span onmouseout="hideTip(event, 'fs12', 139)" onmouseover="showTip(event, 'fs12', 139)" class="i">min</span> <span onmouseout="hideTip(event, 'fs13', 140)" onmouseover="showTip(event, 'fs13', 140)" class="i">max</span> <span onmouseout="hideTip(event, 'fs14', 141)" onmouseover="showTip(event, 'fs14', 141)" class="i">cur</span>
+</code></pre></td>
+</tr>
+</table>
+<p>I also create a small <code>show</code> function that can display the content of a <code>MinMax</code> object.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs31', 142)" onmouseover="showTip(event, 'fs31', 142)" class="f">show</span> <span onmouseout="hideTip(event, 'fs32', 143)" onmouseover="showTip(event, 'fs32', 143)" class="i">mm</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs18', 144)" onmouseover="showTip(event, 'fs18', 144)" class="f">sprintf</span> <span class="s">&quot;</span><span class="pf">%d</span><span class="s"> range </span><span class="pf">%d</span><span class="s">/</span><span class="pf">%d</span><span class="s">&quot;</span> <span onmouseout="hideTip(event, 'fs32', 145)" onmouseover="showTip(event, 'fs32', 145)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs27', 146)" onmouseover="showTip(event, 'fs27', 146)" class="i">Current</span> <span onmouseout="hideTip(event, 'fs32', 147)" onmouseover="showTip(event, 'fs32', 147)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs25', 148)" onmouseover="showTip(event, 'fs25', 148)" class="i">Minimum</span> <span onmouseout="hideTip(event, 'fs32', 149)" onmouseover="showTip(event, 'fs32', 149)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs26', 150)" onmouseover="showTip(event, 'fs26', 150)" class="i">Maximum</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Outside of the <code>MinMax</code> module the only way to create a new <code>MinMax</code> object is
+by using the <code>MinMax.create</code> constructor. As an example the previously invalid
+state cannot be created anymore.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs33', 151)" onmouseover="showTip(event, 'fs33', 151)" class="t">MinMax</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs34', 152)" onmouseover="showTip(event, 'fs34', 152)" class="f">show</span> (<span onmouseout="hideTip(event, 'fs33', 153)" onmouseover="showTip(event, 'fs33', 153)" class="t">MinMax</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs35', 154)" onmouseover="showTip(event, 'fs35', 154)" class="f">create</span> <span class="n">0</span> <span class="n">100</span> <span class="n">1000</span>) <span class="c">// 100 range 0/100</span>
+<span onmouseout="hideTip(event, 'fs33', 155)" onmouseover="showTip(event, 'fs33', 155)" class="t">MinMax</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs35', 156)" onmouseover="showTip(event, 'fs35', 156)" class="f">create</span> <span class="n">100</span> <span class="n">0</span> <span class="o">-</span><span class="n">1000</span>              <span class="c">// Exception: Minimum greater than Maximum</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Inside the module it is a little bit different. Every function still has access
+to the record constructor, so there is a possibility of creating an invalid object.
+This leads to the <strong>only</strong> rule you will ever need with immutability!</p>
+<blockquote>
+<p>Golden Rule: Create a constructor function with the name <code>create</code> that contain
+all your rules and validation logic. Only use this function to create new
+objects from now on.</p>
+</blockquote>
+<p>Here are the <code>add</code> and <code>subtract</code> functions</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs36', 157)" onmouseover="showTip(event, 'fs36', 157)" class="f">add</span> <span onmouseout="hideTip(event, 'fs20', 158)" onmouseover="showTip(event, 'fs20', 158)" class="i">x</span> <span onmouseout="hideTip(event, 'fs32', 159)" onmouseover="showTip(event, 'fs32', 159)" class="i">mm</span>      <span class="o">=</span> <span onmouseout="hideTip(event, 'fs29', 160)" onmouseover="showTip(event, 'fs29', 160)" class="f">create</span> <span onmouseout="hideTip(event, 'fs32', 161)" onmouseover="showTip(event, 'fs32', 161)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs25', 162)" onmouseover="showTip(event, 'fs25', 162)" class="i">Minimum</span> <span onmouseout="hideTip(event, 'fs32', 163)" onmouseover="showTip(event, 'fs32', 163)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs26', 164)" onmouseover="showTip(event, 'fs26', 164)" class="i">Maximum</span> (<span onmouseout="hideTip(event, 'fs32', 165)" onmouseover="showTip(event, 'fs32', 165)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs27', 166)" onmouseover="showTip(event, 'fs27', 166)" class="i">Current</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs20', 167)" onmouseover="showTip(event, 'fs20', 167)" class="i">x</span>)
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs37', 168)" onmouseover="showTip(event, 'fs37', 168)" class="f">subtract</span> <span onmouseout="hideTip(event, 'fs20', 169)" onmouseover="showTip(event, 'fs20', 169)" class="i">x</span> <span onmouseout="hideTip(event, 'fs32', 170)" onmouseover="showTip(event, 'fs32', 170)" class="i">mm</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs29', 171)" onmouseover="showTip(event, 'fs29', 171)" class="f">create</span> <span onmouseout="hideTip(event, 'fs32', 172)" onmouseover="showTip(event, 'fs32', 172)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs25', 173)" onmouseover="showTip(event, 'fs25', 173)" class="i">Minimum</span> <span onmouseout="hideTip(event, 'fs32', 174)" onmouseover="showTip(event, 'fs32', 174)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs26', 175)" onmouseover="showTip(event, 'fs26', 175)" class="i">Maximum</span> (<span onmouseout="hideTip(event, 'fs32', 176)" onmouseover="showTip(event, 'fs32', 176)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs27', 177)" onmouseover="showTip(event, 'fs27', 177)" class="i">Current</span> <span class="o">-</span> <span onmouseout="hideTip(event, 'fs20', 178)" onmouseover="showTip(event, 'fs20', 178)" class="i">x</span>)
+</code></pre></td>
+</tr>
+</table>
+<p>Consider how this functions don't contain any validation logic, and they
+still will always work as intended. With mutability we had rules if we
+need to validate or mutate first. Because we cannot mutate in the first
+place we must create a new object and we do that by using the <code>create</code>
+function that contains all validation logic. We also can say, we are
+falling into the pit of success.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+<span class="l">7: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs33', 179)" onmouseover="showTip(event, 'fs33', 179)" class="t">MinMax</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs35', 180)" onmouseover="showTip(event, 'fs35', 180)" class="f">create</span> <span class="n">0</span> <span class="n">100</span> <span class="n">50</span>
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs33', 181)" onmouseover="showTip(event, 'fs33', 181)" class="t">MinMax</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs38', 182)" onmouseover="showTip(event, 'fs38', 182)" class="f">add</span> <span class="n">200</span>
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs33', 183)" onmouseover="showTip(event, 'fs33', 183)" class="t">MinMax</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs34', 184)" onmouseover="showTip(event, 'fs34', 184)" class="f">show</span> <span class="c">// 100 range 0/100</span>
+
+<span onmouseout="hideTip(event, 'fs33', 185)" onmouseover="showTip(event, 'fs33', 185)" class="t">MinMax</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs35', 186)" onmouseover="showTip(event, 'fs35', 186)" class="f">create</span> <span class="n">0</span> <span class="n">100</span> <span class="n">50</span>
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs33', 187)" onmouseover="showTip(event, 'fs33', 187)" class="t">MinMax</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs39', 188)" onmouseover="showTip(event, 'fs39', 188)" class="f">subtract</span> <span class="n">200</span>
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs33', 189)" onmouseover="showTip(event, 'fs33', 189)" class="t">MinMax</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs34', 190)" onmouseover="showTip(event, 'fs34', 190)" class="f">show</span> <span class="c">// 0 range 0/100</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Because functions return a new <code>MinMax</code> object we often end up with a fluid-interface.
+The only thing you have to consider is that the <code>MinMax</code> object should be
+the last argument of a function.</p>
+<p>Next look at <code>setMinimum</code> and <code>setMaximum</code>. In our mutation version it throws
+an exception, but it could leave an object in an invalid state if we first
+mutated an object. Needless to say that we never get that problem with
+immutability.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs40', 191)" onmouseover="showTip(event, 'fs40', 191)" class="f">setMaximum</span> <span onmouseout="hideTip(event, 'fs13', 192)" onmouseover="showTip(event, 'fs13', 192)" class="i">max</span> <span onmouseout="hideTip(event, 'fs32', 193)" onmouseover="showTip(event, 'fs32', 193)" class="i">mm</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs29', 194)" onmouseover="showTip(event, 'fs29', 194)" class="f">create</span> <span onmouseout="hideTip(event, 'fs32', 195)" onmouseover="showTip(event, 'fs32', 195)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs25', 196)" onmouseover="showTip(event, 'fs25', 196)" class="i">Minimum</span> <span onmouseout="hideTip(event, 'fs13', 197)" onmouseover="showTip(event, 'fs13', 197)" class="i">max</span> <span onmouseout="hideTip(event, 'fs32', 198)" onmouseover="showTip(event, 'fs32', 198)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs27', 199)" onmouseover="showTip(event, 'fs27', 199)" class="i">Current</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs41', 200)" onmouseover="showTip(event, 'fs41', 200)" class="f">setMinimum</span> <span onmouseout="hideTip(event, 'fs12', 201)" onmouseover="showTip(event, 'fs12', 201)" class="i">min</span> <span onmouseout="hideTip(event, 'fs32', 202)" onmouseover="showTip(event, 'fs32', 202)" class="i">mm</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs29', 203)" onmouseover="showTip(event, 'fs29', 203)" class="f">create</span> <span onmouseout="hideTip(event, 'fs12', 204)" onmouseover="showTip(event, 'fs12', 204)" class="i">min</span> <span onmouseout="hideTip(event, 'fs32', 205)" onmouseover="showTip(event, 'fs32', 205)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs26', 206)" onmouseover="showTip(event, 'fs26', 206)" class="i">Maximum</span> <span onmouseout="hideTip(event, 'fs32', 207)" onmouseover="showTip(event, 'fs32', 207)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs27', 208)" onmouseover="showTip(event, 'fs27', 208)" class="i">Current</span>
+</code></pre></td>
+</tr>
+</table>
+<p>As you can see, everything always stays valid:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs42', 209)" onmouseover="showTip(event, 'fs42', 209)" class="i">v</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs33', 210)" onmouseover="showTip(event, 'fs33', 210)" class="t">MinMax</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs35', 211)" onmouseover="showTip(event, 'fs35', 211)" class="f">create</span> <span class="n">0</span> <span class="n">100</span> <span class="n">80</span>
+
+<span class="k">try</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs43', 212)" onmouseover="showTip(event, 'fs43', 212)" class="i">x</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs33', 213)" onmouseover="showTip(event, 'fs33', 213)" class="t">MinMax</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs44', 214)" onmouseover="showTip(event, 'fs44', 214)" class="f">setMaximum</span> <span class="o">-</span><span class="n">100</span> <span onmouseout="hideTip(event, 'fs42', 215)" onmouseover="showTip(event, 'fs42', 215)" class="i">v</span>
+    <span onmouseout="hideTip(event, 'fs45', 216)" onmouseover="showTip(event, 'fs45', 216)" class="f">printfn</span> <span class="s">&quot;</span><span class="pf">%s</span><span class="s">&quot;</span> (<span onmouseout="hideTip(event, 'fs33', 217)" onmouseover="showTip(event, 'fs33', 217)" class="t">MinMax</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs34', 218)" onmouseover="showTip(event, 'fs34', 218)" class="f">show</span> <span onmouseout="hideTip(event, 'fs43', 219)" onmouseover="showTip(event, 'fs43', 219)" class="i">x</span>)
+<span class="k">with</span>
+    | _ <span class="k">-&gt;</span> ()
+
+<span onmouseout="hideTip(event, 'fs33', 220)" onmouseover="showTip(event, 'fs33', 220)" class="t">MinMax</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs34', 221)" onmouseover="showTip(event, 'fs34', 221)" class="f">show</span> <span onmouseout="hideTip(event, 'fs42', 222)" onmouseover="showTip(event, 'fs42', 222)" class="i">v</span>
+<span class="c">// 80 range 0/100</span>
+</code></pre></td>
+</tr>
+</table>
+<p>This should be obvious as <code>MinMax.setMaximum</code> returns a new object and don't
+mutate an object. <code>v</code> never can become invalid.</p>
+<p>You can choose if you want to <em>fix</em> or throw an error exactly like we did
+with the mutable version. But there are no special rules you must consider
+how something can become invalid. Nevertheless it still might be a good idea
+to avoid <em>fixing</em>.</p>
+<div class="info">
+I only use exceptions to throw errors. In functional language this is usually
+not considered good. Instead of throwing an exception I also could return an
+<strong>Option</strong> or a <strong>Result-type</strong>. Functional error
+handling is yet another topic on its own. But for this topic, none of those
+matter as long the validation stays inside the constructor.
+</div>
+<p>Up to this point I already covered the whole <code>MinMax</code> example, and covered
+everything up to the Fifth Rule in our mutation based code. Here is the full
+code for our <code>MinMax</code> module.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+<span class="l">16: </span>
+<span class="l">17: </span>
+<span class="l">18: </span>
+<span class="l">19: </span>
+<span class="l">20: </span>
+<span class="l">21: </span>
+<span class="l">22: </span>
+<span class="l">23: </span>
+<span class="l">24: </span>
+<span class="l">25: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">module</span> <span class="t">MinMax</span> <span class="o">=</span>
+    <span class="k">type</span> <span onmouseout="hideTip(event, 'fs2', 2)" onmouseover="showTip(event, 'fs2', 2)" class="t">T</span> <span class="o">=</span> <span class="k">private</span> {
+        <span onmouseout="hideTip(event, 'fs3', 3)" onmouseover="showTip(event, 'fs3', 3)" class="i">Minimum</span><span class="o">:</span> <span onmouseout="hideTip(event, 'fs4', 4)" onmouseover="showTip(event, 'fs4', 4)" class="t">int</span>
+        <span onmouseout="hideTip(event, 'fs5', 5)" onmouseover="showTip(event, 'fs5', 5)" class="i">Maximum</span><span class="o">:</span> <span onmouseout="hideTip(event, 'fs4', 6)" onmouseover="showTip(event, 'fs4', 6)" class="t">int</span>
+        <span onmouseout="hideTip(event, 'fs6', 7)" onmouseover="showTip(event, 'fs6', 7)" class="i">Current</span><span class="o">:</span> <span onmouseout="hideTip(event, 'fs4', 8)" onmouseover="showTip(event, 'fs4', 8)" class="t">int</span>
+    }
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs7', 9)" onmouseover="showTip(event, 'fs7', 9)" class="f">minimum</span> <span onmouseout="hideTip(event, 'fs8', 10)" onmouseover="showTip(event, 'fs8', 10)" class="i">mm</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 11)" onmouseover="showTip(event, 'fs8', 11)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs3', 12)" onmouseover="showTip(event, 'fs3', 12)" class="i">Minimum</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs9', 13)" onmouseover="showTip(event, 'fs9', 13)" class="f">maximum</span> <span onmouseout="hideTip(event, 'fs8', 14)" onmouseover="showTip(event, 'fs8', 14)" class="i">mm</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 15)" onmouseover="showTip(event, 'fs8', 15)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 16)" onmouseover="showTip(event, 'fs5', 16)" class="i">Maximum</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs10', 17)" onmouseover="showTip(event, 'fs10', 17)" class="f">current</span> <span onmouseout="hideTip(event, 'fs8', 18)" onmouseover="showTip(event, 'fs8', 18)" class="i">mm</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 19)" onmouseover="showTip(event, 'fs8', 19)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs6', 20)" onmouseover="showTip(event, 'fs6', 20)" class="i">Current</span>
+
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs11', 21)" onmouseover="showTip(event, 'fs11', 21)" class="f">create</span> <span onmouseout="hideTip(event, 'fs12', 22)" onmouseover="showTip(event, 'fs12', 22)" class="i">min</span> <span onmouseout="hideTip(event, 'fs13', 23)" onmouseover="showTip(event, 'fs13', 23)" class="i">max</span> <span onmouseout="hideTip(event, 'fs14', 24)" onmouseover="showTip(event, 'fs14', 24)" class="i">cur</span> <span class="o">=</span>
+        <span class="k">let</span> <span onmouseout="hideTip(event, 'fs15', 25)" onmouseover="showTip(event, 'fs15', 25)" class="f">create</span> <span onmouseout="hideTip(event, 'fs12', 26)" onmouseover="showTip(event, 'fs12', 26)" class="i">min</span> <span onmouseout="hideTip(event, 'fs13', 27)" onmouseover="showTip(event, 'fs13', 27)" class="i">max</span> <span onmouseout="hideTip(event, 'fs14', 28)" onmouseover="showTip(event, 'fs14', 28)" class="i">cur</span> <span class="o">=</span> {<span class="i">Minimum</span><span class="o">=</span><span onmouseout="hideTip(event, 'fs12', 29)" onmouseover="showTip(event, 'fs12', 29)" class="i">min</span>; <span class="i">Maximum</span><span class="o">=</span><span onmouseout="hideTip(event, 'fs13', 30)" onmouseover="showTip(event, 'fs13', 30)" class="i">max</span>; <span class="i">Current</span><span class="o">=</span><span onmouseout="hideTip(event, 'fs14', 31)" onmouseover="showTip(event, 'fs14', 31)" class="i">cur</span>}
+
+        <span class="k">if</span>   <span onmouseout="hideTip(event, 'fs12', 32)" onmouseover="showTip(event, 'fs12', 32)" class="i">min</span> <span class="o">&gt;</span> <span onmouseout="hideTip(event, 'fs13', 33)" onmouseover="showTip(event, 'fs13', 33)" class="i">max</span> <span class="k">then</span> <span onmouseout="hideTip(event, 'fs16', 34)" onmouseover="showTip(event, 'fs16', 34)" class="f">failwith</span> <span class="s">&quot;Minimum greater than Maximum&quot;</span>
+        <span class="k">elif</span> <span onmouseout="hideTip(event, 'fs14', 35)" onmouseover="showTip(event, 'fs14', 35)" class="i">cur</span> <span class="o">&gt;</span> <span onmouseout="hideTip(event, 'fs13', 36)" onmouseover="showTip(event, 'fs13', 36)" class="i">max</span> <span class="k">then</span> <span onmouseout="hideTip(event, 'fs15', 37)" onmouseover="showTip(event, 'fs15', 37)" class="f">create</span> <span onmouseout="hideTip(event, 'fs12', 38)" onmouseover="showTip(event, 'fs12', 38)" class="i">min</span> <span onmouseout="hideTip(event, 'fs13', 39)" onmouseover="showTip(event, 'fs13', 39)" class="i">max</span> <span onmouseout="hideTip(event, 'fs13', 40)" onmouseover="showTip(event, 'fs13', 40)" class="i">max</span>
+        <span class="k">elif</span> <span onmouseout="hideTip(event, 'fs14', 41)" onmouseover="showTip(event, 'fs14', 41)" class="i">cur</span> <span class="o">&lt;</span> <span onmouseout="hideTip(event, 'fs12', 42)" onmouseover="showTip(event, 'fs12', 42)" class="i">min</span> <span class="k">then</span> <span onmouseout="hideTip(event, 'fs15', 43)" onmouseover="showTip(event, 'fs15', 43)" class="f">create</span> <span onmouseout="hideTip(event, 'fs12', 44)" onmouseover="showTip(event, 'fs12', 44)" class="i">min</span> <span onmouseout="hideTip(event, 'fs13', 45)" onmouseover="showTip(event, 'fs13', 45)" class="i">max</span> <span onmouseout="hideTip(event, 'fs12', 46)" onmouseover="showTip(event, 'fs12', 46)" class="i">min</span>
+        <span class="k">else</span> <span onmouseout="hideTip(event, 'fs15', 47)" onmouseover="showTip(event, 'fs15', 47)" class="f">create</span> <span onmouseout="hideTip(event, 'fs12', 48)" onmouseover="showTip(event, 'fs12', 48)" class="i">min</span> <span onmouseout="hideTip(event, 'fs13', 49)" onmouseover="showTip(event, 'fs13', 49)" class="i">max</span> <span onmouseout="hideTip(event, 'fs14', 50)" onmouseover="showTip(event, 'fs14', 50)" class="i">cur</span>
+
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs17', 51)" onmouseover="showTip(event, 'fs17', 51)" class="f">show</span> <span onmouseout="hideTip(event, 'fs8', 52)" onmouseover="showTip(event, 'fs8', 52)" class="i">mm</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs18', 53)" onmouseover="showTip(event, 'fs18', 53)" class="f">sprintf</span> <span class="s">&quot;</span><span class="pf">%d</span><span class="s"> range </span><span class="pf">%d</span><span class="s">/</span><span class="pf">%d</span><span class="s">&quot;</span> <span onmouseout="hideTip(event, 'fs8', 54)" onmouseover="showTip(event, 'fs8', 54)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs6', 55)" onmouseover="showTip(event, 'fs6', 55)" class="i">Current</span> <span onmouseout="hideTip(event, 'fs8', 56)" onmouseover="showTip(event, 'fs8', 56)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs3', 57)" onmouseover="showTip(event, 'fs3', 57)" class="i">Minimum</span> <span onmouseout="hideTip(event, 'fs8', 58)" onmouseover="showTip(event, 'fs8', 58)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 59)" onmouseover="showTip(event, 'fs5', 59)" class="i">Maximum</span>
+
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs19', 60)" onmouseover="showTip(event, 'fs19', 60)" class="f">add</span> <span onmouseout="hideTip(event, 'fs20', 61)" onmouseover="showTip(event, 'fs20', 61)" class="i">x</span> <span onmouseout="hideTip(event, 'fs8', 62)" onmouseover="showTip(event, 'fs8', 62)" class="i">mm</span>      <span class="o">=</span> <span onmouseout="hideTip(event, 'fs11', 63)" onmouseover="showTip(event, 'fs11', 63)" class="f">create</span> <span onmouseout="hideTip(event, 'fs8', 64)" onmouseover="showTip(event, 'fs8', 64)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs3', 65)" onmouseover="showTip(event, 'fs3', 65)" class="i">Minimum</span> <span onmouseout="hideTip(event, 'fs8', 66)" onmouseover="showTip(event, 'fs8', 66)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 67)" onmouseover="showTip(event, 'fs5', 67)" class="i">Maximum</span> (<span onmouseout="hideTip(event, 'fs8', 68)" onmouseover="showTip(event, 'fs8', 68)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs6', 69)" onmouseover="showTip(event, 'fs6', 69)" class="i">Current</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs20', 70)" onmouseover="showTip(event, 'fs20', 70)" class="i">x</span>)
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs21', 71)" onmouseover="showTip(event, 'fs21', 71)" class="f">subtract</span> <span onmouseout="hideTip(event, 'fs20', 72)" onmouseover="showTip(event, 'fs20', 72)" class="i">x</span> <span onmouseout="hideTip(event, 'fs8', 73)" onmouseover="showTip(event, 'fs8', 73)" class="i">mm</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs11', 74)" onmouseover="showTip(event, 'fs11', 74)" class="f">create</span> <span onmouseout="hideTip(event, 'fs8', 75)" onmouseover="showTip(event, 'fs8', 75)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs3', 76)" onmouseover="showTip(event, 'fs3', 76)" class="i">Minimum</span> <span onmouseout="hideTip(event, 'fs8', 77)" onmouseover="showTip(event, 'fs8', 77)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 78)" onmouseover="showTip(event, 'fs5', 78)" class="i">Maximum</span> (<span onmouseout="hideTip(event, 'fs8', 79)" onmouseover="showTip(event, 'fs8', 79)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs6', 80)" onmouseover="showTip(event, 'fs6', 80)" class="i">Current</span> <span class="o">-</span> <span onmouseout="hideTip(event, 'fs20', 81)" onmouseover="showTip(event, 'fs20', 81)" class="i">x</span>)
+
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs22', 82)" onmouseover="showTip(event, 'fs22', 82)" class="f">setMaximum</span> <span onmouseout="hideTip(event, 'fs13', 83)" onmouseover="showTip(event, 'fs13', 83)" class="i">max</span> <span onmouseout="hideTip(event, 'fs8', 84)" onmouseover="showTip(event, 'fs8', 84)" class="i">mm</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs11', 85)" onmouseover="showTip(event, 'fs11', 85)" class="f">create</span> <span onmouseout="hideTip(event, 'fs8', 86)" onmouseover="showTip(event, 'fs8', 86)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs3', 87)" onmouseover="showTip(event, 'fs3', 87)" class="i">Minimum</span> <span onmouseout="hideTip(event, 'fs13', 88)" onmouseover="showTip(event, 'fs13', 88)" class="i">max</span> <span onmouseout="hideTip(event, 'fs8', 89)" onmouseover="showTip(event, 'fs8', 89)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs6', 90)" onmouseover="showTip(event, 'fs6', 90)" class="i">Current</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs23', 91)" onmouseover="showTip(event, 'fs23', 91)" class="f">setMinimum</span> <span onmouseout="hideTip(event, 'fs12', 92)" onmouseover="showTip(event, 'fs12', 92)" class="i">min</span> <span onmouseout="hideTip(event, 'fs8', 93)" onmouseover="showTip(event, 'fs8', 93)" class="i">mm</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs11', 94)" onmouseover="showTip(event, 'fs11', 94)" class="f">create</span> <span onmouseout="hideTip(event, 'fs12', 95)" onmouseover="showTip(event, 'fs12', 95)" class="i">min</span> <span onmouseout="hideTip(event, 'fs8', 96)" onmouseover="showTip(event, 'fs8', 96)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 97)" onmouseover="showTip(event, 'fs5', 97)" class="i">Maximum</span> <span onmouseout="hideTip(event, 'fs8', 98)" onmouseover="showTip(event, 'fs8', 98)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs6', 99)" onmouseover="showTip(event, 'fs6', 99)" class="i">Current</span>
+</code></pre></td>
+</tr>
+</table>
+<p>In the mutation based code I introduced the <code>ProductsPriceOver</code> example
+and we discussed what happens if mutable objects are either passed
+or returned from an object.</p>
+<p>We had two solution for this problem. We either fired events as soon
+something was changed or we created defensive copies. Using events
+doesn't make any sense with immutable objects. As they cannot change, those
+events will never be fired.</p>
+<p>And as discussed previously the idea of creating defensive copies is very
+similar to immutability. In fact it created another problem that if we mutated
+a product it didn't affect the same product in a <code>ProductsPriceOver</code>. So lets
+address this problem.</p>
+<p>First, we create an immutable <code>Product</code>. It contains no validation and I also
+could just used the Record definition (3 lines of code). But I anyway decided
+to create another module with functions so you could get an idea how to convert
+a similar mutable <code>Product</code> class to an immutable <code>Product</code> module.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+<span class="l">16: </span>
+<span class="l">17: </span>
+<span class="l">18: </span>
+<span class="l">19: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">module</span> <span class="t">Product</span> <span class="o">=</span>
+    <span class="k">type</span> <span onmouseout="hideTip(event, 'fs46', 223)" onmouseover="showTip(event, 'fs46', 223)" class="t">T</span> <span class="o">=</span> <span class="k">private</span> {
+        <span onmouseout="hideTip(event, 'fs47', 224)" onmouseover="showTip(event, 'fs47', 224)" class="i">Name</span><span class="o">:</span>  <span onmouseout="hideTip(event, 'fs48', 225)" onmouseover="showTip(event, 'fs48', 225)" class="t">string</span>
+        <span onmouseout="hideTip(event, 'fs49', 226)" onmouseover="showTip(event, 'fs49', 226)" class="i">Price</span><span class="o">:</span> <span onmouseout="hideTip(event, 'fs50', 227)" onmouseover="showTip(event, 'fs50', 227)" class="t">decimal</span>
+    }
+    <span class="c">// Constructor</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs51', 228)" onmouseover="showTip(event, 'fs51', 228)" class="f">create</span> <span onmouseout="hideTip(event, 'fs52', 229)" onmouseover="showTip(event, 'fs52', 229)" class="i">name</span> <span onmouseout="hideTip(event, 'fs53', 230)" onmouseover="showTip(event, 'fs53', 230)" class="i">price</span> <span class="o">=</span>
+        {<span class="i">Name</span><span class="o">=</span><span onmouseout="hideTip(event, 'fs52', 231)" onmouseover="showTip(event, 'fs52', 231)" class="i">name</span>; <span class="i">Price</span><span class="o">=</span><span onmouseout="hideTip(event, 'fs53', 232)" onmouseover="showTip(event, 'fs53', 232)" class="i">price</span>}
+
+    <span class="c">// Getters</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs54', 233)" onmouseover="showTip(event, 'fs54', 233)" class="f">name</span> <span onmouseout="hideTip(event, 'fs8', 234)" onmouseover="showTip(event, 'fs8', 234)" class="i">mm</span>  <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 235)" onmouseover="showTip(event, 'fs8', 235)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs47', 236)" onmouseover="showTip(event, 'fs47', 236)" class="i">Name</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs55', 237)" onmouseover="showTip(event, 'fs55', 237)" class="f">price</span> <span onmouseout="hideTip(event, 'fs8', 238)" onmouseover="showTip(event, 'fs8', 238)" class="i">mm</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 239)" onmouseover="showTip(event, 'fs8', 239)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs49', 240)" onmouseover="showTip(event, 'fs49', 240)" class="i">Price</span>
+
+    <span class="c">// Setter</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs56', 241)" onmouseover="showTip(event, 'fs56', 241)" class="f">setName</span> <span onmouseout="hideTip(event, 'fs52', 242)" onmouseover="showTip(event, 'fs52', 242)" class="i">name</span> <span onmouseout="hideTip(event, 'fs8', 243)" onmouseover="showTip(event, 'fs8', 243)" class="i">mm</span>   <span class="o">=</span> <span onmouseout="hideTip(event, 'fs51', 244)" onmouseover="showTip(event, 'fs51', 244)" class="f">create</span> <span onmouseout="hideTip(event, 'fs52', 245)" onmouseover="showTip(event, 'fs52', 245)" class="i">name</span> <span onmouseout="hideTip(event, 'fs8', 246)" onmouseover="showTip(event, 'fs8', 246)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs49', 247)" onmouseover="showTip(event, 'fs49', 247)" class="i">Price</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs57', 248)" onmouseover="showTip(event, 'fs57', 248)" class="f">setPrice</span> <span onmouseout="hideTip(event, 'fs53', 249)" onmouseover="showTip(event, 'fs53', 249)" class="i">price</span> <span onmouseout="hideTip(event, 'fs8', 250)" onmouseover="showTip(event, 'fs8', 250)" class="i">mm</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs51', 251)" onmouseover="showTip(event, 'fs51', 251)" class="f">create</span> <span onmouseout="hideTip(event, 'fs8', 252)" onmouseover="showTip(event, 'fs8', 252)" class="i">mm</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs47', 253)" onmouseover="showTip(event, 'fs47', 253)" class="i">Name</span> <span onmouseout="hideTip(event, 'fs53', 254)" onmouseover="showTip(event, 'fs53', 254)" class="i">price</span>
+
+    <span class="c">// other functions</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs58', 255)" onmouseover="showTip(event, 'fs58', 255)" class="f">toString</span> <span onmouseout="hideTip(event, 'fs59', 256)" onmouseover="showTip(event, 'fs59', 256)" class="i">p</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs18', 257)" onmouseover="showTip(event, 'fs18', 257)" class="f">sprintf</span> <span class="s">&quot;</span><span class="pf">%s</span><span class="s"> -- </span><span class="pf">%.2f</span><span class="s">&quot;</span> <span onmouseout="hideTip(event, 'fs59', 258)" onmouseover="showTip(event, 'fs59', 258)" class="i">p</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs47', 259)" onmouseover="showTip(event, 'fs47', 259)" class="i">Name</span> <span onmouseout="hideTip(event, 'fs59', 260)" onmouseover="showTip(event, 'fs59', 260)" class="i">p</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs49', 261)" onmouseover="showTip(event, 'fs49', 261)" class="i">Price</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Second, we create our <code>ProductsPriceOver</code> type. This time I just show
+the whole code and lets only talk about the new stuff.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+<span class="l">16: </span>
+<span class="l">17: </span>
+<span class="l">18: </span>
+<span class="l">19: </span>
+<span class="l">20: </span>
+<span class="l">21: </span>
+<span class="l">22: </span>
+<span class="l">23: </span>
+<span class="l">24: </span>
+<span class="l">25: </span>
+<span class="l">26: </span>
+<span class="l">27: </span>
+<span class="l">28: </span>
+<span class="l">29: </span>
+<span class="l">30: </span>
+<span class="l">31: </span>
+<span class="l">32: </span>
+<span class="l">33: </span>
+<span class="l">34: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">module</span> <span class="t">ProductsPriceOver</span> <span class="o">=</span>
+    <span class="k">type</span> <span onmouseout="hideTip(event, 'fs60', 262)" onmouseover="showTip(event, 'fs60', 262)" class="t">T</span> <span class="o">=</span> <span class="k">private</span> {
+        <span onmouseout="hideTip(event, 'fs49', 263)" onmouseover="showTip(event, 'fs49', 263)" class="i">Price</span><span class="o">:</span>    <span onmouseout="hideTip(event, 'fs50', 264)" onmouseover="showTip(event, 'fs50', 264)" class="t">decimal</span>
+        <span onmouseout="hideTip(event, 'fs61', 265)" onmouseover="showTip(event, 'fs61', 265)" class="i">Products</span><span class="o">:</span> <span onmouseout="hideTip(event, 'fs62', 266)" onmouseover="showTip(event, 'fs62', 266)" class="t">Product</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs46', 267)" onmouseover="showTip(event, 'fs46', 267)" class="t">T</span> <span onmouseout="hideTip(event, 'fs63', 268)" onmouseover="showTip(event, 'fs63', 268)" class="t">list</span>
+    }
+    <span class="c">// Constructor</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs64', 269)" onmouseover="showTip(event, 'fs64', 269)" class="f">priceOver</span> <span onmouseout="hideTip(event, 'fs65', 270)" onmouseover="showTip(event, 'fs65', 270)" class="i">x</span> <span onmouseout="hideTip(event, 'fs66', 271)" onmouseover="showTip(event, 'fs66', 271)" class="i">product</span> <span class="o">=</span>
+        (<span onmouseout="hideTip(event, 'fs62', 272)" onmouseover="showTip(event, 'fs62', 272)" class="t">Product</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs67', 273)" onmouseover="showTip(event, 'fs67', 273)" class="f">price</span> <span onmouseout="hideTip(event, 'fs66', 274)" onmouseover="showTip(event, 'fs66', 274)" class="i">product</span>) <span class="o">&gt;</span> <span onmouseout="hideTip(event, 'fs65', 275)" onmouseover="showTip(event, 'fs65', 275)" class="i">x</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs68', 276)" onmouseover="showTip(event, 'fs68', 276)" class="f">create</span> <span onmouseout="hideTip(event, 'fs53', 277)" onmouseover="showTip(event, 'fs53', 277)" class="i">price</span> <span onmouseout="hideTip(event, 'fs69', 278)" onmouseover="showTip(event, 'fs69', 278)" class="i">products</span> <span class="o">=</span>
+        <span class="k">let</span> <span onmouseout="hideTip(event, 'fs69', 279)" onmouseover="showTip(event, 'fs69', 279)" class="i">products</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs70', 280)" onmouseover="showTip(event, 'fs70', 280)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs71', 281)" onmouseover="showTip(event, 'fs71', 281)" class="f">filter</span> (<span onmouseout="hideTip(event, 'fs64', 282)" onmouseover="showTip(event, 'fs64', 282)" class="f">priceOver</span> <span onmouseout="hideTip(event, 'fs53', 283)" onmouseover="showTip(event, 'fs53', 283)" class="i">price</span>) <span onmouseout="hideTip(event, 'fs69', 284)" onmouseover="showTip(event, 'fs69', 284)" class="i">products</span>
+        {<span class="i">Price</span><span class="o">=</span><span onmouseout="hideTip(event, 'fs53', 285)" onmouseover="showTip(event, 'fs53', 285)" class="i">price</span>; <span class="i">Products</span><span class="o">=</span><span onmouseout="hideTip(event, 'fs69', 286)" onmouseover="showTip(event, 'fs69', 286)" class="i">products</span>}
+
+    <span class="c">// Getter</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs72', 287)" onmouseover="showTip(event, 'fs72', 287)" class="f">price</span> <span onmouseout="hideTip(event, 'fs73', 288)" onmouseover="showTip(event, 'fs73', 288)" class="i">ppo</span>    <span class="o">=</span> <span onmouseout="hideTip(event, 'fs73', 289)" onmouseover="showTip(event, 'fs73', 289)" class="i">ppo</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs49', 290)" onmouseover="showTip(event, 'fs49', 290)" class="i">Price</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs74', 291)" onmouseover="showTip(event, 'fs74', 291)" class="f">products</span> <span onmouseout="hideTip(event, 'fs73', 292)" onmouseover="showTip(event, 'fs73', 292)" class="i">ppo</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs73', 293)" onmouseover="showTip(event, 'fs73', 293)" class="i">ppo</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs61', 294)" onmouseover="showTip(event, 'fs61', 294)" class="i">Products</span>
+
+    <span class="c">// Setter</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs75', 295)" onmouseover="showTip(event, 'fs75', 295)" class="f">setPrice</span> <span onmouseout="hideTip(event, 'fs53', 296)" onmouseover="showTip(event, 'fs53', 296)" class="i">price</span> <span onmouseout="hideTip(event, 'fs73', 297)" onmouseover="showTip(event, 'fs73', 297)" class="i">ppo</span>       <span class="o">=</span> <span onmouseout="hideTip(event, 'fs68', 298)" onmouseover="showTip(event, 'fs68', 298)" class="f">create</span> <span onmouseout="hideTip(event, 'fs53', 299)" onmouseover="showTip(event, 'fs53', 299)" class="i">price</span> <span onmouseout="hideTip(event, 'fs73', 300)" onmouseover="showTip(event, 'fs73', 300)" class="i">ppo</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs61', 301)" onmouseover="showTip(event, 'fs61', 301)" class="i">Products</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs76', 302)" onmouseover="showTip(event, 'fs76', 302)" class="f">setProducts</span> <span onmouseout="hideTip(event, 'fs69', 303)" onmouseover="showTip(event, 'fs69', 303)" class="i">products</span> <span onmouseout="hideTip(event, 'fs73', 304)" onmouseover="showTip(event, 'fs73', 304)" class="i">ppo</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs68', 305)" onmouseover="showTip(event, 'fs68', 305)" class="f">create</span> <span onmouseout="hideTip(event, 'fs73', 306)" onmouseover="showTip(event, 'fs73', 306)" class="i">ppo</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs49', 307)" onmouseover="showTip(event, 'fs49', 307)" class="i">Price</span> <span onmouseout="hideTip(event, 'fs69', 308)" onmouseover="showTip(event, 'fs69', 308)" class="i">products</span>
+
+    <span class="c">// Other Functions</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs77', 309)" onmouseover="showTip(event, 'fs77', 309)" class="f">toString</span> <span onmouseout="hideTip(event, 'fs73', 310)" onmouseover="showTip(event, 'fs73', 310)" class="i">ppo</span> <span class="o">=</span>
+        <span onmouseout="hideTip(event, 'fs18', 311)" onmouseover="showTip(event, 'fs18', 311)" class="f">sprintf</span> <span class="s">&quot;</span><span class="pf">%A</span><span class="s">&quot;</span> (<span onmouseout="hideTip(event, 'fs70', 312)" onmouseover="showTip(event, 'fs70', 312)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs78', 313)" onmouseover="showTip(event, 'fs78', 313)" class="f">map</span> <span onmouseout="hideTip(event, 'fs62', 314)" onmouseover="showTip(event, 'fs62', 314)" class="t">Product</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs79', 315)" onmouseover="showTip(event, 'fs79', 315)" class="f">toString</span> <span onmouseout="hideTip(event, 'fs73', 316)" onmouseover="showTip(event, 'fs73', 316)" class="i">ppo</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs61', 317)" onmouseover="showTip(event, 'fs61', 317)" class="i">Products</span>)
+
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs80', 318)" onmouseover="showTip(event, 'fs80', 318)" class="f">add</span> <span onmouseout="hideTip(event, 'fs66', 319)" onmouseover="showTip(event, 'fs66', 319)" class="i">product</span> <span onmouseout="hideTip(event, 'fs73', 320)" onmouseover="showTip(event, 'fs73', 320)" class="i">ppo</span> <span class="o">=</span>
+        <span onmouseout="hideTip(event, 'fs68', 321)" onmouseover="showTip(event, 'fs68', 321)" class="f">create</span> <span onmouseout="hideTip(event, 'fs73', 322)" onmouseover="showTip(event, 'fs73', 322)" class="i">ppo</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs49', 323)" onmouseover="showTip(event, 'fs49', 323)" class="i">Price</span> (<span onmouseout="hideTip(event, 'fs66', 324)" onmouseover="showTip(event, 'fs66', 324)" class="i">product</span> <span class="o">::</span> <span onmouseout="hideTip(event, 'fs73', 325)" onmouseover="showTip(event, 'fs73', 325)" class="i">ppo</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs61', 326)" onmouseover="showTip(event, 'fs61', 326)" class="i">Products</span>)
+
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs81', 327)" onmouseover="showTip(event, 'fs81', 327)" class="f">update</span> <span onmouseout="hideTip(event, 'fs66', 328)" onmouseover="showTip(event, 'fs66', 328)" class="i">product</span> <span onmouseout="hideTip(event, 'fs73', 329)" onmouseover="showTip(event, 'fs73', 329)" class="i">ppo</span> <span class="o">=</span>
+        <span class="k">let</span> <span onmouseout="hideTip(event, 'fs82', 330)" onmouseover="showTip(event, 'fs82', 330)" class="f">mapper</span> <span onmouseout="hideTip(event, 'fs83', 331)" onmouseover="showTip(event, 'fs83', 331)" class="i">old</span> <span class="o">=</span>
+            <span class="k">if</span>   (<span onmouseout="hideTip(event, 'fs62', 332)" onmouseover="showTip(event, 'fs62', 332)" class="t">Product</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs84', 333)" onmouseover="showTip(event, 'fs84', 333)" class="f">name</span> <span onmouseout="hideTip(event, 'fs83', 334)" onmouseover="showTip(event, 'fs83', 334)" class="i">old</span>) <span class="o">=</span> (<span onmouseout="hideTip(event, 'fs62', 335)" onmouseover="showTip(event, 'fs62', 335)" class="t">Product</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs84', 336)" onmouseover="showTip(event, 'fs84', 336)" class="f">name</span> <span onmouseout="hideTip(event, 'fs66', 337)" onmouseover="showTip(event, 'fs66', 337)" class="i">product</span>)
+            <span class="k">then</span> <span onmouseout="hideTip(event, 'fs66', 338)" onmouseover="showTip(event, 'fs66', 338)" class="i">product</span>
+            <span class="k">else</span> <span onmouseout="hideTip(event, 'fs83', 339)" onmouseover="showTip(event, 'fs83', 339)" class="i">old</span>
+        <span class="k">let</span> <span onmouseout="hideTip(event, 'fs85', 340)" onmouseover="showTip(event, 'fs85', 340)" class="i">updatedList</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs70', 341)" onmouseover="showTip(event, 'fs70', 341)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs78', 342)" onmouseover="showTip(event, 'fs78', 342)" class="f">map</span> <span onmouseout="hideTip(event, 'fs82', 343)" onmouseover="showTip(event, 'fs82', 343)" class="f">mapper</span> <span onmouseout="hideTip(event, 'fs73', 344)" onmouseover="showTip(event, 'fs73', 344)" class="i">ppo</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs61', 345)" onmouseover="showTip(event, 'fs61', 345)" class="i">Products</span>
+        <span onmouseout="hideTip(event, 'fs68', 346)" onmouseover="showTip(event, 'fs68', 346)" class="f">create</span> <span onmouseout="hideTip(event, 'fs73', 347)" onmouseover="showTip(event, 'fs73', 347)" class="i">ppo</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs49', 348)" onmouseover="showTip(event, 'fs49', 348)" class="i">Price</span> <span onmouseout="hideTip(event, 'fs85', 349)" onmouseover="showTip(event, 'fs85', 349)" class="i">updatedList</span>
+</code></pre></td>
+</tr>
+</table>
+<p>So here is a short summary of the stuff you already should now.</p>
+<p>Instead of a class we create a module. We put all private mutable fields
+inside an immutable record. We make this record private. A constructor
+function that we name <code>create</code> has the purpose of creating a new object and
+contains all validation. In this case it filters the list and ensures that only
+products over a specified price will be saved in our object. The Getter and
+Setter part are identical to what you now from OO. Because the record is private
+we need getters so we can access the name and price outside of our module.
+The setter just sets the value of a name or price to a new value. But it does
+it by creating new objects instead of mutating. The <code>toString</code> and <code>add</code>
+functions are normal functions like <code>MinMax.show</code>, <code>MinMax.add</code> or
+<code>MinMax.subtract</code> with more logic.</p>
+<p>For a moment lets forget about the <code>update</code> function. Lets see what we can
+do with our <code>ProductsPriceOver</code> module so far:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+<span class="l">16: </span>
+<span class="l">17: </span>
+<span class="l">18: </span>
+<span class="l">19: </span>
+<span class="l">20: </span>
+<span class="l">21: </span>
+<span class="l">22: </span>
+<span class="l">23: </span>
+<span class="l">24: </span>
+<span class="l">25: </span>
+<span class="l">26: </span>
+<span class="l">27: </span>
+<span class="l">28: </span>
+<span class="l">29: </span>
+<span class="l">30: </span>
+<span class="l">31: </span>
+<span class="l">32: </span>
+<span class="l">33: </span>
+<span class="l">34: </span>
+<span class="l">35: </span>
+<span class="l">36: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="c">// returns a list of only the product name from a ProductsPriceOver object</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs86', 350)" onmouseover="showTip(event, 'fs86', 350)" class="f">getProductNames</span> <span onmouseout="hideTip(event, 'fs87', 351)" onmouseover="showTip(event, 'fs87', 351)" class="i">ppo</span> <span class="o">=</span>
+    <span onmouseout="hideTip(event, 'fs70', 352)" onmouseover="showTip(event, 'fs70', 352)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs78', 353)" onmouseover="showTip(event, 'fs78', 353)" class="f">map</span> <span onmouseout="hideTip(event, 'fs62', 354)" onmouseover="showTip(event, 'fs62', 354)" class="t">Product</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs84', 355)" onmouseover="showTip(event, 'fs84', 355)" class="f">name</span> (<span onmouseout="hideTip(event, 'fs88', 356)" onmouseover="showTip(event, 'fs88', 356)" class="t">ProductsPriceOver</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs89', 357)" onmouseover="showTip(event, 'fs89', 357)" class="f">products</span> <span onmouseout="hideTip(event, 'fs87', 358)" onmouseover="showTip(event, 'fs87', 358)" class="i">ppo</span>)
+
+<span class="c">// Our three Products</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs90', 359)" onmouseover="showTip(event, 'fs90', 359)" class="i">a</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs62', 360)" onmouseover="showTip(event, 'fs62', 360)" class="t">Product</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs91', 361)" onmouseover="showTip(event, 'fs91', 361)" class="f">create</span> <span class="s">&quot;A&quot;</span> <span class="n">9.99m</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs92', 362)" onmouseover="showTip(event, 'fs92', 362)" class="i">b</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs62', 363)" onmouseover="showTip(event, 'fs62', 363)" class="t">Product</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs91', 364)" onmouseover="showTip(event, 'fs91', 364)" class="f">create</span> <span class="s">&quot;B&quot;</span> <span class="n">19.99m</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs93', 365)" onmouseover="showTip(event, 'fs93', 365)" class="i">c</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs62', 366)" onmouseover="showTip(event, 'fs62', 366)" class="t">Product</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs91', 367)" onmouseover="showTip(event, 'fs91', 367)" class="f">create</span> <span class="s">&quot;C&quot;</span> <span class="n">49.99m</span>
+
+<span class="c">// Initializing and adding three products</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs94', 368)" onmouseover="showTip(event, 'fs94', 368)" class="i">ppo</span> <span class="o">=</span>
+    <span onmouseout="hideTip(event, 'fs88', 369)" onmouseover="showTip(event, 'fs88', 369)" class="t">ProductsPriceOver</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs95', 370)" onmouseover="showTip(event, 'fs95', 370)" class="f">create</span> <span class="n">10.00m</span> []
+    <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs88', 371)" onmouseover="showTip(event, 'fs88', 371)" class="t">ProductsPriceOver</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs96', 372)" onmouseover="showTip(event, 'fs96', 372)" class="f">add</span> <span onmouseout="hideTip(event, 'fs90', 373)" onmouseover="showTip(event, 'fs90', 373)" class="i">a</span>
+    <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs88', 374)" onmouseover="showTip(event, 'fs88', 374)" class="t">ProductsPriceOver</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs96', 375)" onmouseover="showTip(event, 'fs96', 375)" class="f">add</span> <span onmouseout="hideTip(event, 'fs92', 376)" onmouseover="showTip(event, 'fs92', 376)" class="i">b</span>
+    <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs88', 377)" onmouseover="showTip(event, 'fs88', 377)" class="t">ProductsPriceOver</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs96', 378)" onmouseover="showTip(event, 'fs96', 378)" class="f">add</span> <span onmouseout="hideTip(event, 'fs93', 379)" onmouseover="showTip(event, 'fs93', 379)" class="i">c</span>
+<span onmouseout="hideTip(event, 'fs45', 380)" onmouseover="showTip(event, 'fs45', 380)" class="f">printfn</span> <span class="s">&quot;</span><span class="pf">%A</span><span class="s">&quot;</span> (<span onmouseout="hideTip(event, 'fs86', 381)" onmouseover="showTip(event, 'fs86', 381)" class="f">getProductNames</span> <span onmouseout="hideTip(event, 'fs94', 382)" onmouseover="showTip(event, 'fs94', 382)" class="i">ppo</span>) <span class="c">// [&quot;C&quot;; &quot;B&quot;]</span>
+<span class="c">// Correct: only contains B and C as price of A is below 10.00</span>
+
+<span class="c">// Replace the whole products</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs97', 383)" onmouseover="showTip(event, 'fs97', 383)" class="i">ppo2</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs88', 384)" onmouseover="showTip(event, 'fs88', 384)" class="t">ProductsPriceOver</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs98', 385)" onmouseover="showTip(event, 'fs98', 385)" class="f">setProducts</span> [<span onmouseout="hideTip(event, 'fs90', 386)" onmouseover="showTip(event, 'fs90', 386)" class="i">a</span>;<span onmouseout="hideTip(event, 'fs93', 387)" onmouseover="showTip(event, 'fs93', 387)" class="i">c</span>] <span onmouseout="hideTip(event, 'fs94', 388)" onmouseover="showTip(event, 'fs94', 388)" class="i">ppo</span>
+<span onmouseout="hideTip(event, 'fs45', 389)" onmouseover="showTip(event, 'fs45', 389)" class="f">printfn</span> <span class="s">&quot;</span><span class="pf">%A</span><span class="s">&quot;</span> (<span onmouseout="hideTip(event, 'fs86', 390)" onmouseover="showTip(event, 'fs86', 390)" class="f">getProductNames</span> <span onmouseout="hideTip(event, 'fs97', 391)" onmouseover="showTip(event, 'fs97', 391)" class="i">ppo2</span>) <span class="c">// [&quot;C&quot;]</span>
+<span class="c">// Correct: only contains C as price of A is below 10.00</span>
+
+<span class="c">// Increase minimum price</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs99', 392)" onmouseover="showTip(event, 'fs99', 392)" class="i">ppo3</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs88', 393)" onmouseover="showTip(event, 'fs88', 393)" class="t">ProductsPriceOver</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs100', 394)" onmouseover="showTip(event, 'fs100', 394)" class="f">setPrice</span> <span class="n">20.00m</span> <span onmouseout="hideTip(event, 'fs94', 395)" onmouseover="showTip(event, 'fs94', 395)" class="i">ppo</span>
+<span onmouseout="hideTip(event, 'fs45', 396)" onmouseover="showTip(event, 'fs45', 396)" class="f">printfn</span> <span class="s">&quot;</span><span class="pf">%A</span><span class="s">&quot;</span> (<span onmouseout="hideTip(event, 'fs86', 397)" onmouseover="showTip(event, 'fs86', 397)" class="f">getProductNames</span> <span onmouseout="hideTip(event, 'fs99', 398)" onmouseover="showTip(event, 'fs99', 398)" class="i">ppo3</span>) <span class="c">// [&quot;C&quot;]</span>
+<span class="c">// Correct: Contained B and C before. B was removed after</span>
+<span class="c">//          increasing the needed price a product must have.</span>
+
+<span class="c">// Decrease Price and then reset all products</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs101', 399)" onmouseover="showTip(event, 'fs101', 399)" class="i">ppo4</span> <span class="o">=</span>
+    <span onmouseout="hideTip(event, 'fs94', 400)" onmouseover="showTip(event, 'fs94', 400)" class="i">ppo</span>
+    <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs88', 401)" onmouseover="showTip(event, 'fs88', 401)" class="t">ProductsPriceOver</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs100', 402)" onmouseover="showTip(event, 'fs100', 402)" class="f">setPrice</span> <span class="n">5.00m</span>
+    <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs88', 403)" onmouseover="showTip(event, 'fs88', 403)" class="t">ProductsPriceOver</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs98', 404)" onmouseover="showTip(event, 'fs98', 404)" class="f">setProducts</span> [<span onmouseout="hideTip(event, 'fs90', 405)" onmouseover="showTip(event, 'fs90', 405)" class="i">a</span>;<span onmouseout="hideTip(event, 'fs92', 406)" onmouseover="showTip(event, 'fs92', 406)" class="i">b</span>;<span onmouseout="hideTip(event, 'fs93', 407)" onmouseover="showTip(event, 'fs93', 407)" class="i">c</span>]
+<span onmouseout="hideTip(event, 'fs45', 408)" onmouseover="showTip(event, 'fs45', 408)" class="f">printfn</span> <span class="s">&quot;</span><span class="pf">%A</span><span class="s">&quot;</span> (<span onmouseout="hideTip(event, 'fs86', 409)" onmouseover="showTip(event, 'fs86', 409)" class="f">getProductNames</span> <span onmouseout="hideTip(event, 'fs101', 410)" onmouseover="showTip(event, 'fs101', 410)" class="i">ppo4</span>) <span class="c">// [&quot;A&quot;; &quot;B&quot;; &quot;C&quot;]</span>
+<span class="c">// Correct: Should be obvious.</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Again, we can see how we got a fluid-syntax or in general an data-flow API
+very easily. Amazing is that none of our functions from <code>add</code>, <code>setProducts</code>
+or <code>setPrice</code> contains any validation logic and we still always get valid objects.</p>
+<p>The final part is the problem we already saw with <em>defensive copies</em>. If we
+change the price of any product, it doesn't effect any <code>ProductsPriceOver</code>
+object.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="c">// Set Price of A to &quot;1.00&quot;</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs102', 411)" onmouseover="showTip(event, 'fs102', 411)" class="i">newA</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs62', 412)" onmouseover="showTip(event, 'fs62', 412)" class="t">Product</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs103', 413)" onmouseover="showTip(event, 'fs103', 413)" class="f">setPrice</span> <span class="n">1.00m</span> <span onmouseout="hideTip(event, 'fs90', 414)" onmouseover="showTip(event, 'fs90', 414)" class="i">a</span>
+
+<span class="c">// A in ppo4 is still 9.99</span>
+<span onmouseout="hideTip(event, 'fs45', 415)" onmouseover="showTip(event, 'fs45', 415)" class="f">printfn</span> <span class="s">&quot;</span><span class="pf">%s</span><span class="s">&quot;</span> (<span onmouseout="hideTip(event, 'fs88', 416)" onmouseover="showTip(event, 'fs88', 416)" class="t">ProductsPriceOver</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs104', 417)" onmouseover="showTip(event, 'fs104', 417)" class="f">toString</span> <span onmouseout="hideTip(event, 'fs101', 418)" onmouseover="showTip(event, 'fs101', 418)" class="i">ppo4</span>)
+<span class="c">// [&quot;A -- 9.99&quot;; &quot;B -- 19.99&quot;; &quot;C -- 49.99&quot;]</span>
+</code></pre></td>
+</tr>
+</table>
+<p>This should be obvious and is the reason why we need an <code>update</code> function.
+When we update the price of a product, we need to create a new <code>ProductsPriceOver</code>
+object and we pass it the Product that changed. We could pass <code>newA</code>
+that we created and pass it to the <code>update</code> function. But actually, there
+is no reason to create <code>newA</code> separately. We also could write:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+<span class="l">7: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs105', 419)" onmouseover="showTip(event, 'fs105', 419)" class="i">p1</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs88', 420)" onmouseover="showTip(event, 'fs88', 420)" class="t">ProductsPriceOver</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs106', 421)" onmouseover="showTip(event, 'fs106', 421)" class="f">update</span> (<span onmouseout="hideTip(event, 'fs62', 422)" onmouseover="showTip(event, 'fs62', 422)" class="t">Product</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs103', 423)" onmouseover="showTip(event, 'fs103', 423)" class="f">setPrice</span> <span class="n">8.0m</span> <span onmouseout="hideTip(event, 'fs90', 424)" onmouseover="showTip(event, 'fs90', 424)" class="i">a</span>) <span onmouseout="hideTip(event, 'fs101', 425)" onmouseover="showTip(event, 'fs101', 425)" class="i">ppo4</span>
+<span onmouseout="hideTip(event, 'fs88', 426)" onmouseover="showTip(event, 'fs88', 426)" class="t">ProductsPriceOver</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs104', 427)" onmouseover="showTip(event, 'fs104', 427)" class="f">toString</span> <span onmouseout="hideTip(event, 'fs105', 428)" onmouseover="showTip(event, 'fs105', 428)" class="i">p1</span>
+<span class="c">// [&quot;A -- 8.00&quot;; &quot;B -- 19.99&quot;; &quot;C -- 49.99&quot;]</span>
+
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs107', 429)" onmouseover="showTip(event, 'fs107', 429)" class="i">p2</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs88', 430)" onmouseover="showTip(event, 'fs88', 430)" class="t">ProductsPriceOver</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs106', 431)" onmouseover="showTip(event, 'fs106', 431)" class="f">update</span> (<span onmouseout="hideTip(event, 'fs62', 432)" onmouseover="showTip(event, 'fs62', 432)" class="t">Product</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs103', 433)" onmouseover="showTip(event, 'fs103', 433)" class="f">setPrice</span> <span class="n">1.0m</span> <span onmouseout="hideTip(event, 'fs90', 434)" onmouseover="showTip(event, 'fs90', 434)" class="i">a</span>) <span onmouseout="hideTip(event, 'fs101', 435)" onmouseover="showTip(event, 'fs101', 435)" class="i">ppo4</span>
+<span onmouseout="hideTip(event, 'fs88', 436)" onmouseover="showTip(event, 'fs88', 436)" class="t">ProductsPriceOver</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs104', 437)" onmouseover="showTip(event, 'fs104', 437)" class="f">toString</span> <span onmouseout="hideTip(event, 'fs107', 438)" onmouseover="showTip(event, 'fs107', 438)" class="i">p2</span>
+<span class="c">// [&quot;B -- 19.99&quot;; &quot;C -- 49.99&quot;]</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Instead of creating a new object, and then pass it to update, we just
+inline the whole function call. <a href="{% post_url 2016-09-25-function-application-and-composition %}">In general immutability changes the way how
+we write code either into a more sequential-style or a nested-style</a></p>
+<p>If you follow this idea further there are probably even more changes you want
+to do, but all of those are outside the scope of this article. The important
+aspect is if our objects stay valid.</p>
+<p>We must create an <code>update</code> function that is not needed in an mutable version.
+But even that can be considered as good. We didn't need to create an <code>update</code>
+function with a mutable version because mutable Products already had this
+feature. In fact the problem is more that you can forget this feature, and this
+is the reason why an <code>ProductsPriceOver</code> in the mutable version can become
+invalid, because you can forget about this important detail.</p>
+<p>The rules to create either events or defensive copies forces you to think
+about this cases so you don't forget them. With immutability you
+cannot forget anything that later on can invalidate anything. Your code
+only has those features you also implemented!</p>
+<h2>Conclusion</h2>
+<p>Working with immutability sure is different. I guess some people will also claim
+that updating with immutability is harder. With mutability you just need to
+change the Product and that's it.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="csharp">a.Price <span class="o">=</span> <span class="n">5.0</span>;
+</code></pre></td></tr></table>
+<p>The problem is that those things often miss the bigger picture. As just mutating
+the price can cause problems in other code like we have seen previously. If we
+start adding <code>copy</code> functions for defensive copying or need to add event handling
+then this is not really simpler. You also can solve the problem of invalid
+objects with mutability, but it is a lot harder to do it right. Even now I'm
+still not 100% sure if I covered all possibilities how mutation can somehow
+lead to an invalid objects.</p>
+<p>There are more reasons for immutability, advantages and techniques we didn't
+looked at. But there are also reason against immutability. But in this article we
+only looked at mutability vs. immutability in the context of maintaining
+valid objects.</p>
+<p>In my opinion, most of the time, this is the most important aspect we usually
+care for. As a general thumb of rule i would claim that by default everything
+should be immutable. Until of course there are other reasons why this
+shouldn't be the case. What this other reasons could be is a topic for yet another
+articles.</p>
+
+
+<div class="tip" id="fs1">module Main</div>
+<div class="tip" id="fs2">type T =<br />&#160;&#160;private {Minimum: int;<br />&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;Maximum: int;<br />&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;Current: int;}<br /><br />Full name: Main.MinMax.T</div>
+<div class="tip" id="fs3">T.Minimum: int</div>
+<div class="tip" id="fs4">Multiple items<br />val int : value:&#39;T -&gt; int (requires member op_Explicit)<br /><br />Full name: Microsoft.FSharp.Core.Operators.int<br /><br />--------------------<br />type int = int32<br /><br />Full name: Microsoft.FSharp.Core.int<br /><br />--------------------<br />type int&lt;&#39;Measure&gt; = int<br /><br />Full name: Microsoft.FSharp.Core.int&lt;_&gt;</div>
+<div class="tip" id="fs5">T.Maximum: int</div>
+<div class="tip" id="fs6">T.Current: int</div>
+<div class="tip" id="fs7">val minimum : mm:T -&gt; int<br /><br />Full name: Main.MinMax.minimum</div>
+<div class="tip" id="fs8">val mm : T</div>
+<div class="tip" id="fs9">val maximum : mm:T -&gt; int<br /><br />Full name: Main.MinMax.maximum</div>
+<div class="tip" id="fs10">val current : mm:T -&gt; int<br /><br />Full name: Main.MinMax.current</div>
+<div class="tip" id="fs11">val create : min:int -&gt; max:int -&gt; cur:int -&gt; T<br /><br />Full name: Main.MinMax.create</div>
+<div class="tip" id="fs12">val min : int</div>
+<div class="tip" id="fs13">val max : int</div>
+<div class="tip" id="fs14">val cur : int</div>
+<div class="tip" id="fs15">val create : (int -&gt; int -&gt; int -&gt; T)</div>
+<div class="tip" id="fs16">val failwith : message:string -&gt; &#39;T<br /><br />Full name: Microsoft.FSharp.Core.Operators.failwith</div>
+<div class="tip" id="fs17">val show : mm:T -&gt; string<br /><br />Full name: Main.MinMax.show</div>
+<div class="tip" id="fs18">val sprintf : format:Printf.StringFormat&lt;&#39;T&gt; -&gt; &#39;T<br /><br />Full name: Microsoft.FSharp.Core.ExtraTopLevelOperators.sprintf</div>
+<div class="tip" id="fs19">val add : x:int -&gt; mm:T -&gt; T<br /><br />Full name: Main.MinMax.add</div>
+<div class="tip" id="fs20">val x : int</div>
+<div class="tip" id="fs21">val subtract : x:int -&gt; mm:T -&gt; T<br /><br />Full name: Main.MinMax.subtract</div>
+<div class="tip" id="fs22">val setMaximum : max:int -&gt; mm:T -&gt; T<br /><br />Full name: Main.MinMax.setMaximum</div>
+<div class="tip" id="fs23">val setMinimum : min:int -&gt; mm:T -&gt; T<br /><br />Full name: Main.MinMax.setMinimum</div>
+<div class="tip" id="fs24">type MinMax =<br />&#160;&#160;{Minimum: int;<br />&#160;&#160;&#160;Maximum: int;<br />&#160;&#160;&#160;Current: int;}<br /><br />Full name: mutabilityvsimmutabilityvalidation.MinMax</div>
+<div class="tip" id="fs25">MinMax.Minimum: int</div>
+<div class="tip" id="fs26">MinMax.Maximum: int</div>
+<div class="tip" id="fs27">MinMax.Current: int</div>
+<div class="tip" id="fs28">val a : MinMax<br /><br />Full name: mutabilityvsimmutabilityvalidation.a</div>
+<div class="tip" id="fs29">val create : min:int -&gt; max:int -&gt; cur:int -&gt; MinMax<br /><br />Full name: mutabilityvsimmutabilityvalidation.create</div>
+<div class="tip" id="fs30">val create : (int -&gt; int -&gt; int -&gt; MinMax)</div>
+<div class="tip" id="fs31">val show : mm:MinMax -&gt; string<br /><br />Full name: mutabilityvsimmutabilityvalidation.show</div>
+<div class="tip" id="fs32">val mm : MinMax</div>
+<div class="tip" id="fs33">module MinMax<br /><br />from Main</div>
+<div class="tip" id="fs34">val show : mm:MinMax.T -&gt; string<br /><br />Full name: Main.MinMax.show</div>
+<div class="tip" id="fs35">val create : min:int -&gt; max:int -&gt; cur:int -&gt; MinMax.T<br /><br />Full name: Main.MinMax.create</div>
+<div class="tip" id="fs36">val add : x:int -&gt; mm:MinMax -&gt; MinMax<br /><br />Full name: mutabilityvsimmutabilityvalidation.add</div>
+<div class="tip" id="fs37">val subtract : x:int -&gt; mm:MinMax -&gt; MinMax<br /><br />Full name: mutabilityvsimmutabilityvalidation.subtract</div>
+<div class="tip" id="fs38">val add : x:int -&gt; mm:MinMax.T -&gt; MinMax.T<br /><br />Full name: Main.MinMax.add</div>
+<div class="tip" id="fs39">val subtract : x:int -&gt; mm:MinMax.T -&gt; MinMax.T<br /><br />Full name: Main.MinMax.subtract</div>
+<div class="tip" id="fs40">val setMaximum : max:int -&gt; mm:MinMax -&gt; MinMax<br /><br />Full name: mutabilityvsimmutabilityvalidation.setMaximum</div>
+<div class="tip" id="fs41">val setMinimum : min:int -&gt; mm:MinMax -&gt; MinMax<br /><br />Full name: mutabilityvsimmutabilityvalidation.setMinimum</div>
+<div class="tip" id="fs42">val v : MinMax.T<br /><br />Full name: Main.v</div>
+<div class="tip" id="fs43">val x : MinMax.T</div>
+<div class="tip" id="fs44">val setMaximum : max:int -&gt; mm:MinMax.T -&gt; MinMax.T<br /><br />Full name: Main.MinMax.setMaximum</div>
+<div class="tip" id="fs45">val printfn : format:Printf.TextWriterFormat&lt;&#39;T&gt; -&gt; &#39;T<br /><br />Full name: Microsoft.FSharp.Core.ExtraTopLevelOperators.printfn</div>
+<div class="tip" id="fs46">type T =<br />&#160;&#160;private {Name: string;<br />&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;Price: decimal;}<br /><br />Full name: Main.Product.T</div>
+<div class="tip" id="fs47">T.Name: string</div>
+<div class="tip" id="fs48">Multiple items<br />val string : value:&#39;T -&gt; string<br /><br />Full name: Microsoft.FSharp.Core.Operators.string<br /><br />--------------------<br />type string = System.String<br /><br />Full name: Microsoft.FSharp.Core.string</div>
+<div class="tip" id="fs49">T.Price: decimal</div>
+<div class="tip" id="fs50">Multiple items<br />val decimal : value:&#39;T -&gt; decimal (requires member op_Explicit)<br /><br />Full name: Microsoft.FSharp.Core.Operators.decimal<br /><br />--------------------<br />type decimal = System.Decimal<br /><br />Full name: Microsoft.FSharp.Core.decimal<br /><br />--------------------<br />type decimal&lt;&#39;Measure&gt; = decimal<br /><br />Full name: Microsoft.FSharp.Core.decimal&lt;_&gt;</div>
+<div class="tip" id="fs51">val create : name:string -&gt; price:decimal -&gt; T<br /><br />Full name: Main.Product.create</div>
+<div class="tip" id="fs52">val name : string</div>
+<div class="tip" id="fs53">val price : decimal</div>
+<div class="tip" id="fs54">val name : mm:T -&gt; string<br /><br />Full name: Main.Product.name</div>
+<div class="tip" id="fs55">val price : mm:T -&gt; decimal<br /><br />Full name: Main.Product.price</div>
+<div class="tip" id="fs56">val setName : name:string -&gt; mm:T -&gt; T<br /><br />Full name: Main.Product.setName</div>
+<div class="tip" id="fs57">val setPrice : price:decimal -&gt; mm:T -&gt; T<br /><br />Full name: Main.Product.setPrice</div>
+<div class="tip" id="fs58">val toString : p:T -&gt; string<br /><br />Full name: Main.Product.toString</div>
+<div class="tip" id="fs59">val p : T</div>
+<div class="tip" id="fs60">type T =<br />&#160;&#160;private {Price: decimal;<br />&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;Products: T list;}<br /><br />Full name: Main.ProductsPriceOver.T</div>
+<div class="tip" id="fs61">T.Products: Product.T list</div>
+<div class="tip" id="fs62">module Product<br /><br />from Main</div>
+<div class="tip" id="fs63">type &#39;T list = List&lt;&#39;T&gt;<br /><br />Full name: Microsoft.FSharp.Collections.list&lt;_&gt;</div>
+<div class="tip" id="fs64">val priceOver : x:decimal -&gt; product:Product.T -&gt; bool<br /><br />Full name: Main.ProductsPriceOver.priceOver</div>
+<div class="tip" id="fs65">val x : decimal</div>
+<div class="tip" id="fs66">val product : Product.T</div>
+<div class="tip" id="fs67">val price : mm:Product.T -&gt; decimal<br /><br />Full name: Main.Product.price</div>
+<div class="tip" id="fs68">val create : price:decimal -&gt; products:Product.T list -&gt; T<br /><br />Full name: Main.ProductsPriceOver.create</div>
+<div class="tip" id="fs69">val products : Product.T list</div>
+<div class="tip" id="fs70">Multiple items<br />module List<br /><br />from Microsoft.FSharp.Collections<br /><br />--------------------<br />type List&lt;&#39;T&gt; =<br />&#160;&#160;| ( [] )<br />&#160;&#160;| ( :: ) of Head: &#39;T * Tail: &#39;T list<br />&#160;&#160;interface IEnumerable<br />&#160;&#160;interface IEnumerable&lt;&#39;T&gt;<br />&#160;&#160;member GetSlice : startIndex:int option * endIndex:int option -&gt; &#39;T list<br />&#160;&#160;member Head : &#39;T<br />&#160;&#160;member IsEmpty : bool<br />&#160;&#160;member Item : index:int -&gt; &#39;T with get<br />&#160;&#160;member Length : int<br />&#160;&#160;member Tail : &#39;T list<br />&#160;&#160;static member Cons : head:&#39;T * tail:&#39;T list -&gt; &#39;T list<br />&#160;&#160;static member Empty : &#39;T list<br /><br />Full name: Microsoft.FSharp.Collections.List&lt;_&gt;</div>
+<div class="tip" id="fs71">val filter : predicate:(&#39;T -&gt; bool) -&gt; list:&#39;T list -&gt; &#39;T list<br /><br />Full name: Microsoft.FSharp.Collections.List.filter</div>
+<div class="tip" id="fs72">val price : ppo:T -&gt; decimal<br /><br />Full name: Main.ProductsPriceOver.price</div>
+<div class="tip" id="fs73">val ppo : T</div>
+<div class="tip" id="fs74">val products : ppo:T -&gt; Product.T list<br /><br />Full name: Main.ProductsPriceOver.products</div>
+<div class="tip" id="fs75">val setPrice : price:decimal -&gt; ppo:T -&gt; T<br /><br />Full name: Main.ProductsPriceOver.setPrice</div>
+<div class="tip" id="fs76">val setProducts : products:Product.T list -&gt; ppo:T -&gt; T<br /><br />Full name: Main.ProductsPriceOver.setProducts</div>
+<div class="tip" id="fs77">val toString : ppo:T -&gt; string<br /><br />Full name: Main.ProductsPriceOver.toString</div>
+<div class="tip" id="fs78">val map : mapping:(&#39;T -&gt; &#39;U) -&gt; list:&#39;T list -&gt; &#39;U list<br /><br />Full name: Microsoft.FSharp.Collections.List.map</div>
+<div class="tip" id="fs79">val toString : p:Product.T -&gt; string<br /><br />Full name: Main.Product.toString</div>
+<div class="tip" id="fs80">val add : product:Product.T -&gt; ppo:T -&gt; T<br /><br />Full name: Main.ProductsPriceOver.add</div>
+<div class="tip" id="fs81">val update : product:Product.T -&gt; ppo:T -&gt; T<br /><br />Full name: Main.ProductsPriceOver.update</div>
+<div class="tip" id="fs82">val mapper : (Product.T -&gt; Product.T)</div>
+<div class="tip" id="fs83">val old : Product.T</div>
+<div class="tip" id="fs84">val name : mm:Product.T -&gt; string<br /><br />Full name: Main.Product.name</div>
+<div class="tip" id="fs85">val updatedList : Product.T list</div>
+<div class="tip" id="fs86">val getProductNames : ppo:ProductsPriceOver.T -&gt; string list<br /><br />Full name: Main.getProductNames</div>
+<div class="tip" id="fs87">val ppo : ProductsPriceOver.T</div>
+<div class="tip" id="fs88">module ProductsPriceOver<br /><br />from Main</div>
+<div class="tip" id="fs89">val products : ppo:ProductsPriceOver.T -&gt; Product.T list<br /><br />Full name: Main.ProductsPriceOver.products</div>
+<div class="tip" id="fs90">val a : Product.T<br /><br />Full name: Main.a</div>
+<div class="tip" id="fs91">val create : name:string -&gt; price:decimal -&gt; Product.T<br /><br />Full name: Main.Product.create</div>
+<div class="tip" id="fs92">val b : Product.T<br /><br />Full name: Main.b</div>
+<div class="tip" id="fs93">val c : Product.T<br /><br />Full name: Main.c</div>
+<div class="tip" id="fs94">val ppo : ProductsPriceOver.T<br /><br />Full name: Main.ppo</div>
+<div class="tip" id="fs95">val create : price:decimal -&gt; products:Product.T list -&gt; ProductsPriceOver.T<br /><br />Full name: Main.ProductsPriceOver.create</div>
+<div class="tip" id="fs96">val add : product:Product.T -&gt; ppo:ProductsPriceOver.T -&gt; ProductsPriceOver.T<br /><br />Full name: Main.ProductsPriceOver.add</div>
+<div class="tip" id="fs97">val ppo2 : ProductsPriceOver.T<br /><br />Full name: Main.ppo2</div>
+<div class="tip" id="fs98">val setProducts : products:Product.T list -&gt; ppo:ProductsPriceOver.T -&gt; ProductsPriceOver.T<br /><br />Full name: Main.ProductsPriceOver.setProducts</div>
+<div class="tip" id="fs99">val ppo3 : ProductsPriceOver.T<br /><br />Full name: Main.ppo3</div>
+<div class="tip" id="fs100">val setPrice : price:decimal -&gt; ppo:ProductsPriceOver.T -&gt; ProductsPriceOver.T<br /><br />Full name: Main.ProductsPriceOver.setPrice</div>
+<div class="tip" id="fs101">val ppo4 : ProductsPriceOver.T<br /><br />Full name: Main.ppo4</div>
+<div class="tip" id="fs102">val newA : Product.T<br /><br />Full name: Main.newA</div>
+<div class="tip" id="fs103">val setPrice : price:decimal -&gt; mm:Product.T -&gt; Product.T<br /><br />Full name: Main.Product.setPrice</div>
+<div class="tip" id="fs104">val toString : ppo:ProductsPriceOver.T -&gt; string<br /><br />Full name: Main.ProductsPriceOver.toString</div>
+<div class="tip" id="fs105">val p1 : ProductsPriceOver.T<br /><br />Full name: Main.p1</div>
+<div class="tip" id="fs106">val update : product:Product.T -&gt; ppo:ProductsPriceOver.T -&gt; ProductsPriceOver.T<br /><br />Full name: Main.ProductsPriceOver.update</div>
+<div class="tip" id="fs107">val p2 : ProductsPriceOver.T<br /><br />Full name: Main.p2</div>
