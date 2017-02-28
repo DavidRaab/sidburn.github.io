@@ -2,9 +2,9 @@
 layout: post
 title: "Mutability vs. Immutability: Valid objects"
 tags: [F#,C#,immutability,comparison]
-description: "At any time we want to maintain valid objects. In this article we see how hard/easy it is with mutability or immutability."
+description: "At any time we want to maintain valid objects. In this article we compare how hard/easy it is with mutability and immutability."
 keywords: f#, c#, fsharp, csharp, mutability, immutability, comparison
-twitter-card:  "summary"
+twitter-card: "summary"
 ---
 
 <p>I already wrote <a href="{% post_url 2016-03-14-immutability-and-pure-functions %}">an article that explains immutability</a>,
@@ -19,9 +19,8 @@ part really is.</p>
 <p>Because of this, first I show all the things you have to keep in mind if you work
 with mutability. Then we see how immutability helps us.</p>
 <h2>About this article</h2>
-<p>Throughout this article I will use C# and F#. All mutable examples will use
-C# code while all immutable examples use F#. There are multiple reason for this
-decision:</p>
+<p>Throughout this article I will use C# and F#. I use C# for the mutable examples
+and F# for the immutable example. There are multiple reasons for this decision:</p>
 <ol>
 <li>
 Mutability is best handled by classes and C# is built around that concepts
@@ -36,17 +35,17 @@ If you are new to F#, probably this article can help a little bit if
 you see how C# code translates to F#.
 </li>
 </ol>
-<p>There are also some words I want to mention to avoid confusion:</p>
+<p>Throughout this article I use some words, and you should know my definition
+of those words to avoid confusion:</p>
 <ol>
 <li><strong>State</strong>: State, mutable objects or mutability is just used interchangeable.</li>
 <li>
 <strong>Object</strong>: The word <em>object</em> is not limited to OOP. In general it just means
-<em>a thing</em>. Also immutable data-types like records, unions or tuples are just
-objects.
+<strong>a thing</strong>. Also F# data-types like records, unions or tuples are just objects.
 </li>
 <li>
 <strong>Function</strong>: Anything that you somehow execute is a function. This includes
-class constructors, methods, static methods and so on.
+class constructors, methods, static methods, F# functions and so on.
 </li>
 <li>
 <strong>Constructors</strong>: A <em>constructor</em> is any <em>function</em> that creates a new
@@ -62,10 +61,10 @@ If you don't already have a list, you cannot use those functions.</p>
 <code>[1;2;3]</code> or the cons operator <code>1 :: 2</code> or functions like <code>List.unfold</code>. All
 of those things create a list without that you need one beforehand and
 thus are considered <em>constructors</em>.</p>
-<p>It is not a C# vs. F# or a OO vs. FP comparison if you think that way. You
-also can create immutable object in C# and get the same benefits as in the F#
-examples. Or you can create mutable classes in F# and get the same disadvantages
-as in the C# examples.</p>
+<p>This article is not a C# vs. F# or OO vs. FP comparison. You also can create
+immutable object in C# and get the same benefits as in the F# examples. Or
+you can create mutable classes in F# and get the same disadvantages as in
+the C# examples.</p>
 <h2>Mutability: The MinMax example</h2>
 <p>We start with a really small and simple example. A <code>MinMax</code> class that only has
 the purpose to keep a <em>current</em> value between a defined <em>minimum</em> and <em>maximum</em>.
@@ -110,7 +109,7 @@ A C# class could look like this:</p>
 <span class="l">38: </span>
 <span class="l">39: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="csharp"><span class="k">public</span> MinMax {
+<td class="snippet"><pre class="fssnip highlighted"><code lang="csharp"><span class="k">public</span> <span class="k">class</span> MinMax {
     <span class="k">public</span> <span class="k">int</span> Minimum { get; <span class="k">private</span> set; }
     <span class="k">public</span> <span class="k">int</span> Maximum { get; <span class="k">private</span> set; }
     <span class="k">public</span> <span class="k">int</span> Current { get; <span class="k">private</span> set; }
@@ -134,7 +133,7 @@ A C# class could look like this:</p>
         <span class="k">if</span> ( <span class="k">this</span>.Current <span class="o">&gt;</span> <span class="k">this</span>.Maximum ) {
             <span class="k">this</span>.Current <span class="o">=</span> <span class="k">this</span>.Maximum;
         }
-        elif ( <span class="k">this</span>.Current <span class="o">&lt;</span> <span class="k">this</span>.Minimum ) {
+        <span class="k">else</span> <span class="k">if</span> ( <span class="k">this</span>.Current <span class="o">&lt;</span> <span class="k">this</span>.Minimum ) {
             <span class="k">this</span>.Current <span class="o">=</span> <span class="k">this</span>.Minimum;
         }
     }
@@ -176,10 +175,10 @@ v.SetMaximum(<span class="n">50</span>);
 <p>In a very easy example like this it might be obvious that you must re-check
 both rules and call <code>CheckMinMax()</code> <strong>and</strong> <code>CheckCurrent()</code>. In a more complex
 class determining what needs to be called can be a lot harder.</p>
-<p>As our goal is to always keep a valid object, why not make up some rules like
+<p>As our goal is to always maintain valid objects, why not make up some rules like
 a coding-standard that when we strictly follow it, we can be sure objects always
-stay valid.</p>
-<p>So as our first rule we just simply say:</p>
+are valid?</p>
+<p>We just define our first rule as:</p>
 <blockquote>
 <p>First Rule: Always re-validate every rule to ensure the correctness of an object.</p>
 </blockquote>
@@ -206,14 +205,20 @@ this code example?</p>
 <span class="l">3: </span>
 <span class="l">4: </span>
 <span class="l">5: </span>
+<span class="l">6: </span>
+<span class="l">7: </span>
+<span class="l">8: </span>
 </pre></td>
 <td class="snippet"><pre class="fssnip highlighted"><code lang="csharp"><span class="k">var</span> v <span class="o">=</span> <span class="k">new</span> MinMax(<span class="n">0</span>, <span class="n">100</span>, <span class="n">80</span>);
+
 <span class="k">try</span> {
     v.SetMaximum(<span class="n">-100</span>);
 }
+<span class="k">catch</span> {}
+
 v.Add(<span class="n">10</span>);
 </code></pre></td></tr></table>
-<p><strong>Answer:</strong> The <code>SetMaximum</code> is not correct and the state of <code>v</code> will be:
+<p><strong>Answer:</strong> <code>SetMaximum</code> is not correct and the state of <code>v</code> will be:
 <code>Minimum=0; Maximum=-100; Current=-100</code>. Mutating a field before we know
 a change is valid is a problem. Our next rule:</p>
 <blockquote>
@@ -226,18 +231,18 @@ but not with <code>SetMaximum</code>?</p>
 <p>One reason is that we only called <code>CheckMinMax</code> from the constructor. The
 exception in <code>CheckMinMax</code> aborts the whole creation of an object. But when
 we already have an object and call it from a method that isn't enough.</p>
-<p>So as an exception we could add another rule:</p>
+<p>We can create another rule to describe that this is okay.</p>
 <blockquote>
 <p>Third Rule: The second rule don't need to be followed in a constructor. In
 a constructor you always are allowed to mutate and validate afterwards.</p>
 </blockquote>
-<p>But that still doesn't explain why first mutating and the checking is no
-problem in <code>Add</code> and <code>Subtract</code>. On top with our current rules so far we are not
+<p>But this still doesn't explain why first mutating and the checking is no
+problem in <code>Add</code> and <code>Subtract</code>. With our current rules so far we are not
 allowed to write <code>Add</code> and <code>Subtract</code> in the way it is currently written.</p>
-<p>The reason why we can do this is because our <code>CheckCurrent()</code> not just validates
-and throws an error in the case there is something invalid. It actually <strong>fixes</strong>
-the problem.</p>
-<p>If the <code>Current</code> becomes bigger than <code>Maximum</code>, and thus makes the objects invalid,
+<p>The reason why we can validate afterwards is because our <code>CheckCurrent()</code> not
+just validates and throws an error in the case there is something invalid.
+It actually <strong>fixes</strong> the problem.</p>
+<p>If <code>Current</code> gets bigger than <code>Maximum</code>, and thus invalidates the object,
 it fixes the problem by setting <code>Current</code> to the <code>Maximum</code> value. So whenever
 we can <strong>fix</strong> an invalid object and there is a way to turn it back into
 a valid object, we actually are allowed to mutate and check afterwards.</p>
@@ -245,36 +250,17 @@ a valid object, we actually are allowed to mutate and check afterwards.</p>
 <p>Fourth Rule: If there is a way to <em>fix</em> an invalid object, you
 are allowed to mutate and validate even outside of an constructor.</p>
 </blockquote>
-<p>We also could applied this kind of <strong>fixing</strong> to <code>Minimum</code> and <code>Maximum</code>.
-For example i could add the following rules:</p>
+<p>We also could apply this kind of <strong>fixing</strong> to <code>Minimum</code> and <code>Maximum</code>.
+For example I could add the following logic to the <code>SetMinimum</code> and
+<code>SetMaximum</code> methods.</p>
 <ul>
-<li>If Minimum gets mutated and is bigger than Maximum. Also set Maximum to the same value.</li>
-<li>If Maximum gets mutated and is smaller than Minimum. Also set Minimum to the same value.</li>
+<li>If Minimum is bigger than Maximum, then set Maximum to the same value.</li>
+<li>If Maximum is smaller than Minimum, then set Minimum to the same value.</li>
 </ul>
-<p>The problem with rules like these are that they can become hard to remember.
-When we have a MinMax object like this:</p>
-<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
-</pre></td>
-<td class="snippet"><pre class="fssnip"><code lang="console">Minimum=0; Maximum=100; Current=50
-</code></pre></td></tr></table>
-<p>and we set the <code>Maximum</code> to <code>-100</code> we could either return an error or return a
-MinMax like this:</p>
-<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
-</pre></td>
-<td class="snippet"><pre class="fssnip"><code lang="console">Minimum=-100; Maximum=-100; Current=-100
-</code></pre></td></tr></table>
-<p>We also have the same choice when we <code>Add</code> or <code>Subtract</code>. When we start
-with:</p>
-<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
-</pre></td>
-<td class="snippet"><pre class="fssnip"><code lang="console">Minimum=0; Maximum=100; Current=50
-</code></pre></td></tr></table>
-<p>and try to add <code>200</code> to it we also could throw an error instead of <strong>fixing</strong>
-and returning:</p>
-<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
-</pre></td>
-<td class="snippet"><pre class="fssnip"><code lang="console">Minimum=0; Maximum=100; Current=100
-</code></pre></td></tr></table>
+<p>Every method (or say at least "a lot") could somehow fix an object.
+If a string is restricted to 80 characters you could reset a string to
+the empty string, or maybe cut everything off after 80 characters. The
+problem with logic like these are they are very hard to remember.</p>
 <p>There isn't a right or wrong approach. But depending which
 approach you pick you have other rules you must follow. If you pick the approach
 to throw/return errors then you should validate before mutating. If you fix
@@ -282,20 +268,20 @@ invalid objects you are allowed to mutate and call your <strong>fix</strong> fun
 <div class="info">
 It might be true that we cannot label one as <strong>right</strong> or <strong>wrong</strong>,
 nevertheless I suggest we should avoid a solution that fixes something automatically
-most of the time. Those things are usually hard to remember. Returning an error, no matter how
+most of the time as they are hard to remember. Returning an error, no matter how
 you do it exactly (null / Options / Results / Exceptions), is most of the time
-more flexible, and easier to comprehend.
+more flexible and easier to comprehend.
 </div>
-<p>Once we decided for the one way or the other and follow the rules, is it then impossible
-that an object will never be in an invalid state? The answer is actually, no. But
+<p>If we now decide for one way and follow the rules, is it then impossible
+that an object will never be in an invalid state? The answer is no. But
 we need another example to demonstrate this.</p>
 <p>The <code>MinMax</code> class uses three mutable fields. While the fields itself are mutable
 this is not true for the <code>int</code> itself. An <code>int</code> is an immutable type. So we also
-must consider a case where the objects themselves are mutable.</p>
-<p>For our new example let's consider a <code>Product</code> class with two fields <code>Name</code>
+must consider an example where the objects themselves are mutable.</p>
+<p>For the next example let's consider a <code>Product</code> class with two fields <code>Name</code>
 and <code>Price</code>. To make it easy, we just assume every <code>Name</code> and <code>Price</code> is valid.
 Instead we focus on a <code>ProductsPriceOver</code> class. The purpose of this class
-is to maintain a list of <code>Product</code>s with one rule. Every <code>Product</code> must
+is to maintain a list of <code>Product</code>s with only one rule. Every <code>Product</code> must
 be more expensive then a defined minimum.</p>
 <p>The final usage of those two classes could look like this:</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
@@ -320,17 +306,17 @@ ppo.add(c);
 When we implement <code>ProductsPriceOver</code> it means the <code>add</code> method must check the <code>Price</code>
 of every <code>Product</code>. When the above code gets executed we assume only product "B"
 and "C" are inside <code>ProductsPriceOver</code>.</p>
-<p>If we assume <code>add</code> is the only method <code>ProductsPriceOver</code> will ever implement. Will
-<code>ProductsPriceOver</code> always be valid?</p>
-<p>The answer is no. We can invalidate <code>ProductsPriceOver</code> by just changing the Price
-of an Product.</p>
+<p><strong>Question:</strong> If we assume <code>add</code> is the only method <code>ProductsPriceOver</code> will ever
+implement. Will <code>ProductsPriceOver</code> always be valid?</p>
+<p><strong>Answer:</strong> No. We can invalidate <code>ProductsPriceOver</code> by just changing the Price
+of any Product directly.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
 <td class="snippet"><pre class="fssnip highlighted"><code lang="csharp">b.Price <span class="o">=</span> <span class="n">5.00</span>
 </code></pre></td></tr></table>
 <p>The problem is that we reference Product B directly in <code>ProductsPriceOver</code> and we
 also never get a notification if one of the products changes.</p>
-<p>There are two ways how we can fix that. We could choose only one, so i consider
+<p>There are two ways how we can fix that. We could choose only one so I consider
 both as the fifth rule.</p>
 <blockquote>
 <p>Fifth Rule A: Mutable objects must have some kind of notification mechanism
@@ -351,27 +337,27 @@ of the whole object and only keeps the copy in its internal list.</p>
 <p>When we do this, even after we execute <code>b.Price = 5.00</code> the product in <code>ppo</code>
 will still be <code>19.99</code> instead of <code>5</code>. This way every <code>ProductsPriceOver</code> object
 stay valid, but we need a way to update the price in <code>ProductsPriceOver</code>.
-I will cover this problem when I talk about immutability.</p>
+We look at this problem more precisely later in the immutability part.</p>
 <p>In some way <em>defensive copies</em> and <em>immutability</em> are the same. Because
-sharing an mutable object can cause problems, defensive copying creates
+sharing a mutable object can cause problems, defensive copying creates
 copies of objects and try to avoid sharing. With immutable objects
 sharing is no problem, but we create copies of objects when we want to
 change something.</p>
-<p>The difference is only at which point we create copies. Defensive copies
+<p>The difference is at what time we create copies. Defensive copies
 creates copies before-hand, immutability creates copies only in the exact
 moment something is changing.</p>
-<p>But after all, we are still not safe! Rule Five only covers things we
-could describe as <em>Input</em>. It only covers those cases when our current
-object receives another object that was created outside of our current
-object.</p>
+<p>But after all, we are still not safe from invalid objects! Rule Five only
+covers things we could describe as <em>Input</em>. It only covers those cases
+when our current object receives another object from outside of our
+current object.</p>
 <p>Another problem that can occur is when we return mutable objects from
 methods. Or in some sense when we return them as <em>Output</em>.</p>
-<p>Our <code>ProductsPriceOver</code> object only has an <code>add</code> method at this point,
-and in fact is pretty useless. We assume that the <code>ProductsPriceOver</code>
+<p>Up so far The <code>ProductsPriceOver</code> class only provides an <code>add</code> method
+and is pretty useless at this time. We assume that the <code>ProductsPriceOver</code>
 object has an internal mutable list to keep track of all its Products.
 This list is usually created when we create an <code>ProductsPriceOver</code> object
 and is not passed from the outside.</p>
-<p>But when we return those internal mutable objects, then our object can be
+<p>But when we return those internal mutable object, then our object can be
 easily invalidated. Let's assume our <code>ppo</code> has a <code>Products</code> field that
 directly returns the products as a <code>List&lt;Product&gt;</code>. We could then write
 something like this:</p>
@@ -390,10 +376,6 @@ something like this:</p>
 <span class="l">13: </span>
 <span class="l">14: </span>
 <span class="l">15: </span>
-<span class="l">16: </span>
-<span class="l">17: </span>
-<span class="l">18: </span>
-<span class="l">19: </span>
 </pre></td>
 <td class="snippet"><pre class="fssnip highlighted"><code lang="csharp"><span class="k">var</span> a <span class="o">=</span> <span class="k">new</span> Product(<span class="s">"A"</span>, <span class="n">9.99</span>);
 <span class="k">var</span> b <span class="o">=</span> <span class="k">new</span> Product(<span class="s">"B"</span>, <span class="n">19.99</span>);
@@ -404,18 +386,16 @@ ppo.add(a);
 ppo.add(b);
 ppo.add(c);
 
-<span class="c">// list only contains "b" and "c" at this point</span>
+<span class="c">// At this time ppo contains only "B" and "C"</span>
 
 List&lt;Product&gt; products <span class="o">=</span> ppo.Products
 products.Add(a)
 
-<span class="c">// list now contains "a", "b" and "c"!!!</span>
-
-<span class="c">// By directly accessing the internal mutable array</span>
-<span class="c">// we bypass the `ppo.add()` method including its</span>
-<span class="c">// enforcement of the rules</span>
+<span class="c">// ppo now contains "A", "B" and "C"!!!</span>
 </code></pre></td></tr></table>
-<p>We can solve this problem in the exact same way we did with Rule Five.</p>
+<p>By directly accessing the internal mutable array we bypass the <code>ppo.add()</code> method
+including its enforcement of the rules. We can solve this problem in the exact
+same way we did with Rule Five.</p>
 <blockquote>
 <p>Sixth Rule A: Every mutable object we return must have a Changed event
 that gets fired when an object was mutated.</p>
@@ -438,16 +418,18 @@ is the worst rule of all. This rule is so bad that in my opinion most problems
 of OO programming are connected to this idea. This rule alone deserves a
 whole article on its own to describe its evilness. Yes, I'm serious and this
 is not a joke!</p>
-<p>I left it to he reader to figure out how many implications this has.
-You can start with the question: <em>When you cannot access the <code>Products</code>
-list of an <code>ProductsPriceOver</code> object. How do you implement new functionality?</em></p>
+<p>Currently I left it to he reader to figure out how many implications this has,
+otherwise this article will get too long. You can start with the question:
+<em>When you cannot access the <code>Products</code> list of an <code>ProductsPriceOver</code> object.
+How do you implement new functionality?</em></p>
 <p>Now that we have Rule Five and Six, lets talk about these. Actually you cannot
 freely decide if you either use events or defensive copies. Events are
 <em>reactive</em>. They get fired <em>after</em> a mutation happened. So you only can use
 events if there is a way to fix an object after it became invalid.</p>
-<p>If there is no way to fix an invalid object, you must use defensive copies!</p>
-<p>Even though this is not directly a rule. I think it is important enough
-to still consider it as a rule.</p>
+<p>If there is no way to fix an invalid object, you must use defensive copies!
+This is not really a rule you must follow, more a reminder which
+previously rule you must choose. But because of its important I still
+consider it as a new rule.</p>
 <blockquote>
 <p>Seventh Rule: Events can only be used if there is always a way to fix
 an invalid object. If there is no way to fix an invalid object, use
@@ -467,7 +449,7 @@ state.</p>
 primitives doesn't mean it is thread-safe. Because of this, you probably
 want to ignore Rule Eight.</p>
 </blockquote>
-<p>Also this is worth its own article that i will probably write about in the future.</p>
+<p>Also this is worth its own article I will write about in the near future.</p>
 <p>Let's get an overview of all rules we have to follow so we can be sure state
 will always be valid.</p>
 <h2>All Rules to ensure a valid State</h2>
@@ -487,8 +469,8 @@ are allowed to mutate and validate even outside of an constructor.
 once they changed.
 </li>
 <li>
-<strong>Fifth Rule B:</strong> Mutable objects must have a <code>Copy</code> or <code>Clone</code> function
-that can create deep copies of an object.
+<strong>Fifth Rule B:</strong> Mutable objects must have a <code>Copy</code> function that can create
+deep copies of an object.
 </li>
 <li>
 <strong>Sixth Rule A:</strong> Every mutable object we return must have a Changed event
@@ -516,12 +498,12 @@ primitives doesn't mean it is thread-safe. Because of this, you probably
 want to ignore Rule Eighth.
 </li>
 </ol>
-<p>In fact, even now I'm not sure at all if I really covered everything! Besides
+<p>In fact, even now I'm not sure if I really covered everything! Besides
 the amount of rules you should follow to ensure an object is always valid,
 the problem is that nearly every rule either has an exception or special
 requirements when you should/can use them.</p>
 <p>This overall makes mutability pretty hard. Now that we covered the mutability
-part, lets so how immutability helps us.</p>
+part lets see how immutability helps us.</p>
 <h2>Designing with Immutability</h2>
 <p>Our MinMax class can be easily represented by a record in F#. Records in F#
 are immutable by default and can group data together like classes do.</p>
@@ -566,10 +548,10 @@ of invalid objects like:</p>
 </code></pre></td>
 </tr>
 </table>
-<p>But we cannot create a MinMax outside of our <code>MinMax</code> module. So we need at
+<p>Now we cannot create a <code>MinMax</code> object outside of the <code>MinMax</code> module. So we need at
 least one constructor. Because we want to eliminate the ability to create invalid
 <code>MinMax</code> objects we also add any validation we want to this constructor. Our
-final constructor <code>create</code> looks like this.</p>
+final constructor <code>create</code> looks like this:</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -610,11 +592,11 @@ state cannot be created anymore.</p>
 to the record constructor, so there is a possibility of creating an invalid object.
 This leads to the <strong>only</strong> rule you will ever need with immutability!</p>
 <blockquote>
-<p>Golden Rule: Create a constructor function with the name <code>create</code> that contain
-all your rules and validation logic. Only use this function to create new
+<p>Golden Rule: Create a constructor function with the name <code>create</code> that contains
+all rules and validation logic. Only use this function to create new
 objects from now on.</p>
 </blockquote>
-<p>Here are the <code>add</code> and <code>subtract</code> functions</p>
+<p>Here are the <code>add</code> and <code>subtract</code> functions:</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 </pre></td>
@@ -623,8 +605,8 @@ objects from now on.</p>
 </code></pre></td>
 </tr>
 </table>
-<p>Consider how this functions don't contain any validation logic, and they
-still will always work as intended. With mutability we had rules if we
+<p>Consider that these functions don't contain any validation logic and
+still work as intended. With mutability we had rules if we
 need to validate or mutate first. Because we cannot mutate in the first
 place we must create a new object and we do that by using the <code>create</code>
 function that contains all validation logic. We also can say, we are
@@ -652,7 +634,7 @@ The only thing you have to consider is that the <code>MinMax</code> object shoul
 the last argument of a function.</p>
 <p>Next look at <code>setMinimum</code> and <code>setMaximum</code>. In our mutation version it throws
 an exception, but it could leave an object in an invalid state if we first
-mutated an object. Needless to say that we never get that problem with
+mutated an object. Needless to say that we never get this problem with
 immutability.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
@@ -762,12 +744,12 @@ and we discussed what happens if mutable objects are either passed
 or returned from an object.</p>
 <p>We had two solution for this problem. We either fired events as soon
 something was changed or we created defensive copies. Using events
-doesn't make any sense with immutable objects. As they cannot change, those
+doesn't make any sense with immutable objects. As they cannot change those
 events will never be fired.</p>
 <p>And as discussed previously the idea of creating defensive copies is very
 similar to immutability. In fact it created another problem that if we mutated
-a product it didn't affect the same product in a <code>ProductsPriceOver</code>. So lets
-address this problem.</p>
+a product it didn't affected the same product in a <code>ProductsPriceOver</code> object.
+So lets address this problem.</p>
 <p>First, we create an immutable <code>Product</code>. It contains no validation and I also
 could just used the Record definition (3 lines of code). But I anyway decided
 to create another module with functions so you could get an idea how to convert
@@ -815,7 +797,7 @@ a similar mutable <code>Product</code> class to an immutable <code>Product</code
 </tr>
 </table>
 <p>Second, we create our <code>ProductsPriceOver</code> type. This time I just show
-the whole code and lets only talk about the new stuff.</p>
+the whole code.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
 <span class="l"> 2: </span>
 <span class="l"> 3: </span>
@@ -888,15 +870,15 @@ the whole code and lets only talk about the new stuff.</p>
 </code></pre></td>
 </tr>
 </table>
-<p>So here is a short summary of the stuff you already should now.</p>
+<p>Here is a short summary of the stuff you already should now.</p>
 <p>Instead of a class we create a module. We put all private mutable fields
 inside an immutable record. We make this record private. A constructor
 function that we name <code>create</code> has the purpose of creating a new object and
 contains all validation. In this case it filters the list and ensures that only
 products over a specified price will be saved in our object. The Getter and
-Setter part are identical to what you now from OO. Because the record is private
-we need getters so we can access the name and price outside of our module.
-The setter just sets the value of a name or price to a new value. But it does
+Setter part are identical to what you know from OO. Because the record is private
+we need getters so we can access the <code>Price</code> and <code>Products</code> outside of the module.
+The setter just sets the value of <code>Price</code> or <code>Products</code> to a new value. But it does
 it by creating new objects instead of mutating. The <code>toString</code> and <code>add</code>
 functions are normal functions like <code>MinMax.show</code>, <code>MinMax.add</code> or
 <code>MinMax.subtract</code> with more logic.</p>
@@ -939,16 +921,16 @@ do with our <code>ProductsPriceOver</code> module so far:</p>
 <span class="l">35: </span>
 <span class="l">36: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="c">// returns a list of only the product name from a ProductsPriceOver object</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="c">// returns a list of product names from a ProductsPriceOver object</span>
 <span class="k">let</span> <span onmouseout="hideTip(event, 'fs86', 350)" onmouseover="showTip(event, 'fs86', 350)" class="f">getProductNames</span> <span onmouseout="hideTip(event, 'fs87', 351)" onmouseover="showTip(event, 'fs87', 351)" class="i">ppo</span> <span class="o">=</span>
     <span onmouseout="hideTip(event, 'fs70', 352)" onmouseover="showTip(event, 'fs70', 352)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs78', 353)" onmouseover="showTip(event, 'fs78', 353)" class="f">map</span> <span onmouseout="hideTip(event, 'fs62', 354)" onmouseover="showTip(event, 'fs62', 354)" class="t">Product</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs84', 355)" onmouseover="showTip(event, 'fs84', 355)" class="f">name</span> (<span onmouseout="hideTip(event, 'fs88', 356)" onmouseover="showTip(event, 'fs88', 356)" class="t">ProductsPriceOver</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs89', 357)" onmouseover="showTip(event, 'fs89', 357)" class="f">products</span> <span onmouseout="hideTip(event, 'fs87', 358)" onmouseover="showTip(event, 'fs87', 358)" class="i">ppo</span>)
 
-<span class="c">// Our three Products</span>
+<span class="c">// Our Products</span>
 <span class="k">let</span> <span onmouseout="hideTip(event, 'fs90', 359)" onmouseover="showTip(event, 'fs90', 359)" class="i">a</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs62', 360)" onmouseover="showTip(event, 'fs62', 360)" class="t">Product</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs91', 361)" onmouseover="showTip(event, 'fs91', 361)" class="f">create</span> <span class="s">&quot;A&quot;</span> <span class="n">9.99m</span>
 <span class="k">let</span> <span onmouseout="hideTip(event, 'fs92', 362)" onmouseover="showTip(event, 'fs92', 362)" class="i">b</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs62', 363)" onmouseover="showTip(event, 'fs62', 363)" class="t">Product</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs91', 364)" onmouseover="showTip(event, 'fs91', 364)" class="f">create</span> <span class="s">&quot;B&quot;</span> <span class="n">19.99m</span>
 <span class="k">let</span> <span onmouseout="hideTip(event, 'fs93', 365)" onmouseover="showTip(event, 'fs93', 365)" class="i">c</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs62', 366)" onmouseover="showTip(event, 'fs62', 366)" class="t">Product</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs91', 367)" onmouseover="showTip(event, 'fs91', 367)" class="f">create</span> <span class="s">&quot;C&quot;</span> <span class="n">49.99m</span>
 
-<span class="c">// Initializing and adding three products</span>
+<span class="c">// Initializing and adding our products</span>
 <span class="k">let</span> <span onmouseout="hideTip(event, 'fs94', 368)" onmouseover="showTip(event, 'fs94', 368)" class="i">ppo</span> <span class="o">=</span>
     <span onmouseout="hideTip(event, 'fs88', 369)" onmouseover="showTip(event, 'fs88', 369)" class="t">ProductsPriceOver</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs95', 370)" onmouseover="showTip(event, 'fs95', 370)" class="f">create</span> <span class="n">10.00m</span> []
     <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs88', 371)" onmouseover="showTip(event, 'fs88', 371)" class="t">ProductsPriceOver</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs96', 372)" onmouseover="showTip(event, 'fs96', 372)" class="f">add</span> <span onmouseout="hideTip(event, 'fs90', 373)" onmouseover="showTip(event, 'fs90', 373)" class="i">a</span>
@@ -1034,11 +1016,11 @@ But even that can be considered as good. We didn't need to create an <code>updat
 function with a mutable version because mutable Products already had this
 feature. In fact the problem is more that you can forget this feature, and this
 is the reason why an <code>ProductsPriceOver</code> in the mutable version can become
-invalid, because you can forget about this important detail.</p>
-<p>The rules to create either events or defensive copies forces you to think
-about this cases so you don't forget them. With immutability you
-cannot forget anything that later on can invalidate anything. Your code
-only has those features you also implemented!</p>
+invalid, because you can forget a feature that msomehow must be handled.</p>
+<p>The rules to create either events or defensive copies forces you to think about
+this cases so you hopefully don't forget them. With immutability you cannot forget
+anything that later on can invalidate anything. Your code only has those
+features you also implemented!</p>
 <h2>Conclusion</h2>
 <p>Working with immutability sure is different. I guess some people will also claim
 that updating with immutability is harder. With mutability you just need to
@@ -1050,18 +1032,18 @@ change the Product and that's it.</p>
 <p>The problem is that those things often miss the bigger picture. As just mutating
 the price can cause problems in other code like we have seen previously. If we
 start adding <code>copy</code> functions for defensive copying or need to add event handling
-then this is not really simpler. You also can solve the problem of invalid
-objects with mutability, but it is a lot harder to do it right. Even now I'm
-still not 100% sure if I covered all possibilities how mutation can somehow
-lead to an invalid objects.</p>
+then this is not really simpler compared to immutability.</p>
+<p>It is sure possible that you can create mutable objects that are always valid,
+but doing so is a lot harder. Even now I'm still not 100% sure if I covered
+ll possibilities how mutation can somehow lead to an invalid object.</p>
 <p>There are more reasons for immutability, advantages and techniques we didn't
-looked at. But there are also reason against immutability. But in this article we
+looked at. But there are also reasons against immutability. But in this article we
 only looked at mutability vs. immutability in the context of maintaining
 valid objects.</p>
 <p>In my opinion, most of the time, this is the most important aspect we usually
-care for. As a general thumb of rule i would claim that by default everything
+care for. As a general thumb of rule I would claim that by default everything
 should be immutable. Until of course there are other reasons why this
-shouldn't be the case. What this other reasons could be is a topic for yet another
+shouldn't be the case. What this other reasons could be are topics for other
 articles.</p>
 
 

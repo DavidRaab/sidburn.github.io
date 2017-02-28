@@ -3,9 +3,9 @@
 layout: post
 title: "Mutability vs. Immutability: Valid objects"
 tags: [F#,C#,immutability,comparison]
-description: "At any time we want to maintain valid objects. In this article we see how hard/easy it is with mutability or immutability."
+description: "At any time we want to maintain valid objects. In this article we compare how hard/easy it is with mutability and immutability."
 keywords: f#, c#, fsharp, csharp, mutability, immutability, comparison
-twitter-card:  "summary"
+twitter-card: "summary"
 \---
 *)
 
@@ -30,9 +30,8 @@ with mutability. Then we see how immutability helps us.
 
 ## About this article
 
-Throughout this article I will use C# and F#. All mutable examples will use
-C# code while all immutable examples use F#. There are multiple reason for this
-decision:
+Throughout this article I will use C# and F#. I use C# for the mutable examples
+and F# for the immutable example. There are multiple reasons for this decision:
 
 1. Mutability is best handled by classes and C# is built around that concepts
    and everything by default is mutable.
@@ -41,14 +40,14 @@ decision:
 3. If you are new to F#, probably this article can help a little bit if
    you see how C# code translates to F#.
 
-There are also some words I want to mention to avoid confusion:
+Throughout this article I use some words, and you should know my definition
+of those words to avoid confusion:
 
 1. **State**: State, mutable objects or mutability is just used interchangeable.
 2. **Object**: The word *object* is not limited to OOP. In general it just means
-   *a thing*. Also immutable data-types like records, unions or tuples are just
-   objects.
+   **a thing**. Also F# data-types like records, unions or tuples are just objects.
 3. **Function**: Anything that you somehow execute is a function. This includes
-   class constructors, methods, static methods and so on.
+   class constructors, methods, static methods, F# functions and so on.
 4. **Constructors**: A *constructor* is any *function* that creates a new
    *object* if you don't already have one.
 
@@ -63,10 +62,10 @@ In F# there are multiple ways to create a list, like the special List syntax
 of those things create a list without that you need one beforehand and
 thus are considered *constructors*.
 
-It is not a C# vs. F# or a OO vs. FP comparison if you think that way. You
-also can create immutable object in C# and get the same benefits as in the F#
-examples. Or you can create mutable classes in F# and get the same disadvantages
-as in the C# examples.
+This article is not a C# vs. F# or OO vs. FP comparison. You also can create
+immutable object in C# and get the same benefits as in the F# examples. Or
+you can create mutable classes in F# and get the same disadvantages as in
+the C# examples.
 
 ## Mutability: The MinMax example
 
@@ -75,7 +74,7 @@ the purpose to keep a *current* value between a defined *minimum* and *maximum*.
 A C# class could look like this:
 
     [lang=csharp]
-    public MinMax {
+    public class MinMax {
         public int Minimum { get; private set; }
         public int Maximum { get; private set; }
         public int Current { get; private set; }
@@ -99,7 +98,7 @@ A C# class could look like this:
             if ( this.Current > this.Maximum ) {
                 this.Current = this.Maximum;
             }
-            elif ( this.Current < this.Minimum ) {
+            else if ( this.Current < this.Minimum ) {
                 this.Current = this.Minimum;
             }
         }
@@ -142,11 +141,11 @@ In a very easy example like this it might be obvious that you must re-check
 both rules and call `CheckMinMax()` **and** `CheckCurrent()`. In a more complex
 class determining what needs to be called can be a lot harder.
 
-As our goal is to always keep a valid object, why not make up some rules like
+As our goal is to always maintain valid objects, why not make up some rules like
 a coding-standard that when we strictly follow it, we can be sure objects always
-stay valid.
+are valid?
 
-So as our first rule we just simply say:
+We just define our first rule as:
 
 > First Rule: Always re-validate every rule to ensure the correctness of an object.
 
@@ -167,12 +166,15 @@ this code example?
 
     [lang=csharp]
     var v = new MinMax(0, 100, 80);
+	
     try {
-        v.SetMaximum(-100);
-    }
-    v.Add(10);
+	    v.SetMaximum(-100);
+	}
+	catch {}
 
-**Answer:** The `SetMaximum` is not correct and the state of `v` will be:
+	v.Add(10);
+
+**Answer:** `SetMaximum` is not correct and the state of `v` will be:
 `Minimum=0; Maximum=-100; Current=-100`. Mutating a field before we know
 a change is valid is a problem. Our next rule:
 
@@ -187,20 +189,20 @@ One reason is that we only called `CheckMinMax` from the constructor. The
 exception in `CheckMinMax` aborts the whole creation of an object. But when
 we already have an object and call it from a method that isn't enough.
 
-So as an exception we could add another rule:
+We can create another rule to describe that this is okay.
 
 > Third Rule: The second rule don't need to be followed in a constructor. In
 > a constructor you always are allowed to mutate and validate afterwards.
 
-But that still doesn't explain why first mutating and the checking is no
-problem in `Add` and `Subtract`. On top with our current rules so far we are not
+But this still doesn't explain why first mutating and the checking is no
+problem in `Add` and `Subtract`. With our current rules so far we are not
 allowed to write `Add` and `Subtract` in the way it is currently written.
 
-The reason why we can do this is because our `CheckCurrent()` not just validates
-and throws an error in the case there is something invalid. It actually **fixes**
-the problem.
+The reason why we can validate afterwards is because our `CheckCurrent()` not
+just validates and throws an error in the case there is something invalid.
+It actually **fixes** the problem.
 
-If the `Current` becomes bigger than `Maximum`, and thus makes the objects invalid,
+If `Current` gets bigger than `Maximum`, and thus invalidates the object,
 it fixes the problem by setting `Current` to the `Maximum` value. So whenever
 we can **fix** an invalid object and there is a way to turn it back into
 a valid object, we actually are allowed to mutate and check afterwards.
@@ -208,35 +210,17 @@ a valid object, we actually are allowed to mutate and check afterwards.
 > Fourth Rule: If there is a way to *fix* an invalid object, you
 > are allowed to mutate and validate even outside of an constructor.
 
-We also could applied this kind of **fixing** to `Minimum` and `Maximum`.
-For example i could add the following rules:
+We also could apply this kind of **fixing** to `Minimum` and `Maximum`.
+For example I could add the following logic to the `SetMinimum` and
+`SetMaximum` methods.
 
-* If Minimum gets mutated and is bigger than Maximum. Also set Maximum to the same value.
-* If Maximum gets mutated and is smaller than Minimum. Also set Minimum to the same value.
+* If Minimum is bigger than Maximum, then set Maximum to the same value.
+* If Maximum is smaller than Minimum, then set Minimum to the same value.
 
-The problem with rules like these are that they can become hard to remember.
-When we have a MinMax object like this:
-
-    [lang=console]
-    Minimum=0; Maximum=100; Current=50
-
-and we set the `Maximum` to `-100` we could either return an error or return a
-MinMax like this:
-
-    [lang=console]
-    Minimum=-100; Maximum=-100; Current=-100
-
-We also have the same choice when we `Add` or `Subtract`. When we start
-with:
-
-    [lang=console]
-    Minimum=0; Maximum=100; Current=50
-
-and try to add `200` to it we also could throw an error instead of **fixing**
-and returning:
-
-    [lang=console]
-    Minimum=0; Maximum=100; Current=100
+Every method (or say at least "a lot") could somehow fix an object. 
+If a string is restricted to 80 characters you could reset a string to
+the empty string, or maybe cut everything off after 80 characters. The
+problem with logic like these are they are very hard to remember.
 
 There isn't a right or wrong approach. But depending which
 approach you pick you have other rules you must follow. If you pick the approach
@@ -246,23 +230,23 @@ invalid objects you are allowed to mutate and call your **fix** function afterwa
 <div class="info">
 It might be true that we cannot label one as <strong>right</strong> or <strong>wrong</strong>,
 nevertheless I suggest we should avoid a solution that fixes something automatically
-most of the time. Those things are usually hard to remember. Returning an error, no matter how
+most of the time as they are hard to remember. Returning an error, no matter how
 you do it exactly (null / Options / Results / Exceptions), is most of the time
-more flexible, and easier to comprehend.
+more flexible and easier to comprehend.
 </div>
 
-Once we decided for the one way or the other and follow the rules, is it then impossible
-that an object will never be in an invalid state? The answer is actually, no. But
+If we now decide for one way and follow the rules, is it then impossible
+that an object will never be in an invalid state? The answer is no. But
 we need another example to demonstrate this.
 
 The `MinMax` class uses three mutable fields. While the fields itself are mutable
 this is not true for the `int` itself. An `int` is an immutable type. So we also
-must consider a case where the objects themselves are mutable.
+must consider an example where the objects themselves are mutable.
 
-For our new example let's consider a `Product` class with two fields `Name`
+For the next example let's consider a `Product` class with two fields `Name`
 and `Price`. To make it easy, we just assume every `Name` and `Price` is valid.
 Instead we focus on a `ProductsPriceOver` class. The purpose of this class
-is to maintain a list of `Product`s with one rule. Every `Product` must
+is to maintain a list of `Product`s with only one rule. Every `Product` must
 be more expensive then a defined minimum.
 
 The final usage of those two classes could look like this:
@@ -282,11 +266,11 @@ When we implement `ProductsPriceOver` it means the `add` method must check the `
 of every `Product`. When the above code gets executed we assume only product "B"
 and "C" are inside `ProductsPriceOver`.
 
-If we assume `add` is the only method `ProductsPriceOver` will ever implement. Will
-`ProductsPriceOver` always be valid?
+**Question:** If we assume `add` is the only method `ProductsPriceOver` will ever
+implement. Will `ProductsPriceOver` always be valid?
 
-The answer is no. We can invalidate `ProductsPriceOver` by just changing the Price
-of an Product.
+**Answer:** No. We can invalidate `ProductsPriceOver` by just changing the Price
+of any Product directly.
 
     [lang=csharp]
     b.Price = 5.00
@@ -294,7 +278,7 @@ of an Product.
 The problem is that we reference Product B directly in `ProductsPriceOver` and we
 also never get a notification if one of the products changes.
 
-There are two ways how we can fix that. We could choose only one, so i consider
+There are two ways how we can fix that. We could choose only one so I consider
 both as the fifth rule.
 
 > Fifth Rule A: Mutable objects must have some kind of notification mechanism
@@ -317,33 +301,33 @@ of the whole object and only keeps the copy in its internal list.
 When we do this, even after we execute `b.Price = 5.00` the product in `ppo`
 will still be `19.99` instead of `5`. This way every `ProductsPriceOver` object
 stay valid, but we need a way to update the price in `ProductsPriceOver`.
-I will cover this problem when I talk about immutability.
+We look at this problem more precisely later in the immutability part.
 
 In some way *defensive copies* and *immutability* are the same. Because
-sharing an mutable object can cause problems, defensive copying creates
+sharing a mutable object can cause problems, defensive copying creates
 copies of objects and try to avoid sharing. With immutable objects
 sharing is no problem, but we create copies of objects when we want to
 change something.
 
-The difference is only at which point we create copies. Defensive copies
+The difference is at what time we create copies. Defensive copies
 creates copies before-hand, immutability creates copies only in the exact
 moment something is changing.
 
-But after all, we are still not safe! Rule Five only covers things we
-could describe as *Input*. It only covers those cases when our current
-object receives another object that was created outside of our current
-object.
+But after all, we are still not safe from invalid objects! Rule Five only
+covers things we could describe as *Input*. It only covers those cases
+when our current object receives another object from outside of our
+current object.
 
 Another problem that can occur is when we return mutable objects from
 methods. Or in some sense when we return them as *Output*.
 
-Our `ProductsPriceOver` object only has an `add` method at this point,
-and in fact is pretty useless. We assume that the `ProductsPriceOver`
+Up so far The `ProductsPriceOver` class only provides an `add` method
+and is pretty useless at this time. We assume that the `ProductsPriceOver`
 object has an internal mutable list to keep track of all its Products.
 This list is usually created when we create an `ProductsPriceOver` object
 and is not passed from the outside.
 
-But when we return those internal mutable objects, then our object can be
+But when we return those internal mutable object, then our object can be
 easily invalidated. Let's assume our `ppo` has a `Products` field that
 directly returns the products as a `List<Product>`. We could then write
 something like this:
@@ -358,18 +342,16 @@ something like this:
     ppo.add(b);
     ppo.add(c);
 
-    // list only contains "b" and "c" at this point
+    // At this time ppo contains only "B" and "C"
 
     List<Product> products = ppo.Products
     products.Add(a)
 
-    // list now contains "a", "b" and "c"!!!
+    // ppo now contains "A", "B" and "C"!!!
 
-    // By directly accessing the internal mutable array
-    // we bypass the `ppo.add()` method including its
-    // enforcement of the rules
-
-We can solve this problem in the exact same way we did with Rule Five.
+By directly accessing the internal mutable array we bypass the `ppo.add()` method
+including its enforcement of the rules. We can solve this problem in the exact
+same way we did with Rule Five.
 
 > Sixth Rule A: Every mutable object we return must have a Changed event
 > that gets fired when an object was mutated.
@@ -394,9 +376,10 @@ of OO programming are connected to this idea. This rule alone deserves a
 whole article on its own to describe its evilness. Yes, I'm serious and this
 is not a joke!
 
-I left it to he reader to figure out how many implications this has.
-You can start with the question: *When you cannot access the `Products`
-list of an `ProductsPriceOver` object. How do you implement new functionality?*
+Currently I left it to he reader to figure out how many implications this has,
+otherwise this article will get too long. You can start with the question:
+*When you cannot access the `Products` list of an `ProductsPriceOver` object.
+How do you implement new functionality?*
 
 Now that we have Rule Five and Six, lets talk about these. Actually you cannot
 freely decide if you either use events or defensive copies. Events are
@@ -404,9 +387,9 @@ freely decide if you either use events or defensive copies. Events are
 events if there is a way to fix an object after it became invalid.
 
 If there is no way to fix an invalid object, you must use defensive copies!
-
-Even though this is not directly a rule. I think it is important enough
-to still consider it as a rule.
+This is not really a rule you must follow, more a reminder which
+previously rule you must choose. But because of its important I still
+consider it as a new rule.
 
 > Seventh Rule: Events can only be used if there is always a way to fix
 > an invalid object. If there is no way to fix an invalid object, use
@@ -426,7 +409,7 @@ And here is a bonus rule for the eighth rule.
 > primitives doesn't mean it is thread-safe. Because of this, you probably
 > want to ignore Rule Eight.
 
-Also this is worth its own article that i will probably write about in the future.
+Also this is worth its own article I will write about in the near future.
 
 Let's get an overview of all rules we have to follow so we can be sure state
 will always be valid.
@@ -441,8 +424,8 @@ will always be valid.
    are allowed to mutate and validate even outside of an constructor.
 1. **Fifth Rule A:** Mutable objects must have some kind of notification mechanism
    once they changed.
-1. **Fifth Rule B:** Mutable objects must have a `Copy` or `Clone` function
-   that can create deep copies of an object.
+1. **Fifth Rule B:** Mutable objects must have a `Copy` function that can create
+   deep copies of an object.
 1. **Sixth Rule A:** Every mutable object we return must have a Changed event
    that gets fired when an object was mutated.
 1. **Sixth Rule B:** Never return mutable objects directly. Return defensive
@@ -459,13 +442,13 @@ will always be valid.
    primitives doesn't mean it is thread-safe. Because of this, you probably
    want to ignore Rule Eighth.
 
-In fact, even now I'm not sure at all if I really covered everything! Besides
+In fact, even now I'm not sure if I really covered everything! Besides
 the amount of rules you should follow to ensure an object is always valid,
 the problem is that nearly every rule either has an exception or special
 requirements when you should/can use them.
 
 This overall makes mutability pretty hard. Now that we covered the mutability
-part, lets so how immutability helps us.
+part lets see how immutability helps us.
 
 ## Designing with Immutability
 *)
@@ -526,10 +509,10 @@ We solve that problem by creating a module and make the record constructor priva
             Current: int
         }
 
-But we cannot create a MinMax outside of our `MinMax` module. So we need at
+Now we cannot create a `MinMax` object outside of the `MinMax` module. So we need at
 least one constructor. Because we want to eliminate the ability to create invalid
 `MinMax` objects we also add any validation we want to this constructor. Our
-final constructor `create` looks like this.
+final constructor `create` looks like this:
 
     [fsharp]
     let create min max cur =
@@ -558,18 +541,18 @@ Inside the module it is a little bit different. Every function still has access
 to the record constructor, so there is a possibility of creating an invalid object.
 This leads to the **only** rule you will ever need with immutability!
 
-> Golden Rule: Create a constructor function with the name `create` that contain
-> all your rules and validation logic. Only use this function to create new
+> Golden Rule: Create a constructor function with the name `create` that contains
+> all rules and validation logic. Only use this function to create new
 > objects from now on.
 
-Here are the `add` and `subtract` functions
+Here are the `add` and `subtract` functions:
 
     [fsharp]
     let add x mm      = create mm.Minimum mm.Maximum (mm.Current + x)
     let subtract x mm = create mm.Minimum mm.Maximum (mm.Current - x)
 
-Consider how this functions don't contain any validation logic, and they
-still will always work as intended. With mutability we had rules if we
+Consider that these functions don't contain any validation logic and
+still work as intended. With mutability we had rules if we
 need to validate or mutate first. Because we cannot mutate in the first
 place we must create a new object and we do that by using the `create`
 function that contains all validation logic. We also can say, we are
@@ -591,7 +574,7 @@ the last argument of a function.
 
 Next look at `setMinimum` and `setMaximum`. In our mutation version it throws
 an exception, but it could leave an object in an invalid state if we first
-mutated an object. Needless to say that we never get that problem with
+mutated an object. Needless to say that we never get this problem with
 immutability.
 
     [fsharp]
@@ -643,13 +626,13 @@ or returned from an object.
 
 We had two solution for this problem. We either fired events as soon
 something was changed or we created defensive copies. Using events
-doesn't make any sense with immutable objects. As they cannot change, those
+doesn't make any sense with immutable objects. As they cannot change those
 events will never be fired.
 
 And as discussed previously the idea of creating defensive copies is very
 similar to immutability. In fact it created another problem that if we mutated
-a product it didn't affect the same product in a `ProductsPriceOver`. So lets
-address this problem.
+a product it didn't affected the same product in a `ProductsPriceOver` object.
+So lets address this problem.
 
 First, we create an immutable `Product`. It contains no validation and I also
 could just used the Record definition (3 lines of code). But I anyway decided
@@ -679,7 +662,7 @@ module Product =
 
 (**
 Second, we create our `ProductsPriceOver` type. This time I just show
-the whole code and lets only talk about the new stuff.
+the whole code.
 *)
 
 module ProductsPriceOver =
@@ -718,16 +701,16 @@ module ProductsPriceOver =
         create ppo.Price updatedList
 
 (**
-So here is a short summary of the stuff you already should now.
+Here is a short summary of the stuff you already should now.
 
 Instead of a class we create a module. We put all private mutable fields
 inside an immutable record. We make this record private. A constructor
 function that we name `create` has the purpose of creating a new object and
 contains all validation. In this case it filters the list and ensures that only
 products over a specified price will be saved in our object. The Getter and
-Setter part are identical to what you now from OO. Because the record is private
-we need getters so we can access the name and price outside of our module.
-The setter just sets the value of a name or price to a new value. But it does
+Setter part are identical to what you know from OO. Because the record is private
+we need getters so we can access the `Price` and `Products` outside of the module.
+The setter just sets the value of `Price` or `Products` to a new value. But it does
 it by creating new objects instead of mutating. The `toString` and `add`
 functions are normal functions like `MinMax.show`, `MinMax.add` or
 `MinMax.subtract` with more logic.
@@ -736,16 +719,16 @@ For a moment lets forget about the `update` function. Lets see what we can
 do with our `ProductsPriceOver` module so far:
 *)
 
-// returns a list of only the product name from a ProductsPriceOver object
+// returns a list of product names from a ProductsPriceOver object
 let getProductNames ppo =
     List.map Product.name (ProductsPriceOver.products ppo)
 
-// Our three Products
+// Our Products
 let a = Product.create "A" 9.99m
 let b = Product.create "B" 19.99m
 let c = Product.create "C" 49.99m
 
-// Initializing and adding three products
+// Initializing and adding our products
 let ppo =
     ProductsPriceOver.create 10.00m []
     |> ProductsPriceOver.add a
@@ -820,12 +803,12 @@ But even that can be considered as good. We didn't need to create an `update`
 function with a mutable version because mutable Products already had this
 feature. In fact the problem is more that you can forget this feature, and this
 is the reason why an `ProductsPriceOver` in the mutable version can become
-invalid, because you can forget about this important detail.
+invalid, because you can forget a feature that msomehow must be handled.
 
-The rules to create either events or defensive copies forces you to think
-about this cases so you don't forget them. With immutability you
-cannot forget anything that later on can invalidate anything. Your code
-only has those features you also implemented!
+The rules to create either events or defensive copies forces you to think about
+this cases so you hopefully don't forget them. With immutability you cannot forget
+anything that later on can invalidate anything. Your code only has those
+features you also implemented!
 
 ## Conclusion
 
@@ -839,19 +822,20 @@ change the Product and that's it.
 The problem is that those things often miss the bigger picture. As just mutating
 the price can cause problems in other code like we have seen previously. If we
 start adding `copy` functions for defensive copying or need to add event handling
-then this is not really simpler. You also can solve the problem of invalid
-objects with mutability, but it is a lot harder to do it right. Even now I'm
-still not 100% sure if I covered all possibilities how mutation can somehow
-lead to an invalid objects.
+then this is not really simpler compared to immutability. 
+
+It is sure possible that you can create mutable objects that are always valid,
+but doing so is a lot harder. Even now I'm still not 100% sure if I covered 
+ll possibilities how mutation can somehow lead to an invalid object.
 
 There are more reasons for immutability, advantages and techniques we didn't
-looked at. But there are also reason against immutability. But in this article we
+looked at. But there are also reasons against immutability. But in this article we
 only looked at mutability vs. immutability in the context of maintaining
 valid objects.
 
 In my opinion, most of the time, this is the most important aspect we usually
-care for. As a general thumb of rule i would claim that by default everything
+care for. As a general thumb of rule I would claim that by default everything
 should be immutable. Until of course there are other reasons why this
-shouldn't be the case. What this other reasons could be is a topic for yet another
+shouldn't be the case. What this other reasons could be are topics for other
 articles.
 *)

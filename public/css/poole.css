@@ -230,6 +230,7 @@ blockquote p:last-child {
 @media (min-width: 30em) {
   blockquote {
     padding: 1em 1.5em;
+    margin-bottom: 1rem;
   }
 }
 
@@ -334,7 +335,7 @@ tbody tr:nth-child(odd) th {
  * page is wrapped in `.page` and is only used on the page layout.
  */
 
-.page, 
+.page,
 .post {
   margin-bottom: 4em;
   text-align: justify;
@@ -355,7 +356,7 @@ tbody tr:nth-child(odd) th {
   color: #404040;
 }
 
-.page-title, 
+.page-title,
 .post-title {
   margin-top: 0;
   text-align: left;
