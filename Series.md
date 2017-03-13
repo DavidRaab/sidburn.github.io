@@ -50,3 +50,4 @@ in different categories.
 ## Ungrouped
 * [Higher-Kinded Polymorphism]({% post_url 2016-03-24-higher-kinded-polymorphism %})
 * [Monoids]({% post_url 2016-05-24-monoids %})
+* [Variable Arguments in F#]({% post_url 2017-03-13-variable-arguments %})
