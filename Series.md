@@ -22,6 +22,7 @@ in different categories.
 * [Applicative: List]({% post_url 2016-04-13-applicative-list %})
 
 ## Fold (Catamorphism)
+1. [Understanding fold]({% post_url 2017-03-19-understanding-fold %})
 1. [Algebraic Data-Types]({% post_url 2016-04-26-algebraic-data-types %})
 1. [From mutable loops to immutability]({% post_url 2016-04-05-mutable-loops-to-immutability %})
 1. [Continuations and foldBack]({% post_url 2016-04-16-fold-continuations %})
