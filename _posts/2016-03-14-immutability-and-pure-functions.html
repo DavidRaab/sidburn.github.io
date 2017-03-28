@@ -450,9 +450,9 @@ array of objects, and returned an object from this array? If <em>yes</em>, you a
 of errors. Because you have two functions that still can access the same object used at
 multiple places. And in fact we don't even need an array. Looking at object-oriented languages
 like C# nearly <em>everything</em> is actually a reference-type. <em>Objects</em> itself never get copied,
-only references are copied, and the only thing you pass around are references. But hat
-also means that every function could hold a reference to some data and directly change
-it whenever it wants to!</p>
+only references are copied, and the only thing you pass around are references. This
+also means every function could hold a reference to some data and directly change
+those whenever it wants!</p>
 <p>So shortly, we cannot know if <code>value</code> still contains the same data. It already could have changed
 multiple times. This kind of possibility even raises with <em>multi-threaded</em> code. And
 I'm not talking about <em>thread-safety</em> or <em>race-conditions</em> here. <code>value</code> could be thread-safe

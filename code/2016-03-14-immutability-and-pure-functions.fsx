@@ -420,9 +420,9 @@ array of objects, and returned an object from this array? If *yes*, you are open
 of errors. Because you have two functions that still can access the same object used at
 multiple places. And in fact we don't even need an array. Looking at object-oriented languages
 like C# nearly *everything* is actually a reference-type. *Objects* itself never get copied,
-only references are copied, and the only thing you pass around are references. But hat
-also means that every function could hold a reference to some data and directly change
-it whenever it wants to!
+only references are copied, and the only thing you pass around are references. This
+also means every function could hold a reference to some data and directly change
+those whenever it wants!
 
 So shortly, we cannot know if `value` still contains the same data. It already could have changed
 multiple times. This kind of possibility even raises with *multi-threaded* code. And
@@ -704,5 +704,5 @@ immutable `string`.
  * [Is your language unreasonable](http://fsharpforfunandprofit.com/posts/is-your-language-unreasonable/)
  * [Immutability, Purity, and Referential Transparency](https://blogs.msdn.microsoft.com/wesdyer/2007/03/01/immutability-purity-and-referential-transparency/)
  * [So You Want to be a Functional Programmer (Part 1)](https://medium.com/@cscalfani/so-you-want-to-be-a-functional-programmer-part-1-1f15e387e536)
- 
+
 *)
