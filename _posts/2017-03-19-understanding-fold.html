@@ -3,7 +3,7 @@ layout: post
 title: "Understanding Fold"
 tags: [F#,list,fold]
 description: "A journey with pictures to understand List.fold and List.foldBack"
-keywords: f#, fsharp, list, fold, foldback, foldleft, foldright
+keywords: f#, fsharp, list, fold, foldback, foldleft, foldright, foldl, foldr, reduce
 twitter-card: "summary"
 twitter-image: "/images/2017/fold/twitter.png"
 ---
@@ -261,7 +261,7 @@ our <strong>folder</strong> function return in the <code>List.fold</code> exampl
         <span onmouseout="hideTip(event, 'fs12', 40)" onmouseover="showTip(event, 'fs12', 40)" class="v">sumOfEvenNumbers</span>    <span class="o">&lt;-</span> <span onmouseout="hideTip(event, 'fs12', 41)" onmouseover="showTip(event, 'fs12', 41)" class="v">sumOfEvenNumbers</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs13', 42)" onmouseover="showTip(event, 'fs13', 42)" class="i">x</span>
 
 <span onmouseout="hideTip(event, 'fs11', 43)" onmouseover="showTip(event, 'fs11', 43)" class="v">amountOfEvenNumbers</span> <span class="c">// 5</span>
-<span onmouseout="hideTip(event, 'fs12', 44)" onmouseover="showTip(event, 'fs12', 44)" class="v">sumOfEvenNumbers</span>    <span class="c">// 30 </span>
+<span onmouseout="hideTip(event, 'fs12', 44)" onmouseover="showTip(event, 'fs12', 44)" class="v">sumOfEvenNumbers</span>    <span class="c">// 30</span>
 </code></pre></td>
 </tr>
 </table>
@@ -366,6 +366,57 @@ right-side of the list. The <code>List.fold</code> and <code>List.foldBack</code
 (right argument) in <code>List.foldback</code> while <code>List.fold</code> receives it as the first
 argument (left argument).</p>
 <h2>Summary</h2>
+<p>Other languages use different namens for these operations, but the logic
+stays the same.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="left"><p>List.fold</p></th>
+<th align="left"><p>List.foldBack</p></th>
+<th align="left"><p>List.reduce</p></th>
+<th align="left"><p>Comment</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><p><strong>C# (LINQ)</strong></p></td>
+<td align="left"><p>Aggregate</p></td>
+<td align="left"><p>N/A</p></td>
+<td align="left"><p>Aggregate</p></td>
+<td align="left"><p>Aggregate accepts 2 or 3 arguments</p></td>
+</tr>
+<tr class="even">
+<td align="left"><p><strong>JavaScript</strong></p></td>
+<td align="left"><p>Array.reduce</p></td>
+<td align="left"><p>Array.reduceRight</p></td>
+<td align="left"><p>Array.reduce</p></td>
+<td align="left"><p>Array.reduce accepts 2 or 3 arguments</p></td>
+</tr>
+<tr class="odd">
+<td align="left"><p><strong>Elm</strong></p></td>
+<td align="left"><p>foldl</p></td>
+<td align="left"><p>foldr</p></td>
+<td align="left"><p>N/A</p></td>
+<td align="left"><p>None</p></td>
+</tr>
+<tr class="even">
+<td align="left"><p><strong>Haskell</strong></p></td>
+<td align="left"><p>foldl</p></td>
+<td align="left"><p>foldr</p></td>
+<td align="left"><p>foldl1</p></td>
+<td align="left"><p>None</p></td>
+</tr>
+<tr class="odd">
+<td align="left"><p><strong>Clojure</strong></p></td>
+<td align="left"><p>reduce</p></td>
+<td align="left"><p>N/A</p></td>
+<td align="left"><p>reduce</p></td>
+<td align="left"><p>reduce accepts 2 or 3 arguments</p></td>
+</tr>
+</tbody>
+</table>
+
 <p>The <code>List.fold</code> and <code>List.foldBack</code> functions are powerful function, but this
 doesn't mean they are "good". In general you should avoid powerful language
 constructs. Functions like <code>map</code> or <code>filter</code> are overall less powerful but

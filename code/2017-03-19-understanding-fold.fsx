@@ -4,7 +4,7 @@ layout: post
 title: "Understanding Fold"
 tags: [F#,list,fold]
 description: "A journey with pictures to understand List.fold and List.foldBack"
-keywords: f#, fsharp, list, fold, foldback, foldleft, foldright
+keywords: f#, fsharp, list, fold, foldback, foldleft, foldright, foldl, foldr, reduce
 twitter-card: "summary"
 twitter-image: "/images/2017/fold/twitter.png"
 \---
@@ -53,8 +53,8 @@ first looking at `List.map` and then `List.reduce`.
 
 We could visualize a call like `List.map times2 [1;2;3;4;5]` with the technique
 we have seen so far. Draw a box with two inputs and a list as output. But we
-are not interested in visualizing the `List.map` call itself, we want to 
-visualize how `List.map` internally works. 
+are not interested in visualizing the `List.map` call itself, we want to
+visualize how `List.map` internally works.
 
 We can think of `List.map` as a function that applies its first argument, a function,
 to every element of the list passed as the second argument.
@@ -154,7 +154,7 @@ and `2` as the second argument to `+`. As both values come from the same list
 and all values in a list must be of the same type it means both input values
 must be the exact same type of the list.
 
-As the result of `1 + 2` is again passed as the first argument to the next 
+As the result of `1 + 2` is again passed as the first argument to the next
 `+` call it also means the output of a function must be the same as its
 input type.
 
@@ -255,7 +255,7 @@ is to mutate some state that is usually defined outside of the loop. In
 and we need to return the new state for the next function call.
 
 It becomes more obvious if we go through the states of `acc` in the loop based
-code. We start with the empty string `""`. In the first loop iteration `x` is 
+code. We start with the empty string `""`. In the first loop iteration `x` is
 assigned `1` and we append this to `acc` and `acc` is set to `"1"`. The second
 loop iteration assigns `"12"` to `acc` and so on. These are exactly the states
 our **folder** function return in the `List.fold` example.
@@ -271,12 +271,12 @@ for x in 1 .. 10 do
         sumOfEvenNumbers    <- sumOfEvenNumbers + x
 
 amountOfEvenNumbers // 5
-sumOfEvenNumbers    // 30 
+sumOfEvenNumbers    // 30
 
 (** Written as a fold: *)
 
 let folder (amount,sum) x =
-    if   x % 2 = 0 
+    if   x % 2 = 0
     then (amount+1, sum+x)
     else (amount, sum)
 
@@ -342,7 +342,7 @@ map'' times2 [1..5] // [2;4;6;8;10]
 
 If you look at the visualization it also becomes clear why the order of the initial
 value is different. In `List.fold` you start from the left and the initial value
-is also places on the left-side from the list. 
+is also places on the left-side from the list.
 
 In `List.foldBack` we start at the right and we also place the initial value at the
 right-side of the list. The `List.fold` and `List.foldBack` resembles that idea.
@@ -355,6 +355,17 @@ Also the folder function receives the accumulator as the second argument
 argument (left argument).
 
 ## Summary
+
+Other languages use different namens for these operations, but the logic
+stays the same.
+
+|   | List.fold | List.foldBack | List.reduce | Comment |
+|:--------|:----------|:---------------|:------------|:--------|
+| **C# (LINQ)** | Aggregate | N/A | Aggregate | Aggregate accepts 2 or 3 arguments |
+| **JavaScript** | Array.reduce | Array.reduceRight | Array.reduce | Array.reduce accepts 2 or 3 arguments |
+| **Elm** | foldl | foldr | N/A | None |
+| **Haskell** | foldl | foldr | foldl1 | None |
+| **Clojure** | reduce | N/A | reduce | reduce accepts 2 or 3 arguments |
 
 The `List.fold` and `List.foldBack` functions are powerful function, but this
 doesn't mean they are "good". In general you should avoid powerful language
