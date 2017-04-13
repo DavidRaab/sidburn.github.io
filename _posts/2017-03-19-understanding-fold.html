@@ -365,6 +365,41 @@ right-side of the list. The <code>List.fold</code> and <code>List.foldBack</code
 <p>Also the folder function receives the accumulator as the second argument
 (right argument) in <code>List.foldback</code> while <code>List.fold</code> receives it as the first
 argument (left argument).</p>
+<h2>Exercises</h2>
+<p>If you truly want to understand those function you should do some exercises.
+As an exercise you should re-create the following List functions with either
+<code>List.fold</code> or <code>List.foldBack</code>.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left"><p>Function</p></th>
+<th align="left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><p>length xs</p></td>
+<td align="left"><p>Returns the amount of elements in a list</p></td>
+</tr>
+<tr class="even">
+<td align="left"><p>rev xs</p></td>
+<td align="left"><p>Reverses a list</p></td>
+</tr>
+<tr class="odd">
+<td align="left"><p>map f xs</p></td>
+<td align="left"><p>Runs a function on every element of a list</p></td>
+</tr>
+<tr class="even">
+<td align="left"><p>filter predicate xs</p></td>
+<td align="left"><p>Only keep those elements that predicate returns true for</p></td>
+</tr>
+<tr class="odd">
+<td align="left"><p>forAll predicate xs</p></td>
+<td align="left"><p>Returns true if all elements of the list return true for the predicate</p></td>
+</tr>
+</tbody>
+</table>
+
 <h2>Summary</h2>
 <p>Other languages use different namens for these operations, but the logic
 stays the same.</p>

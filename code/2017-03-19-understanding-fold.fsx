@@ -354,6 +354,20 @@ Also the folder function receives the accumulator as the second argument
 (right argument) in `List.foldback` while `List.fold` receives it as the first
 argument (left argument).
 
+## Exercises
+
+If you truly want to understand those function you should do some exercises.
+As an exercise you should re-create the following List functions with either
+`List.fold` or `List.foldBack`.
+
+| Function    | Description |
+|:------------|:-----------|
+| length xs | Returns the amount of elements in a list |
+| rev xs    | Reverses a list |
+| map f xs  | Runs a function on every element of a list |
+| filter predicate xs | Only keep those elements that predicate returns true for |
+| forAll predicate xs | Returns true if all elements of the list return true for the predicate |
+
 ## Summary
 
 Other languages use different namens for these operations, but the logic
