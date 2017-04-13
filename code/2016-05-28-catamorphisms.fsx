@@ -71,13 +71,13 @@ let cons h t = Cons(h,t)
 (**
 <div class="info">
 When you wonder about the name <code>Cons</code> this dates back to Lisp. For example
-in <a href="http://www.racket-lang.org/">Racket</a> (a Lisp dialect) you build a list
-in such way.
+in <a href="http://www.racket-lang.org/">Racket</a> (a Lisp dialect) you can
+build a list in such way.
 
     [lang=racket]
     (define xs (cons 1 (cons 2 (cons 3 empty))))
 
-with the defined helper functions above in F# it sure looks completely different.
+with the helper functions we defined in F# it almost looks the same.
 
     let xs = (cons 1 (cons 2 (cons 3 empty)))
 </div>
@@ -722,29 +722,82 @@ full tree, then you must use `foldBack`. Because of that, `foldBack` is more pow
 <a name="tree-foldback"></a>
 ## FoldBack for Tree
 
-I'm not going into to much detail in how to implement `foldBack` exactly, we once again
-do it with the continuation approach. So we first look at `cata`.
+I will implement `foldBack` with the Continuation approach, but I don't go into
+much detail how the implementation works exactly, you can read more of those
+details here:
+
+* [Continuations and foldBack]({% post_url 2016-04-16-fold-continuations %})
+* [CPS Fold -- fold with early exit]({% post_url 2016-05-07-cps-fold %})
+
+First, we look again at `cata`.
 *)
 
 (*** include:treecata ***)
 
 (**
-We see that we have two recursive calls. So we replace the recursive calls with values.
-As we don't have the values yet, we must wrap it into continuation functions. So the
-end-result looks like this:
+Instead of a recursive `treeCata` we will create an inner `loop` function that
+is used for recursion.
+
+    let treeCata folder tree acc =
+        let rec loop t =
+            match t with
+            | Leaf        -> acc
+            | Node(x,l,r) -> folder x (loop l) (loop r)
+        loop tree
+
+As we now have an inner recursive loop we also need to explicitly
+start the recursion with `loop tree`. In the next step we expand the
+`Node` case and remove the nested `loop` calls and put each on its own line.
+
+    let treeCata folder tree acc =
+        let rec loop t =
+            match t with
+            | Leaf        -> acc
+            | Node(x,l,r) ->
+                let lacc = loop l
+                let racc = loop r
+                folder x lacc racc
+        loop tree
+
+Finally, we add `cont` (the continuation) to the `loop` function and
+rename the function to `treeFoldBack`.
 *)
 
 let treeFoldBack folder tree acc : 'State =
-    let rec loop tree cont =
-        match tree with
+    let rec loop t cont =
+        match t with
         | Leaf        -> cont acc
         | Node(x,l,r) ->
             loop l (fun lacc ->
             loop r (fun racc ->
-                cont (folder x lacc racc)))
+                cont (folder x lacc racc)
+                ))
     loop tree id
-
 (**
+Before, we had code like:
+
+    let lacc = loop l
+
+it was recursive and it meant: Recurse on `loop l`. Somewhere in the future
+(after many more recursive calls) it will return a result that we save in `lacc`.
+
+Then we executed:
+
+    let racc = loop r
+
+It was recursive again and after many more recursive calls we got the result
+and saved it in `racc`. But all of this is not tail-recursive. The new
+`treeFoldBack` function really only has one function call.
+
+    loop l (fun ...)
+
+The idea of continuations is like this: Please execute `loop l callback`. When
+you finished calculating the result, please call the `callback` function
+and pass it the result. *Callback* or *Continuation* really means the same.
+
+But in this case we call `loop` that is in tail position. So we end up with a
+tail-recursive function.
+
 <a name="tree-foldback-examples"></a>
 ## FoldBack examples
 

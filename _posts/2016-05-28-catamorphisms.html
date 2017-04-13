@@ -65,13 +65,13 @@ list type.</p>
 </table>
 <div class="info">
 When you wonder about the name <code>Cons</code> this dates back to Lisp. For example
-in <a href="http://www.racket-lang.org/">Racket</a> (a Lisp dialect) you build a list
-in such way.
+in <a href="http://www.racket-lang.org/">Racket</a> (a Lisp dialect) you can
+build a list in such way.
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
 <td class="snippet"><pre class="fssnip"><code lang="racket">(define xs (cons 1 (cons 2 (cons 3 empty))))
 </code></pre></td></tr></table>
-<p>with the defined helper functions above in F# it sure looks completely different.</p>
+<p>with the helper functions we defined in F# it almost looks the same.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
 <td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs11', 16)" onmouseover="showTip(event, 'fs11', 16)" class="i">xs</span> <span class="o">=</span> (<span class="i">cons</span> <span class="n">1</span> (<span class="i">cons</span> <span class="n">2</span> (<span class="i">cons</span> <span class="n">3</span> <span class="i">empty</span>)))
@@ -838,8 +838,14 @@ full tree, then you must use <code>foldBack</code>. Because of that, <code>foldB
 <code>fold</code> as you always can use <code>foldBack</code> instead of <code>fold</code>. But the reverse is not true.</p>
 <a name="tree-foldback"></a>
 <h2>FoldBack for Tree</h2>
-<p>I'm not going into to much detail in how to implement <code>foldBack</code> exactly, we once again
-do it with the continuation approach. So we first look at <code>cata</code>.</p>
+<p>I will implement <code>foldBack</code> with the Continuation approach, but I don't go into
+much detail how the implementation works exactly, you can read more of those
+details here:</p>
+<ul>
+<li><a href="{% post_url 2016-04-16-fold-continuations %}">Continuations and foldBack</a></li>
+<li><a href="{% post_url 2016-05-07-cps-fold %}">CPS Fold -- fold with early exit</a></li>
+</ul>
+<p>First, we look again at <code>cata</code>.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -854,9 +860,27 @@ do it with the continuation approach. So we first look at <code>cata</code>.</p>
 </code></pre></td>
 </tr>
 </table>
-<p>We see that we have two recursive calls. So we replace the recursive calls with values.
-As we don't have the values yet, we must wrap it into continuation functions. So the
-end-result looks like this:</p>
+<p>Instead of a recursive <code>treeCata</code> we will create an inner <code>loop</code> function that
+is used for recursion.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">treeCata</span> <span class="i">folder</span> <span class="i">tree</span> <span class="i">acc</span> <span class="o">=</span>
+    <span class="k">let</span> <span class="k">rec</span> <span class="i">loop</span> <span class="i">t</span> <span class="o">=</span>
+        <span class="k">match</span> <span class="i">t</span> <span class="k">with</span>
+        | <span class="i">Leaf</span>        <span class="k">-&gt;</span> <span class="i">acc</span>
+        | <span class="i">Node</span>(<span class="i">x</span>,<span class="i">l</span>,<span class="i">r</span>) <span class="k">-&gt;</span> <span class="i">folder</span> <span class="i">x</span> (<span class="i">loop</span> <span class="i">l</span>) (<span class="i">loop</span> <span class="i">r</span>)
+    <span class="i">loop</span> <span class="i">tree</span>
+</code></pre></td>
+</tr>
+</table>
+<p>As we now have an inner recursive loop we also need to explicitly
+start the recursion with <code>loop tree</code>. In the next step we expand the
+<code>Node</code> case and remove the nested <code>loop</code> calls and put each on its own line.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -867,18 +891,74 @@ end-result looks like this:</p>
 <span class="l">8: </span>
 <span class="l">9: </span>
 </pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">treeCata</span> <span class="i">folder</span> <span class="i">tree</span> <span class="i">acc</span> <span class="o">=</span>
+    <span class="k">let</span> <span class="k">rec</span> <span class="i">loop</span> <span class="i">t</span> <span class="o">=</span>
+        <span class="k">match</span> <span class="i">t</span> <span class="k">with</span>
+        | <span class="i">Leaf</span>        <span class="k">-&gt;</span> <span class="i">acc</span>
+        | <span class="i">Node</span>(<span class="i">x</span>,<span class="i">l</span>,<span class="i">r</span>) <span class="k">-&gt;</span>
+            <span class="k">let</span> <span class="i">lacc</span> <span class="o">=</span> <span class="i">loop</span> <span class="i">l</span>
+            <span class="k">let</span> <span class="i">racc</span> <span class="o">=</span> <span class="i">loop</span> <span class="i">r</span>
+            <span class="i">folder</span> <span class="i">x</span> <span class="i">lacc</span> <span class="i">racc</span>
+    <span class="i">loop</span> <span class="i">tree</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Finally, we add <code>cont</code> (the continuation) to the <code>loop</code> function and
+rename the function to <code>treeFoldBack</code>.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+</pre></td>
 <td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs92', 457)" onmouseover="showTip(event, 'fs92', 457)" class="f">treeFoldBack</span> <span onmouseout="hideTip(event, 'fs78', 458)" onmouseover="showTip(event, 'fs78', 458)" class="f">folder</span> <span onmouseout="hideTip(event, 'fs79', 459)" onmouseover="showTip(event, 'fs79', 459)" class="i">tree</span> <span onmouseout="hideTip(event, 'fs80', 460)" onmouseover="showTip(event, 'fs80', 460)" class="i">acc</span> <span class="o">:</span> <span class="o">&#39;</span><span class="i">State</span> <span class="o">=</span>
-    <span class="k">let</span> <span class="k">rec</span> <span onmouseout="hideTip(event, 'fs93', 461)" onmouseover="showTip(event, 'fs93', 461)" class="f">loop</span> <span onmouseout="hideTip(event, 'fs79', 462)" onmouseover="showTip(event, 'fs79', 462)" class="i">tree</span> <span onmouseout="hideTip(event, 'fs55', 463)" onmouseover="showTip(event, 'fs55', 463)" class="f">cont</span> <span class="o">=</span>
-        <span class="k">match</span> <span onmouseout="hideTip(event, 'fs79', 464)" onmouseover="showTip(event, 'fs79', 464)" class="i">tree</span> <span class="k">with</span>
+    <span class="k">let</span> <span class="k">rec</span> <span onmouseout="hideTip(event, 'fs93', 461)" onmouseover="showTip(event, 'fs93', 461)" class="f">loop</span> <span onmouseout="hideTip(event, 'fs82', 462)" onmouseover="showTip(event, 'fs82', 462)" class="i">t</span> <span onmouseout="hideTip(event, 'fs55', 463)" onmouseover="showTip(event, 'fs55', 463)" class="f">cont</span> <span class="o">=</span>
+        <span class="k">match</span> <span onmouseout="hideTip(event, 'fs82', 464)" onmouseover="showTip(event, 'fs82', 464)" class="i">t</span> <span class="k">with</span>
         | <span onmouseout="hideTip(event, 'fs59', 465)" onmouseover="showTip(event, 'fs59', 465)" class="p">Leaf</span>        <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs55', 466)" onmouseover="showTip(event, 'fs55', 466)" class="f">cont</span> <span onmouseout="hideTip(event, 'fs80', 467)" onmouseover="showTip(event, 'fs80', 467)" class="i">acc</span>
         | <span onmouseout="hideTip(event, 'fs60', 468)" onmouseover="showTip(event, 'fs60', 468)" class="p">Node</span>(<span onmouseout="hideTip(event, 'fs26', 469)" onmouseover="showTip(event, 'fs26', 469)" class="i">x</span>,<span onmouseout="hideTip(event, 'fs62', 470)" onmouseover="showTip(event, 'fs62', 470)" class="i">l</span>,<span onmouseout="hideTip(event, 'fs63', 471)" onmouseover="showTip(event, 'fs63', 471)" class="i">r</span>) <span class="k">-&gt;</span>
             <span onmouseout="hideTip(event, 'fs93', 472)" onmouseover="showTip(event, 'fs93', 472)" class="f">loop</span> <span onmouseout="hideTip(event, 'fs62', 473)" onmouseover="showTip(event, 'fs62', 473)" class="i">l</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs94', 474)" onmouseover="showTip(event, 'fs94', 474)" class="i">lacc</span> <span class="k">-&gt;</span>
             <span onmouseout="hideTip(event, 'fs93', 475)" onmouseover="showTip(event, 'fs93', 475)" class="f">loop</span> <span onmouseout="hideTip(event, 'fs63', 476)" onmouseover="showTip(event, 'fs63', 476)" class="i">r</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs56', 477)" onmouseover="showTip(event, 'fs56', 477)" class="i">racc</span> <span class="k">-&gt;</span>
-                <span onmouseout="hideTip(event, 'fs55', 478)" onmouseover="showTip(event, 'fs55', 478)" class="f">cont</span> (<span onmouseout="hideTip(event, 'fs78', 479)" onmouseover="showTip(event, 'fs78', 479)" class="f">folder</span> <span onmouseout="hideTip(event, 'fs26', 480)" onmouseover="showTip(event, 'fs26', 480)" class="i">x</span> <span onmouseout="hideTip(event, 'fs94', 481)" onmouseover="showTip(event, 'fs94', 481)" class="i">lacc</span> <span onmouseout="hideTip(event, 'fs56', 482)" onmouseover="showTip(event, 'fs56', 482)" class="i">racc</span>)))
+                <span onmouseout="hideTip(event, 'fs55', 478)" onmouseover="showTip(event, 'fs55', 478)" class="f">cont</span> (<span onmouseout="hideTip(event, 'fs78', 479)" onmouseover="showTip(event, 'fs78', 479)" class="f">folder</span> <span onmouseout="hideTip(event, 'fs26', 480)" onmouseover="showTip(event, 'fs26', 480)" class="i">x</span> <span onmouseout="hideTip(event, 'fs94', 481)" onmouseover="showTip(event, 'fs94', 481)" class="i">lacc</span> <span onmouseout="hideTip(event, 'fs56', 482)" onmouseover="showTip(event, 'fs56', 482)" class="i">racc</span>)
+                ))
     <span onmouseout="hideTip(event, 'fs93', 483)" onmouseover="showTip(event, 'fs93', 483)" class="f">loop</span> <span onmouseout="hideTip(event, 'fs79', 484)" onmouseover="showTip(event, 'fs79', 484)" class="i">tree</span> <span onmouseout="hideTip(event, 'fs57', 485)" onmouseover="showTip(event, 'fs57', 485)" class="f">id</span>
 </code></pre></td>
 </tr>
 </table>
+<p>Before, we had code like:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">lacc</span> <span class="o">=</span> <span class="i">loop</span> <span class="i">l</span>
+</code></pre></td>
+</tr>
+</table>
+<p>it was recursive and it meant: Recurse on <code>loop l</code>. Somewhere in the future
+(after many more recursive calls) it will return a result that we save in <code>lacc</code>.</p>
+<p>Then we executed:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">racc</span> <span class="o">=</span> <span class="i">loop</span> <span class="i">r</span>
+</code></pre></td>
+</tr>
+</table>
+<p>It was recursive again and after many more recursive calls we got the result
+and saved it in <code>racc</code>. But all of this is not tail-recursive. The new
+<code>treeFoldBack</code> function really only has one function call.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="i">loop</span> <span class="i">l</span> (<span class="k">fun</span> <span class="o">..</span><span class="o">.</span>)
+</code></pre></td>
+</tr>
+</table>
+<p>The idea of continuations is like this: Please execute <code>loop l callback</code>. When
+you finished calculating the result, please call the <code>callback</code> function
+and pass it the result. <em>Callback</em> or <em>Continuation</em> really means the same.</p>
+<p>But in this case we call <code>loop</code> that is in tail position. So we end up with a
+tail-recursive function.</p>
 <a name="tree-foldback-examples"></a>
 <h2>FoldBack examples</h2>
 <p>Instead let's focus on things we can do with <code>foldBack</code> but not with <code>fold</code>. As <code>foldBack</code>
