@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+  ﻿<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  
+  <meta name="description" content="This article explains how you can create functions with variable arguments, and why you should avoid them." />
+  
+
+  
+  <meta name="keywords" content="f#, fsharp, functions, variable arguments, paramarray" />
+  
+
+  <title>
+    
+      Variable Arguments in F# &middot; David Raab
+    
+  </title>
+
+  <!-- Twitter Card -->
+  
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:site" content="@David_Raab" />
+  <meta name="twitter:title" content="Variable Arguments in F#" />
+  <meta name="twitter:description" content="This article explains how you can create functions with variable arguments, and why you should avoid them." />
+  
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/public/css/styles.css">
+  <link rel="stylesheet" href="/public/css/poole.css">
+  <link rel="stylesheet" href="/public/css/syntax.css">
+  <link rel="stylesheet" href="/public/css/hyde.css">
+  <link rel="stylesheet" href="/public/css/tips.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  <!-- Favicons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/public/favicon/apple-touch-icon.png?v=XBr3BkNgXe">
+  <link rel="icon" type="image/png" href="/public/favicon/favicon-32x32.png?v=XBr3BkNgXe" sizes="32x32">
+  <link rel="icon" type="image/png" href="/public/favicon/favicon-16x16.png?v=XBr3BkNgXe" sizes="16x16">
+  <link rel="manifest" href="/public/favicon/manifest.json?v=XBr3BkNgXe">
+  <link rel="mask-icon" href="/public/favicon/safari-pinned-tab.svg?v=XBr3BkNgXe" color="#6699ff">
+  <link rel="shortcut icon" href="/public/favicon/favicon.ico?v=XBr3BkNgXe">
+  <meta name="apple-mobile-web-app-title" content="David Raab">
+  <meta name="application-name" content="David Raab">
+  <meta name="msapplication-config" content="/public/favicon/browserconfig.xml?v=XBr3BkNgXe">
+  <meta name="theme-color" content="#ff0000">
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
+
+  <!-- JS -->
+  <script type="text/javascript" src="/public/js/tips.js"></script>
+</head>
+
+  <body>
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h2>
+        <a href="/">
+          David Raab
+        </a>
+      </h2>
+      <p class="lead"></p>
+    </div>
+
+      <nav class="sidebar-nav">
+          <a class="sidebar-nav-item" href="/">Home</a>
+          <a class="sidebar-nav-item" href="/Series">Series</a>
+          <a class="sidebar-nav-item" href="/Links">External Links</a>
+          <a class="sidebar-nav-item" href="/tags">Tags</a>
+          <a class="sidebar-nav-item" href="/archive">Archive</a>
+          <a class="sidebar-nav-item" href="/atom.xml">RSS</a>
+      </nav>
+      <div>
+          <a href="https://github.com/sidburn/sidburn.github.io">
+              <img src="/public/GitHub-Mark-Light-32px.png" style="display: inline" />
+          </a>
+          <a href="https://twitter.com/David_Raab">
+              <img src="/public/Twitter_logo_white_32.png" style="display: inline" />
+          </a>
+          <a href="http://stackoverflow.com/users/338059/sid-burn">
+              <img src="/public/so-icon.png" style="display: inline" />
+          </a>
+      </div>
+  </div>
+</div>
+
+
+    <div class="content container">
+      <div class="post">
+  <h1 class="post-title">Variable Arguments in F#</h1>
+  <div class="post-header">
+    <span class="post-date">13 March 2017</span>
+    <span class="post-tags">
+  
+  
+  <a class="tag" href="/tags/#F#">F#</a>
+  
+</span>
+
+  </div>
+
+  <p>One question that appears in F# from time to time is: How do you create a
+function that expects a variable amount of arguments?</p>
+<p><strong>A short answer is:</strong> You can't do that.</p>
+<p><strong>A longer and correct answer:</strong> You can do it with (static) methods.
+But you probably don't want to use this and look for an alternative.</p>
+<p>First we should look at the difference between an F# function and a (static)
+method.</p>
+<h2>F# Functions vs. (static) methods</h2>
+<p>Usually I don't distinguish between those two as both just execute
+some code and return some value. But in this case we must differentiate
+them. An F# function is any function defined with the <code>let</code> keyword.
+F# functions are usually defined inside of modules or inside of other
+functions.</p>
+<p>A (static) method on the other hand is part of a class definition. The
+definition is different, but using (static) methods or functions can look
+the same. The biggest difference is that (static) methods often use
+tupled-syntax while F# functions use currying. But you are not restricted
+to the one or other.</p>
+<p>You can use currying and a tupled syntax in F# functions.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">module</span> <span class="t">SomeModule</span> <span class="o">=</span>
+    <span class="c">// Currying</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs2', 2)" onmouseover="showTip(event, 'fs2', 2)" class="f">funcC</span> <span onmouseout="hideTip(event, 'fs3', 3)" onmouseover="showTip(event, 'fs3', 3)" class="i">a</span> <span onmouseout="hideTip(event, 'fs4', 4)" onmouseover="showTip(event, 'fs4', 4)" class="i">b</span> <span class="o">=</span> <span class="o">..</span><span class="o">.</span>
+
+    <span class="c">// Tuple</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs5', 5)" onmouseover="showTip(event, 'fs5', 5)" class="f">funcT</span> (<span onmouseout="hideTip(event, 'fs3', 6)" onmouseover="showTip(event, 'fs3', 6)" class="i">a</span>,<span onmouseout="hideTip(event, 'fs4', 7)" onmouseover="showTip(event, 'fs4', 7)" class="i">b</span>) <span class="o">=</span> <span class="o">..</span><span class="o">.</span>
+</code></pre></td>
+</tr>
+</table>
+<p>You could call both functions like this:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs6', 8)" onmouseover="showTip(event, 'fs6', 8)" class="t">SomeModule</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs2', 9)" onmouseover="showTip(event, 'fs2', 9)" class="f">funcC</span> <span class="i">x</span> <span class="i">y</span>
+<span onmouseout="hideTip(event, 'fs6', 10)" onmouseover="showTip(event, 'fs6', 10)" class="t">SomeModule</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 11)" onmouseover="showTip(event, 'fs5', 11)" class="f">funcT</span> (<span class="i">x</span>,<span class="i">y</span>)
+</code></pre></td>
+</tr>
+</table>
+<p>The second version looks a lot like calling a function in other languages
+from C, C#, Java and so on and this is not an accident. But F# is
+really consistent in its syntax. Whenever you see parenthesis
+and values separated with commas then you really just define a tuple.
+Because of this you also could write:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs7', 12)" onmouseover="showTip(event, 'fs7', 12)" class="i">args</span> <span class="o">=</span> (<span class="i">x</span>,<span class="i">y</span>)
+<span onmouseout="hideTip(event, 'fs6', 13)" onmouseover="showTip(event, 'fs6', 13)" class="t">SomeModule</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 14)" onmouseover="showTip(event, 'fs5', 14)" class="f">funcT</span> <span onmouseout="hideTip(event, 'fs7', 15)" onmouseover="showTip(event, 'fs7', 15)" class="i">args</span>
+</code></pre></td>
+</tr>
+</table>
+<p>This is something you cannot do in C, C#, Java and so on. Calling a function
+looks the same but the meaning is different. All of this is also possible
+with (static) methods.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">type</span> <span onmouseout="hideTip(event, 'fs8', 16)" onmouseover="showTip(event, 'fs8', 16)" class="t">SomeClass</span>() <span class="o">=</span>
+    <span class="k">static</span> <span class="k">member</span> <span class="i">funcC</span> <span class="i">a</span> <span class="i">b</span> <span class="o">=</span> <span class="o">..</span><span class="o">.</span>
+    <span class="k">static</span> <span class="k">member</span> <span class="i">funcT</span> (<span class="i">a</span>,<span class="i">b</span>) <span class="o">=</span> <span class="o">..</span><span class="o">.</span>
+</code></pre></td>
+</tr>
+</table>
+<p>you can call it in the same way</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs8', 17)" onmouseover="showTip(event, 'fs8', 17)" class="i">SomeClass</span><span class="o">.</span><span class="i">funcC</span> <span class="i">x</span> <span class="i">y</span>
+<span onmouseout="hideTip(event, 'fs8', 18)" onmouseover="showTip(event, 'fs8', 18)" class="i">SomeClass</span><span class="o">.</span><span class="i">funcT</span> (<span class="i">x</span>,<span class="i">y</span>)
+</code></pre></td>
+</tr>
+</table>
+<p>So, why is any of this important?</p>
+<ol>
+<li>In F# you usually want to work with curried functions.</li>
+<li>Variable Arguments are only supported with tupled (static) methods.</li>
+</ol>
+<h2>Variable Arguments</h2>
+<p>First lets focus on the second point. So we only can use variable
+arguments if we create a class, and use tupled syntax. As a light
+example let's build a <code>max</code> function that returns the biggest
+element from all arguments we pass to it.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">type</span> <span class="i">Util</span>() <span class="o">=</span>
+    <span class="k">static</span> <span class="k">member</span> <span onmouseout="hideTip(event, 'fs27', 51)" onmouseover="showTip(event, 'fs27', 51)" class="f">max</span>([&lt;<span onmouseout="hideTip(event, 'fs11', 52)" onmouseover="showTip(event, 'fs11', 52)" class="i">System</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs12', 53)" onmouseover="showTip(event, 'fs12', 53)" class="t">ParamArray</span>&gt;] <span onmouseout="hideTip(event, 'fs28', 54)" onmouseover="showTip(event, 'fs28', 54)" class="i">xs</span>) <span class="o">=</span> <span onmouseout="hideTip(event, 'fs14', 55)" onmouseover="showTip(event, 'fs14', 55)" class="t">Array</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs15', 56)" onmouseover="showTip(event, 'fs15', 56)" class="f">reduce</span> <span onmouseout="hideTip(event, 'fs16', 57)" onmouseover="showTip(event, 'fs16', 57)" class="f">max</span> <span onmouseout="hideTip(event, 'fs28', 58)" onmouseover="showTip(event, 'fs28', 58)" class="i">xs</span>
+</code></pre></td>
+</tr>
+</table>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs9', 59)" onmouseover="showTip(event, 'fs9', 59)" class="t">Util</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs29', 60)" onmouseover="showTip(event, 'fs29', 60)" class="f">max</span>(<span class="n">1</span>,<span class="n">2</span>,<span class="n">3</span>)         <span class="c">// 3</span>
+<span onmouseout="hideTip(event, 'fs9', 61)" onmouseover="showTip(event, 'fs9', 61)" class="t">Util</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs29', 62)" onmouseover="showTip(event, 'fs29', 62)" class="f">max</span>(<span class="n">1</span>,<span class="n">10</span>,<span class="n">3</span>,<span class="n">20</span>,<span class="n">4</span>,<span class="n">6</span>) <span class="c">// 20</span>
+<span onmouseout="hideTip(event, 'fs9', 63)" onmouseover="showTip(event, 'fs9', 63)" class="t">Util</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs29', 64)" onmouseover="showTip(event, 'fs29', 64)" class="f">max</span>(<span class="n">3</span>,<span class="n">2</span>,<span class="n">1</span>)         <span class="c">// 3</span>
+</code></pre></td>
+</tr>
+</table>
+<p>The concept of a variable argument function is easy. You just use a normal
+argument and add the attribute <code>[&lt;System.ParamArray&gt;]</code> to it. Only the
+last argument can be flagged with the attribute. And finally, you receive all
+arguments as an array.</p>
+<h2>Why you should avoid variable arguments</h2>
+<p>Previously I said that when you use parenthesis and separate values with
+comma it is a tuple. In fact this kind of consistency is broken with <code>ParamArray</code>.
+You can see the difference in this extended example:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">type</span> <span onmouseout="hideTip(event, 'fs30', 65)" onmouseover="showTip(event, 'fs30', 65)" class="t">Util</span>() <span class="o">=</span>
+    <span class="k">static</span> <span class="k">member</span> <span onmouseout="hideTip(event, 'fs31', 66)" onmouseover="showTip(event, 'fs31', 66)" class="f">max</span>([&lt;<span onmouseout="hideTip(event, 'fs11', 67)" onmouseover="showTip(event, 'fs11', 67)" class="i">System</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs12', 68)" onmouseover="showTip(event, 'fs12', 68)" class="t">ParamArray</span>&gt;] <span onmouseout="hideTip(event, 'fs32', 69)" onmouseover="showTip(event, 'fs32', 69)" class="i">xs</span>) <span class="o">=</span> <span onmouseout="hideTip(event, 'fs14', 70)" onmouseover="showTip(event, 'fs14', 70)" class="t">Array</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs15', 71)" onmouseover="showTip(event, 'fs15', 71)" class="f">reduce</span> <span onmouseout="hideTip(event, 'fs16', 72)" onmouseover="showTip(event, 'fs16', 72)" class="f">max</span> <span onmouseout="hideTip(event, 'fs32', 73)" onmouseover="showTip(event, 'fs32', 73)" class="i">xs</span>
+    <span class="k">static</span> <span class="k">member</span> <span onmouseout="hideTip(event, 'fs33', 74)" onmouseover="showTip(event, 'fs33', 74)" class="f">max4</span>(<span onmouseout="hideTip(event, 'fs34', 75)" onmouseover="showTip(event, 'fs34', 75)" class="i">a</span>,<span onmouseout="hideTip(event, 'fs35', 76)" onmouseover="showTip(event, 'fs35', 76)" class="i">b</span>,<span onmouseout="hideTip(event, 'fs36', 77)" onmouseover="showTip(event, 'fs36', 77)" class="i">c</span>,<span onmouseout="hideTip(event, 'fs37', 78)" onmouseover="showTip(event, 'fs37', 78)" class="i">d</span>)                 <span class="o">=</span> <span onmouseout="hideTip(event, 'fs14', 79)" onmouseover="showTip(event, 'fs14', 79)" class="t">Array</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs15', 80)" onmouseover="showTip(event, 'fs15', 80)" class="f">reduce</span> <span onmouseout="hideTip(event, 'fs16', 81)" onmouseover="showTip(event, 'fs16', 81)" class="f">max</span> [|<span onmouseout="hideTip(event, 'fs34', 82)" onmouseover="showTip(event, 'fs34', 82)" class="i">a</span>;<span onmouseout="hideTip(event, 'fs35', 83)" onmouseover="showTip(event, 'fs35', 83)" class="i">b</span>;<span onmouseout="hideTip(event, 'fs36', 84)" onmouseover="showTip(event, 'fs36', 84)" class="i">c</span>;<span onmouseout="hideTip(event, 'fs37', 85)" onmouseover="showTip(event, 'fs37', 85)" class="i">d</span>|]
+</code></pre></td>
+</tr>
+</table>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs38', 86)" onmouseover="showTip(event, 'fs38', 86)" class="i">nums</span> <span class="o">=</span> (<span class="n">1</span>,<span class="n">10</span>,<span class="n">30</span>,<span class="n">15</span>)
+
+<span onmouseout="hideTip(event, 'fs9', 87)" onmouseover="showTip(event, 'fs9', 87)" class="t">Util</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs39', 88)" onmouseover="showTip(event, 'fs39', 88)" class="f">max4</span> (<span class="n">1</span>,<span class="n">10</span>,<span class="n">30</span>,<span class="n">15</span>) <span class="c">// 30</span>
+<span onmouseout="hideTip(event, 'fs9', 89)" onmouseover="showTip(event, 'fs9', 89)" class="t">Util</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs39', 90)" onmouseover="showTip(event, 'fs39', 90)" class="f">max4</span> <span onmouseout="hideTip(event, 'fs38', 91)" onmouseover="showTip(event, 'fs38', 91)" class="i">nums</span>         <span class="c">// 30</span>
+<span onmouseout="hideTip(event, 'fs9', 92)" onmouseover="showTip(event, 'fs9', 92)" class="t">Util</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs29', 93)" onmouseover="showTip(event, 'fs29', 93)" class="f">max</span>  (<span class="n">1</span>,<span class="n">10</span>,<span class="n">30</span>,<span class="n">15</span>) <span class="c">// 30</span>
+<span onmouseout="hideTip(event, 'fs9', 94)" onmouseover="showTip(event, 'fs9', 94)" class="t">Util</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs29', 95)" onmouseover="showTip(event, 'fs29', 95)" class="f">max</span>  <span onmouseout="hideTip(event, 'fs38', 96)" onmouseover="showTip(event, 'fs38', 96)" class="i">nums</span>         <span class="c">// (1,10,30,15)</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Both <code>Util.max4</code> calls return <code>30</code> because this function expects a tuple with
+four arguments and we pass this to <code>Util.max4</code> in both cases.</p>
+<p>But the <code>Util.max</code> calls completely differ. In the first example we really pass
+four arguments, but in the second <code>Util.max</code> example we really pass a single
+value, a tuple containing four elements.</p>
+<p><code>ParamArray</code> really is an inconsistency in the language. I wouldn't even say this
+was a bad decision. If you use a variable arguments function defined in C# from F#
+it absolutely makes sense to break this consistency. In fact this inconsistency can
+even feel more consistent. A C# static method that you call from F# with four
+arguments looks like:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs40', 102)" onmouseover="showTip(event, 'fs40', 102)" class="i">Class</span><span class="o">.</span><span class="i">Func</span>(<span onmouseout="hideTip(event, 'fs34', 103)" onmouseover="showTip(event, 'fs34', 103)" class="i">a</span>,<span onmouseout="hideTip(event, 'fs35', 104)" onmouseover="showTip(event, 'fs35', 104)" class="i">b</span>,<span onmouseout="hideTip(event, 'fs36', 105)" onmouseover="showTip(event, 'fs36', 105)" class="i">c</span>,<span onmouseout="hideTip(event, 'fs37', 106)" onmouseover="showTip(event, 'fs37', 106)" class="i">d</span>)
+</code></pre></td>
+</tr>
+</table>
+<p>a static method with variable arguments that you also pass four arguments also looks like:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs40', 102)" onmouseover="showTip(event, 'fs40', 102)" class="i">Class</span><span class="o">.</span><span class="i">Func</span>(<span onmouseout="hideTip(event, 'fs34', 103)" onmouseover="showTip(event, 'fs34', 103)" class="i">a</span>,<span onmouseout="hideTip(event, 'fs35', 104)" onmouseover="showTip(event, 'fs35', 104)" class="i">b</span>,<span onmouseout="hideTip(event, 'fs36', 105)" onmouseover="showTip(event, 'fs36', 105)" class="i">c</span>,<span onmouseout="hideTip(event, 'fs37', 106)" onmouseover="showTip(event, 'fs37', 106)" class="i">d</span>)
+</code></pre></td>
+</tr>
+</table>
+<p>So it is consistent or inconsistent depending from which way you look at it.</p>
+<p>But rather arguing with consistency the important part I consider is that it
+behaves differently and you cannot see that from the code. When I look at
+code like <code>Class.func(a,b,c,d)</code> I could assume that it is a function that
+expects four arguments. It isn't obvious that I can add a fifth argument
+or probably use less arguments.</p>
+<p>The biggest problem in my opinion is that most of the time you already have
+a collection like a list and you just want to pass that list to a function.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs41', 107)" onmouseover="showTip(event, 'fs41', 107)" class="i">list</span> <span class="o">=</span> [<span class="n">20</span>;<span class="n">14</span>;<span class="n">37</span>;<span class="n">16</span>]
+
+<span onmouseout="hideTip(event, 'fs9', 108)" onmouseover="showTip(event, 'fs9', 108)" class="t">Util</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs29', 109)" onmouseover="showTip(event, 'fs29', 109)" class="f">max</span> [<span class="n">20</span>;<span class="n">14</span>;<span class="n">37</span>;<span class="n">16</span>] <span class="c">// [20;14;37;16]</span>
+<span onmouseout="hideTip(event, 'fs9', 110)" onmouseover="showTip(event, 'fs9', 110)" class="t">Util</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs29', 111)" onmouseover="showTip(event, 'fs29', 111)" class="f">max</span> <span onmouseout="hideTip(event, 'fs41', 112)" onmouseover="showTip(event, 'fs41', 112)" class="i">list</span>          <span class="c">// [20;14;37;16]</span>
+</code></pre></td>
+</tr>
+</table>
+<p>If you already have a list, then variable arguments doesn't help you at all.
+In fact you must write other code like:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs42', 113)" onmouseover="showTip(event, 'fs42', 113)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs43', 114)" onmouseover="showTip(event, 'fs43', 114)" class="f">reduce</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs44', 115)" onmouseover="showTip(event, 'fs44', 115)" class="i">acc</span> <span onmouseout="hideTip(event, 'fs45', 116)" onmouseover="showTip(event, 'fs45', 116)" class="i">x</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs9', 117)" onmouseover="showTip(event, 'fs9', 117)" class="t">Util</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs29', 118)" onmouseover="showTip(event, 'fs29', 118)" class="f">max</span>(<span onmouseout="hideTip(event, 'fs44', 119)" onmouseover="showTip(event, 'fs44', 119)" class="i">acc</span>,<span onmouseout="hideTip(event, 'fs45', 120)" onmouseover="showTip(event, 'fs45', 120)" class="i">x</span>)) <span onmouseout="hideTip(event, 'fs41', 121)" onmouseover="showTip(event, 'fs41', 121)" class="i">list</span> <span class="c">// 37</span>
+</code></pre></td>
+</tr>
+</table>
+<p>This is pretty much exactly how <code>Util.max()</code> itself is implemented! On top
+it's a bit longer, because you cannot just write
+<code>List.reduce Util.max numbers</code>. <code>List.reduce</code> expect a curried two argument
+function, not a tupled two argument function!</p>
+<p>The funny thing is: It works differently with an Array. Actually you can write
+stuff like this:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs46', 122)" onmouseover="showTip(event, 'fs46', 122)" class="i">array</span> <span class="o">=</span> [|<span class="n">20</span>;<span class="n">14</span>;<span class="n">37</span>;<span class="n">16</span>|]
+
+<span onmouseout="hideTip(event, 'fs9', 123)" onmouseover="showTip(event, 'fs9', 123)" class="t">Util</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs29', 124)" onmouseover="showTip(event, 'fs29', 124)" class="f">max</span> <span onmouseout="hideTip(event, 'fs46', 125)" onmouseover="showTip(event, 'fs46', 125)" class="i">array</span>               <span class="c">// 37</span>
+<span onmouseout="hideTip(event, 'fs9', 126)" onmouseover="showTip(event, 'fs9', 126)" class="t">Util</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs29', 127)" onmouseover="showTip(event, 'fs29', 127)" class="f">max</span> [|<span class="n">20</span>;<span class="n">14</span>;<span class="n">37</span>;<span class="n">16</span>|]     <span class="c">// 37</span>
+<span onmouseout="hideTip(event, 'fs9', 128)" onmouseover="showTip(event, 'fs9', 128)" class="t">Util</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs29', 129)" onmouseover="showTip(event, 'fs29', 129)" class="f">max</span> (<span onmouseout="hideTip(event, 'fs14', 130)" onmouseover="showTip(event, 'fs14', 130)" class="t">Array</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs47', 131)" onmouseover="showTip(event, 'fs47', 131)" class="f">ofList</span> <span onmouseout="hideTip(event, 'fs41', 132)" onmouseover="showTip(event, 'fs41', 132)" class="i">list</span>) <span class="c">// 37</span>
+</code></pre></td>
+</tr>
+</table>
+<p>So you can pass arrays, and arrays are not considered as passing one argument.
+This also works with functions with fixed arguments.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">type</span> <span onmouseout="hideTip(event, 'fs30', 133)" onmouseover="showTip(event, 'fs30', 133)" class="i">Util</span>() <span class="o">=</span>
+    <span class="k">static</span> <span class="k">member</span> <span class="i">replicate</span>(<span class="i">amount</span>, [&lt;<span onmouseout="hideTip(event, 'fs11', 134)" onmouseover="showTip(event, 'fs11', 134)" class="i">System</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs12', 135)" onmouseover="showTip(event, 'fs12', 135)" class="i">ParamArray</span>&gt;] <span class="i">xs</span>) <span class="o">=</span> <span onmouseout="hideTip(event, 'fs14', 136)" onmouseover="showTip(event, 'fs14', 136)" class="i">Array</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs25', 137)" onmouseover="showTip(event, 'fs25', 137)" class="i">collect</span> (<span onmouseout="hideTip(event, 'fs14', 138)" onmouseover="showTip(event, 'fs14', 138)" class="i">Array</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs26', 139)" onmouseover="showTip(event, 'fs26', 139)" class="i">replicate</span> <span class="i">amount</span>) <span class="i">xs</span>
+</code></pre></td>
+</tr>
+</table>
+<p>The idea is that you can pass a variable amount of elements, and the first argument
+describes how often every element gets repeated.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs9', 140)" onmouseover="showTip(event, 'fs9', 140)" class="t">Util</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs48', 141)" onmouseover="showTip(event, 'fs48', 141)" class="f">replicate</span>(<span class="n">3</span>,<span class="n">1</span>,<span class="n">2</span>,<span class="n">3</span>)      <span class="c">// [|1; 1; 1; 2; 2; 2; 3; 3; 3|]</span>
+<span onmouseout="hideTip(event, 'fs9', 142)" onmouseover="showTip(event, 'fs9', 142)" class="t">Util</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs48', 143)" onmouseover="showTip(event, 'fs48', 143)" class="f">replicate</span>(<span class="n">3</span>, [|<span class="n">1</span>;<span class="n">2</span>;<span class="n">3</span>|]) <span class="c">// [|1; 1; 1; 2; 2; 2; 3; 3; 3|]</span>
+<span onmouseout="hideTip(event, 'fs9', 144)" onmouseover="showTip(event, 'fs9', 144)" class="t">Util</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs48', 145)" onmouseover="showTip(event, 'fs48', 145)" class="f">replicate</span>(<span class="n">3</span>, [<span class="n">1</span>;<span class="n">2</span>;<span class="n">3</span>])   <span class="c">// [|[1; 2; 3]; [1; 2; 3]; [1; 2; 3]|]</span>
+</code></pre></td>
+</tr>
+</table>
+<p>So the first and second function calls are the same, but the third one is different.
+It works with arrays but not with lists. By the way here we see how <code>ParamArray</code>
+could be implemented in F# from the beginning and still maintain consistency by
+always expecting an <code>Array</code> and disallowing the first notation.</p>
+<p>The Last reason why it might be a bad idea is because in F# everything is really
+build around the concepts of currying. A tupled syntax like in <code>Util.replicate</code>
+means we always must pass all arguments. We cannot just partial apply
+only the first argument and write:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs30', 146)" onmouseover="showTip(event, 'fs30', 146)" class="i">Util</span><span class="o">.</span><span class="i">replicate</span>(<span class="n">3</span>)
+</code></pre></td>
+</tr>
+</table>
+<p>The reason why we want to write this is to allow a more sequence based approach.
+As an example. We would want to write it like this:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="c">// This doesn&#39;t work</span>
+[|<span class="n">1</span>;<span class="n">2</span>;<span class="n">3</span>|]
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs30', 147)" onmouseover="showTip(event, 'fs30', 147)" class="i">Util</span><span class="o">.</span><span class="i">replicate</span> <span class="n">3</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Okay, in this small example you gain not much from this kind of piping-style.
+But you usually want functions that work well with piping. It's important to notice
+that piping doesn't work because we have the <code>|&gt;</code> operator. Piping really works
+because we have curried function that we can call without passing all arguments!</p>
+<p>Currying is the reason we can choose to write <code>func a b</code> or <code>b |&gt; func a</code>.
+With tupled-syntax we really lose this advantage, and we also must write
+more parenthesis and commas.</p>
+<h2>The Alternative</h2>
+<p>So, instead of variable arguments, what should we do instead? We should just
+expect a collection as an argument! If you expect <code>Seq</code> then a user also can
+pass an <code>Array</code> or <code>List</code> as an argument.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs49', 148)" onmouseover="showTip(event, 'fs49', 148)" class="f">max</span> <span onmouseout="hideTip(event, 'fs50', 149)" onmouseover="showTip(event, 'fs50', 149)" class="i">xs</span>              <span class="o">=</span> <span onmouseout="hideTip(event, 'fs51', 150)" onmouseover="showTip(event, 'fs51', 150)" class="t">Seq</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs52', 151)" onmouseover="showTip(event, 'fs52', 151)" class="f">reduce</span> <span onmouseout="hideTip(event, 'fs16', 152)" onmouseover="showTip(event, 'fs16', 152)" class="f">max</span> <span onmouseout="hideTip(event, 'fs50', 153)" onmouseover="showTip(event, 'fs50', 153)" class="i">xs</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs53', 154)" onmouseover="showTip(event, 'fs53', 154)" class="f">replicate</span> <span onmouseout="hideTip(event, 'fs23', 155)" onmouseover="showTip(event, 'fs23', 155)" class="i">amount</span> <span onmouseout="hideTip(event, 'fs54', 156)" onmouseover="showTip(event, 'fs54', 156)" class="i">xs</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs51', 157)" onmouseover="showTip(event, 'fs51', 157)" class="t">Seq</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs55', 158)" onmouseover="showTip(event, 'fs55', 158)" class="f">collect</span> (<span onmouseout="hideTip(event, 'fs51', 159)" onmouseover="showTip(event, 'fs51', 159)" class="t">Seq</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs56', 160)" onmouseover="showTip(event, 'fs56', 160)" class="f">replicate</span> <span onmouseout="hideTip(event, 'fs23', 161)" onmouseover="showTip(event, 'fs23', 161)" class="i">amount</span>) <span onmouseout="hideTip(event, 'fs54', 162)" onmouseover="showTip(event, 'fs54', 162)" class="i">xs</span>
+
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs57', 163)" onmouseover="showTip(event, 'fs57', 163)" class="i">numbers</span> <span class="o">=</span> [<span class="n">1</span>;<span class="n">2</span>;<span class="n">3</span>]
+
+<span onmouseout="hideTip(event, 'fs49', 164)" onmouseover="showTip(event, 'fs49', 164)" class="f">max</span> <span onmouseout="hideTip(event, 'fs57', 165)" onmouseover="showTip(event, 'fs57', 165)" class="i">numbers</span>        <span class="c">// 3</span>
+<span onmouseout="hideTip(event, 'fs49', 166)" onmouseover="showTip(event, 'fs49', 166)" class="f">max</span> [<span class="n">1</span>;<span class="n">2</span>;<span class="n">3</span>]        <span class="c">// 3</span>
+<span onmouseout="hideTip(event, 'fs49', 167)" onmouseover="showTip(event, 'fs49', 167)" class="f">max</span> [|<span class="n">1</span>;<span class="n">2</span>;<span class="n">3</span>|]      <span class="c">// 3</span>
+<span onmouseout="hideTip(event, 'fs49', 168)" onmouseover="showTip(event, 'fs49', 168)" class="f">max</span> (<span onmouseout="hideTip(event, 'fs58', 169)" onmouseover="showTip(event, 'fs58', 169)" class="i">seq</span> {<span class="n">1</span> <span class="o">..</span> <span class="n">3</span>}) <span class="c">// 3</span>
+
+<span onmouseout="hideTip(event, 'fs53', 170)" onmouseover="showTip(event, 'fs53', 170)" class="f">replicate</span> <span class="n">3</span> <span onmouseout="hideTip(event, 'fs57', 171)" onmouseover="showTip(event, 'fs57', 171)" class="i">numbers</span>        <span class="c">// seq [1;1;1;2;2;2;3;3;3]</span>
+<span onmouseout="hideTip(event, 'fs53', 172)" onmouseover="showTip(event, 'fs53', 172)" class="f">replicate</span> <span class="n">3</span> [<span class="n">1</span>;<span class="n">2</span>;<span class="n">3</span>]        <span class="c">// seq [1;1;1;2;2;2;3;3;3]</span>
+<span onmouseout="hideTip(event, 'fs53', 173)" onmouseover="showTip(event, 'fs53', 173)" class="f">replicate</span> <span class="n">3</span> [|<span class="n">1</span>;<span class="n">2</span>;<span class="n">3</span>|]      <span class="c">// seq [1;1;1;2;2;2;3;3;3]</span>
+<span onmouseout="hideTip(event, 'fs53', 174)" onmouseover="showTip(event, 'fs53', 174)" class="f">replicate</span> <span class="n">3</span> (<span onmouseout="hideTip(event, 'fs58', 175)" onmouseover="showTip(event, 'fs58', 175)" class="i">seq</span> {<span class="n">1</span> <span class="o">..</span> <span class="n">3</span>}) <span class="c">// seq [1;1;1;2;2;2;3;3;3]</span>
+</code></pre></td>
+</tr>
+</table>
+<h2>Summary</h2>
+<p>Instead of variable arguments you should just expect a <code>Seq</code> as an argument
+to a function. It's very easy to create <code>List</code> or <code>Array</code> in F# and you can
+directly inline those creations with a function call. You don't get problems
+if you already have a collection. With currying you can use functions in a
+piping-style and you can use partial application.</p>
+<p>But more important, its easy to see that arguments are variable because you
+pass a <code>List</code>, <code>Array</code> or <code>Seq</code> as an argument. My recommendation is just
+simply: <strong>Avoid functions with variable arguments.</strong></p>
+
+
+<div class="tip" id="fs1">module Main</div>
+<div class="tip" id="fs2">val funcC : a:&#39;a -&gt; b:&#39;b -&gt; &#39;c<br /><br />Full name: variablearguments.SomeModule.funcC</div>
+<div class="tip" id="fs3">val a : &#39;a</div>
+<div class="tip" id="fs4">val b : &#39;b</div>
+<div class="tip" id="fs5">val funcT : a:&#39;a * b:&#39;b -&gt; &#39;c<br /><br />Full name: variablearguments.SomeModule.funcT</div>
+<div class="tip" id="fs6">module SomeModule<br /><br />from variablearguments</div>
+<div class="tip" id="fs7">val args : obj * obj<br /><br />Full name: variablearguments.args</div>
+<div class="tip" id="fs8">Multiple items<br />type SomeClass =<br />&#160;&#160;new : unit -&gt; SomeClass<br />&#160;&#160;static member max : [&lt;ParamArray&gt;] xs:&#39;a [] -&gt; &#39;a (requires comparison)<br /><br />Full name: variablearguments.SomeClass<br /><br />--------------------<br />new : unit -&gt; SomeClass</div>
+<div class="tip" id="fs9">Multiple items<br />type Util =<br />&#160;&#160;new : unit -&gt; Util<br />&#160;&#160;static member max : [&lt;ParamArray&gt;] xs:&#39;c [] -&gt; &#39;c (requires comparison)<br />&#160;&#160;static member max4 : a:&#39;b * b:&#39;b * c:&#39;b * d:&#39;b -&gt; &#39;b (requires comparison)<br />&#160;&#160;static member replicate : amount:int * [&lt;ParamArray&gt;] xs:&#39;a [] -&gt; &#39;a []<br /><br />Full name: Main.Util<br /><br />--------------------<br />new : unit -&gt; Util</div>
+<div class="tip" id="fs10">static member Util.max : [&lt;System.ParamArray&gt;] xs:&#39;c [] -&gt; &#39;c (requires comparison)<br /><br />Full name: Main.Util.max</div>
+<div class="tip" id="fs11">namespace System</div>
+<div class="tip" id="fs12">Multiple items<br />type ParamArrayAttribute =<br />&#160;&#160;inherit Attribute<br />&#160;&#160;new : unit -&gt; ParamArrayAttribute<br /><br />Full name: System.ParamArrayAttribute<br /><br />--------------------<br />System.ParamArrayAttribute() : unit</div>
+<div class="tip" id="fs13">val xs : &#39;c [] (requires comparison)</div>
+<div class="tip" id="fs14">module Array<br /><br />from Microsoft.FSharp.Collections</div>
+<div class="tip" id="fs15">val reduce : reduction:(&#39;T -&gt; &#39;T -&gt; &#39;T) -&gt; array:&#39;T [] -&gt; &#39;T<br /><br />Full name: Microsoft.FSharp.Collections.Array.reduce</div>
+<div class="tip" id="fs16">val max : e1:&#39;T -&gt; e2:&#39;T -&gt; &#39;T (requires comparison)<br /><br />Full name: Microsoft.FSharp.Core.Operators.max</div>
+<div class="tip" id="fs17">static member Util.max4 : a:&#39;b * b:&#39;b * c:&#39;b * d:&#39;b -&gt; &#39;b (requires comparison)<br /><br />Full name: Main.Util.max4</div>
+<div class="tip" id="fs18">val a : &#39;b (requires comparison)</div>
+<div class="tip" id="fs19">val b : &#39;b (requires comparison)</div>
+<div class="tip" id="fs20">val c : &#39;b (requires comparison)</div>
+<div class="tip" id="fs21">val d : &#39;b (requires comparison)</div>
+<div class="tip" id="fs22">static member Util.replicate : amount:int * [&lt;System.ParamArray&gt;] xs:&#39;a [] -&gt; &#39;a []<br /><br />Full name: Main.Util.replicate</div>
+<div class="tip" id="fs23">val amount : int</div>
+<div class="tip" id="fs24">val xs : &#39;a []</div>
+<div class="tip" id="fs25">val collect : mapping:(&#39;T -&gt; &#39;U []) -&gt; array:&#39;T [] -&gt; &#39;U []<br /><br />Full name: Microsoft.FSharp.Collections.Array.collect</div>
+<div class="tip" id="fs26">val replicate : count:int -&gt; initial:&#39;T -&gt; &#39;T []<br /><br />Full name: Microsoft.FSharp.Collections.Array.replicate</div>
+<div class="tip" id="fs27">static member SomeClass.max : [&lt;System.ParamArray&gt;] xs:&#39;a [] -&gt; &#39;a (requires comparison)<br /><br />Full name: variablearguments.SomeClass.max</div>
+<div class="tip" id="fs28">val xs : &#39;a [] (requires comparison)</div>
+<div class="tip" id="fs29">static member Util.max : [&lt;System.ParamArray&gt;] xs:&#39;c [] -&gt; &#39;c (requires comparison)</div>
+<div class="tip" id="fs30">Multiple items<br />type Util =<br />&#160;&#160;new : unit -&gt; Util<br />&#160;&#160;static member max : [&lt;ParamArray&gt;] xs:&#39;b [] -&gt; &#39;b (requires comparison)<br />&#160;&#160;static member max4 : a:&#39;a * b:&#39;a * c:&#39;a * d:&#39;a -&gt; &#39;a (requires comparison)<br /><br />Full name: variablearguments.Util<br /><br />--------------------<br />new : unit -&gt; Util</div>
+<div class="tip" id="fs31">static member Util.max : [&lt;System.ParamArray&gt;] xs:&#39;b [] -&gt; &#39;b (requires comparison)<br /><br />Full name: variablearguments.Util.max</div>
+<div class="tip" id="fs32">val xs : &#39;b [] (requires comparison)</div>
+<div class="tip" id="fs33">static member Util.max4 : a:&#39;a * b:&#39;a * c:&#39;a * d:&#39;a -&gt; &#39;a (requires comparison)<br /><br />Full name: variablearguments.Util.max4</div>
+<div class="tip" id="fs34">val a : &#39;a (requires comparison)</div>
+<div class="tip" id="fs35">val b : &#39;a (requires comparison)</div>
+<div class="tip" id="fs36">val c : &#39;a (requires comparison)</div>
+<div class="tip" id="fs37">val d : &#39;a (requires comparison)</div>
+<div class="tip" id="fs38">val nums : int * int * int * int<br /><br />Full name: Main.nums</div>
+<div class="tip" id="fs39">static member Util.max4 : a:&#39;b * b:&#39;b * c:&#39;b * d:&#39;b -&gt; &#39;b (requires comparison)</div>
+<div class="tip" id="fs40">Multiple items<br />type ClassAttribute =<br />&#160;&#160;inherit Attribute<br />&#160;&#160;new : unit -&gt; ClassAttribute<br /><br />Full name: Microsoft.FSharp.Core.ClassAttribute<br /><br />--------------------<br />new : unit -&gt; ClassAttribute</div>
+<div class="tip" id="fs41">Multiple items<br />val list : int list<br /><br />Full name: Main.list<br /><br />--------------------<br />type &#39;T list = List&lt;&#39;T&gt;<br /><br />Full name: Microsoft.FSharp.Collections.list&lt;_&gt;</div>
+<div class="tip" id="fs42">Multiple items<br />module List<br /><br />from Microsoft.FSharp.Collections<br /><br />--------------------<br />type List&lt;&#39;T&gt; =<br />&#160;&#160;| ( [] )<br />&#160;&#160;| ( :: ) of Head: &#39;T * Tail: &#39;T list<br />&#160;&#160;interface IEnumerable<br />&#160;&#160;interface IEnumerable&lt;&#39;T&gt;<br />&#160;&#160;member GetSlice : startIndex:int option * endIndex:int option -&gt; &#39;T list<br />&#160;&#160;member Head : &#39;T<br />&#160;&#160;member IsEmpty : bool<br />&#160;&#160;member Item : index:int -&gt; &#39;T with get<br />&#160;&#160;member Length : int<br />&#160;&#160;member Tail : &#39;T list<br />&#160;&#160;static member Cons : head:&#39;T * tail:&#39;T list -&gt; &#39;T list<br />&#160;&#160;static member Empty : &#39;T list<br /><br />Full name: Microsoft.FSharp.Collections.List&lt;_&gt;</div>
+<div class="tip" id="fs43">val reduce : reduction:(&#39;T -&gt; &#39;T -&gt; &#39;T) -&gt; list:&#39;T list -&gt; &#39;T<br /><br />Full name: Microsoft.FSharp.Collections.List.reduce</div>
+<div class="tip" id="fs44">val acc : int</div>
+<div class="tip" id="fs45">val x : int</div>
+<div class="tip" id="fs46">Multiple items<br />val array : int []<br /><br />Full name: Main.array<br /><br />--------------------<br />type &#39;T array = &#39;T []<br /><br />Full name: Microsoft.FSharp.Core.array&lt;_&gt;</div>
+<div class="tip" id="fs47">val ofList : list:&#39;T list -&gt; &#39;T []<br /><br />Full name: Microsoft.FSharp.Collections.Array.ofList</div>
+<div class="tip" id="fs48">static member Util.replicate : amount:int * [&lt;System.ParamArray&gt;] xs:&#39;a [] -&gt; &#39;a []</div>
+<div class="tip" id="fs49">val max : xs:seq&lt;&#39;a&gt; -&gt; &#39;a (requires comparison)<br /><br />Full name: Main.max</div>
+<div class="tip" id="fs50">val xs : seq&lt;&#39;a&gt; (requires comparison)</div>
+<div class="tip" id="fs51">module Seq<br /><br />from Microsoft.FSharp.Collections</div>
+<div class="tip" id="fs52">val reduce : reduction:(&#39;T -&gt; &#39;T -&gt; &#39;T) -&gt; source:seq&lt;&#39;T&gt; -&gt; &#39;T<br /><br />Full name: Microsoft.FSharp.Collections.Seq.reduce</div>
+<div class="tip" id="fs53">val replicate : amount:int -&gt; xs:seq&lt;&#39;a&gt; -&gt; seq&lt;&#39;a&gt;<br /><br />Full name: Main.replicate</div>
+<div class="tip" id="fs54">val xs : seq&lt;&#39;a&gt;</div>
+<div class="tip" id="fs55">val collect : mapping:(&#39;T -&gt; #seq&lt;&#39;U&gt;) -&gt; source:seq&lt;&#39;T&gt; -&gt; seq&lt;&#39;U&gt;<br /><br />Full name: Microsoft.FSharp.Collections.Seq.collect</div>
+<div class="tip" id="fs56">val replicate : count:int -&gt; initial:&#39;T -&gt; seq&lt;&#39;T&gt;<br /><br />Full name: Microsoft.FSharp.Collections.Seq.replicate</div>
+<div class="tip" id="fs57">val numbers : int list<br /><br />Full name: Main.numbers</div>
+<div class="tip" id="fs58">Multiple items<br />val seq : sequence:seq&lt;&#39;T&gt; -&gt; seq&lt;&#39;T&gt;<br /><br />Full name: Microsoft.FSharp.Core.Operators.seq<br /><br />--------------------<br />type seq&lt;&#39;T&gt; = System.Collections.Generic.IEnumerable&lt;&#39;T&gt;<br /><br />Full name: Microsoft.FSharp.Collections.seq&lt;_&gt;</div>
+
+</div>
+
+<div class="related">
+  <h2>Related Posts</h2>
+
+  
+  
+  
+
+  <ul class="related-posts">
+  
+    
+    
+
+    
+  
+    
+    
+
+    
+      <li><h3><a href="https://sidburn.github.io/blog/2017/03/19/understanding-fold">Understanding Fold</a></h3></li>
+      
+      
+    
+  
+    
+    
+
+    
+  
+    
+    
+
+    
+      <li><h3><a href="https://sidburn.github.io/blog/2017/02/27/mutability-vs-immutability-validation">Mutability vs. Immutability: Valid objects</a></h3></li>
+      
+      
+    
+  
+    
+    
+
+    
+      <li><h3><a href="https://sidburn.github.io/blog/2016/09/25/function-application-and-composition">Function Application and Composition</a></h3></li>
+      
+      
+    
+  
+    
+    
+
+    
+      <li><h3><a href="https://sidburn.github.io/blog/2016/05/28/catamorphisms">Catamorphisms</a></h3></li>
+      
+      
+    
+  
+    
+    
+
+    
+      <li><h3><a href="https://sidburn.github.io/blog/2016/05/24/monoids">Monoids</a></h3></li>
+      
+      
+        
+  </ul>
+</div>
+
+<div id="disqus_thread"></div>
+<script>
+var disqus_config = function () {
+    this.page.title = "Variable Arguments in F#"
+    this.page.url = "http://sidburn.github.io/blog/2017/03/13/variable-arguments";
+    this.page.identifier = "/blog/2017/03/13/variable-arguments";
+};
+(function() {
+    var d = document, s = d.createElement('script');
+    s.src = '//davidraab.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+    </div>
+    
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-74950849-1', 'auto');
+  ga('send', 'pageview');
+</script>
+    <script id="dsq-count-scr" src="https://davidraab.disqus.com/count.js" async></script>
+  </body>
+</html>

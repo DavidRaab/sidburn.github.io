@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg font-size="12px" text-rendering="auto" color-rendering="auto" shape-rendering="auto" stroke="black" stroke-linecap="square" fill="black" font-family="&apos;Dialog&apos;" width="260" version="1.1" stroke-miterlimit="10" image-rendering="auto" xmlns:cc="http://creativecommons.org/ns#" height="218" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:dc="http://purl.org/dc/elements/1.1/" color-interpolation="auto">
+ <defs>
+  <clipPath id="e" clipPathUnits="userSpaceOnUse">
+   <path d="m0 0h260v218h-260v-218z"/>
+  </clipPath>
+  <clipPath id="a" clipPathUnits="userSpaceOnUse">
+   <path d="m5-15h260v218h-260v-218z"/>
+  </clipPath>
+  <clipPath id="b" clipPathUnits="userSpaceOnUse">
+   <path d="m85 0v79h100v-79z"/>
+  </clipPath>
+  <clipPath id="d" clipPathUnits="userSpaceOnUse">
+   <path d="m20 112v73h100v-73z"/>
+  </clipPath>
+  <clipPath id="c" clipPathUnits="userSpaceOnUse">
+   <path d="m150 109v79h100v-79z"/>
+  </clipPath>
+ </defs>
+ <g text-rendering="geometricPrecision" shape-rendering="geometricPrecision">
+  <g stroke="gray" fill="gray">
+   <line y2="-44" clip-path="url(#e)" y1="-46" x2="-35" x1="-35" fill="none"/>
+  </g>
+  <g transform="translate(-5 15)" stroke="none" fill="#fc0">
+   <rect clip-path="url(#a)" height="77" width="98" y="1" x="86"/>
+   <rect clip-path="url(#a)" height="79" width="1" y="0" x="85" fill="#ff0"/>
+   <rect clip-path="url(#a)" height="1" width="98" y="0" x="86" fill="#ff0"/>
+   <rect clip-path="url(#a)" height="1" width="99" y="78" x="86" fill="#b28e00"/>
+   <rect clip-path="url(#a)" height="78" width="1" y="0" x="184" fill="#b28e00"/>
+  </g>
+  <g font-size="13px" font-family="sans-serif" transform="translate(-5 15)" stroke-linecap="butt" stroke-miterlimit="1.45" font-weight="bold">
+   <text clip-path="url(#b)" xml:space="preserve" stroke="none" y="18.0698" x="113.3291">Animal</text>
+  </g>
+  <g transform="translate(-5 15)">
+   <line y2="25" clip-path="url(#b)" y1="25" x2="184" x1="86" fill="none"/>
+   <text clip-path="url(#b)" xml:space="preserve" stroke="none" stroke-linecap="butt" stroke-miterlimit="1.45" y="42.9907" x="90" font-family="sans-serif">Name : string</text>
+   <line y2="50" clip-path="url(#b)" y1="50" x2="184" x1="86" fill="none"/>
+   <g stroke="none">
+    <text clip-path="url(#b)" xml:space="preserve" stroke-linecap="butt" stroke-miterlimit="1.45" y="67.6919" x="90" font-family="sans-serif">Move()</text>
+    <rect clip-path="url(#a)" height="71" width="98" y="113" x="21" fill="#fc0"/>
+    <rect clip-path="url(#a)" height="73" width="1" y="112" x="20" fill="#ff0"/>
+    <rect clip-path="url(#a)" height="1" width="98" y="112" x="21" fill="#ff0"/>
+    <rect clip-path="url(#a)" height="1" width="99" y="184" x="21" fill="#b28e00"/>
+    <rect clip-path="url(#a)" height="72" width="1" y="112" x="119" fill="#b28e00"/>
+   </g>
+  </g>
+  <g font-size="13px" font-family="sans-serif" transform="translate(-5 15)" stroke-linecap="butt" stroke-miterlimit="1.45" font-weight="bold">
+   <text clip-path="url(#d)" xml:space="preserve" stroke="none" y="130.0698" x="57.365">Dog</text>
+  </g>
+  <g transform="translate(-5 15)">
+   <line y2="137" clip-path="url(#d)" y1="137" x2="119" x1="21" fill="none"/>
+   <line y2="147" clip-path="url(#d)" y1="147" x2="119" x1="21" fill="none"/>
+   <g stroke="none">
+    <text clip-path="url(#d)" xml:space="preserve" stroke-linecap="butt" stroke-miterlimit="1.45" y="164.9907" x="25" font-family="sans-serif">Bark()</text>
+    <rect clip-path="url(#a)" height="77" width="98" y="110" x="151" fill="#fc0"/>
+    <rect clip-path="url(#a)" height="79" width="1" y="109" x="150" fill="#ff0"/>
+    <rect clip-path="url(#a)" height="1" width="98" y="109" x="151" fill="#ff0"/>
+    <rect clip-path="url(#a)" height="1" width="99" y="187" x="151" fill="#b28e00"/>
+    <rect clip-path="url(#a)" height="78" width="1" y="109" x="249" fill="#b28e00"/>
+   </g>
+  </g>
+  <g font-size="13px" font-family="sans-serif" transform="translate(-5 15)" stroke-linecap="butt" stroke-miterlimit="1.45" font-weight="bold">
+   <text clip-path="url(#c)" xml:space="preserve" stroke="none" y="127.0698" x="189.5264">Cat</text>
+  </g>
+  <g transform="translate(-5 15)">
+   <line y2="134" clip-path="url(#c)" y1="134" x2="249" x1="151" fill="none"/>
+   <line y2="144" clip-path="url(#c)" y1="144" x2="249" x1="151" fill="none"/>
+   <g stroke-linecap="butt" stroke-miterlimit="1.45">
+    <text clip-path="url(#c)" xml:space="preserve" stroke="none" y="161.9907" x="155" font-family="sans-serif">Meow()</text>
+    <path d="m110 79.029v14.971h-40v9.96" clip-path="url(#a)" fill="none"/>
+    <path d="m70 111.96l5-11.995-5 2.995-5-2.995z" clip-path="url(#a)" stroke="none"/>
+    <path d="m160 79.029v14.971h40v6.97" clip-path="url(#a)" fill="none"/>
+    <path d="m200 108.97l5-11.999-5 3-5-3z" clip-path="url(#a)" stroke="none"/>
+   </g>
+  </g>
+ </g>
+</svg>

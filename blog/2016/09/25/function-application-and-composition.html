@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+  ﻿<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  
+  <meta name="description" content="Describes the various ways on how to call a function and how to use function composition" />
+  
+
+  
+  <meta name="keywords" content="f#, fsharp, functional, programming, application, function application, composition, piping" />
+  
+
+  <title>
+    
+      Function Application and Composition &middot; David Raab
+    
+  </title>
+
+  <!-- Twitter Card -->
+  
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:site" content="@David_Raab" />
+  <meta name="twitter:title" content="Function Application and Composition" />
+  <meta name="twitter:description" content="Describes the various ways on how to call a function and how to use function composition" />
+  
+  <meta name="twitter:image" content="https://sidburn.github.io/images/2016/application/twitter.png" />
+  
+  
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/public/css/styles.css">
+  <link rel="stylesheet" href="/public/css/poole.css">
+  <link rel="stylesheet" href="/public/css/syntax.css">
+  <link rel="stylesheet" href="/public/css/hyde.css">
+  <link rel="stylesheet" href="/public/css/tips.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  <!-- Favicons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/public/favicon/apple-touch-icon.png?v=XBr3BkNgXe">
+  <link rel="icon" type="image/png" href="/public/favicon/favicon-32x32.png?v=XBr3BkNgXe" sizes="32x32">
+  <link rel="icon" type="image/png" href="/public/favicon/favicon-16x16.png?v=XBr3BkNgXe" sizes="16x16">
+  <link rel="manifest" href="/public/favicon/manifest.json?v=XBr3BkNgXe">
+  <link rel="mask-icon" href="/public/favicon/safari-pinned-tab.svg?v=XBr3BkNgXe" color="#6699ff">
+  <link rel="shortcut icon" href="/public/favicon/favicon.ico?v=XBr3BkNgXe">
+  <meta name="apple-mobile-web-app-title" content="David Raab">
+  <meta name="application-name" content="David Raab">
+  <meta name="msapplication-config" content="/public/favicon/browserconfig.xml?v=XBr3BkNgXe">
+  <meta name="theme-color" content="#ff0000">
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
+
+  <!-- JS -->
+  <script type="text/javascript" src="/public/js/tips.js"></script>
+</head>
+
+  <body>
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h2>
+        <a href="/">
+          David Raab
+        </a>
+      </h2>
+      <p class="lead"></p>
+    </div>
+
+      <nav class="sidebar-nav">
+          <a class="sidebar-nav-item" href="/">Home</a>
+          <a class="sidebar-nav-item" href="/Series">Series</a>
+          <a class="sidebar-nav-item" href="/Links">External Links</a>
+          <a class="sidebar-nav-item" href="/tags">Tags</a>
+          <a class="sidebar-nav-item" href="/archive">Archive</a>
+          <a class="sidebar-nav-item" href="/atom.xml">RSS</a>
+      </nav>
+      <div>
+          <a href="https://github.com/sidburn/sidburn.github.io">
+              <img src="/public/GitHub-Mark-Light-32px.png" style="display: inline" />
+          </a>
+          <a href="https://twitter.com/David_Raab">
+              <img src="/public/Twitter_logo_white_32.png" style="display: inline" />
+          </a>
+          <a href="http://stackoverflow.com/users/338059/sid-burn">
+              <img src="/public/so-icon.png" style="display: inline" />
+          </a>
+      </div>
+  </div>
+</div>
+
+
+    <div class="content container">
+      <div class="post">
+  <h1 class="post-title">Function Application and Composition</h1>
+  <div class="post-header">
+    <span class="post-date">25 September 2016</span>
+    <span class="post-tags">
+  
+  
+  <a class="tag" href="/tags/#F#">F#</a>
+  
+  <a class="tag" href="/tags/#composition">composition</a>
+  
+  <a class="tag" href="/tags/#piping">piping</a>
+  
+  <a class="tag" href="/tags/#recursion">recursion</a>
+  
+  <a class="tag" href="/tags/#immutability">immutability</a>
+  
+</span>
+
+  </div>
+
+  <p>Function application is probably one of those terms in functional programming that sounds more
+scarier as the topic really is. The idea behind functional application just means that we execute
+a function to get the result. Let's take the example of calculating the square root of
+<code>2.0</code>. We can write the following in F# to do that:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs2', 2)" onmouseover="showTip(event, 'fs2', 2)" class="i">x</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs3', 3)" onmouseover="showTip(event, 'fs3', 3)" class="f">sqrt</span> <span class="n">2.0</span>
+</code></pre></td>
+</tr>
+</table>
+<p>The interesting part is how we read this example. We read it from right-to-left.
+<code>2.0</code> is the input to <code>sqrt</code>, <code>sqrt</code> returns the value <code>1.41</code> this is then stored in <code>x</code>.</p>
+<div class="svg-code" style="width:50%; margin: 30px auto">
+<img src="/images/2016/application/sqrt.svg" alt="sqrt example that shows how we read a function from right-to-left" />
+</div>
+<p>Usually we just say that we <em>execute</em> or <em>run</em> the <code>sqrt</code> function. But in functional
+programming the correct term is that we apply the value <code>2.0</code> to the function <code>sqrt</code>. Probably
+you will ask how I can write a whole article about this topic, but there are some topics
+associated with it.</p>
+<h2>Partial Application</h2>
+<p>Partial application is one of those topics. If we pass all arguments to a function we name it
+<em>function application</em>. But if we only pass some arguments to a function we name it
+<em>partial application</em>.</p>
+<p>In some programming languages it is an error if we don't pass all arguments to a function, but
+in some functional languages, including F#, this is an explicit feature. The result of
+partial application is a new function that accepts/waits for the remaining arguments. For
+example: If we have a function <code>add</code> that expects two integers:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs4', 4)" onmouseover="showTip(event, 'fs4', 4)" class="f">add</span> <span onmouseout="hideTip(event, 'fs5', 5)" onmouseover="showTip(event, 'fs5', 5)" class="i">x</span> <span onmouseout="hideTip(event, 'fs6', 6)" onmouseover="showTip(event, 'fs6', 6)" class="i">y</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs5', 7)" onmouseover="showTip(event, 'fs5', 7)" class="i">x</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs6', 8)" onmouseover="showTip(event, 'fs6', 8)" class="i">y</span>
+</code></pre></td>
+</tr>
+</table>
+<p>But we only pass one argument to that function:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs7', 9)" onmouseover="showTip(event, 'fs7', 9)" class="f">add1</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs4', 10)" onmouseover="showTip(event, 'fs4', 10)" class="f">add</span> <span class="n">1</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Then partial application returns a new functions that expects the remaining argument. In the
+above case we could say that we baked in <code>1</code> as <code>x</code> and <code>add1</code> expects the remaining
+argument <code>y</code>.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs7', 11)" onmouseover="showTip(event, 'fs7', 11)" class="f">add1</span> <span class="n">1</span>  <span class="c">// 2</span>
+<span onmouseout="hideTip(event, 'fs7', 12)" onmouseover="showTip(event, 'fs7', 12)" class="f">add1</span> <span class="n">10</span> <span class="c">// 11</span>
+</code></pre></td>
+</tr>
+</table>
+<h2>Immutability</h2>
+<p>Another big topic in functional programming is immutability. Immutability is a fairly easy
+concept. It just means data cannot be changed after creation. If you are new to functional
+programming or in general to this concept, this sound a little bit strange. How
+can we do anything useful if we cannot change anything?</p>
+<p>The answer is simple. Instead of changing any kind of data, we just generate new data.
+Probably you wonder how this concept is associated with function application. While immutability
+has no direct effect on function application, it changes the way how we think about
+functions. With immutability in-place every functions must return a new value.</p>
+<p>Let's look at some example code to understand why this kind of idea is important. Besides
+<code>sqrt</code> we first create two new functions:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs8', 13)" onmouseover="showTip(event, 'fs8', 13)" class="f">square</span> <span onmouseout="hideTip(event, 'fs9', 14)" onmouseover="showTip(event, 'fs9', 14)" class="i">x</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs10', 15)" onmouseover="showTip(event, 'fs10', 15)" class="f">pown</span> <span onmouseout="hideTip(event, 'fs9', 16)" onmouseover="showTip(event, 'fs9', 16)" class="i">x</span> <span class="n">2</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs11', 17)" onmouseover="showTip(event, 'fs11', 17)" class="f">add10</span> <span onmouseout="hideTip(event, 'fs9', 18)" onmouseover="showTip(event, 'fs9', 18)" class="i">x</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs9', 19)" onmouseover="showTip(event, 'fs9', 19)" class="i">x</span> <span class="o">+</span> <span class="n">10.0</span>
+</code></pre></td>
+</tr>
+</table>
+<p>We now create a new function that first calculates the square root of a number, add 10 to the
+result of it, and finally squares the result. That function is pretty artificial so we just
+name it <code>blub</code>:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+<span class="l">7: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs12', 20)" onmouseover="showTip(event, 'fs12', 20)" class="f">blub</span> <span onmouseout="hideTip(event, 'fs9', 21)" onmouseover="showTip(event, 'fs9', 21)" class="i">x</span> <span class="o">=</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs13', 22)" onmouseover="showTip(event, 'fs13', 22)" class="i">a</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs3', 23)" onmouseover="showTip(event, 'fs3', 23)" class="f">sqrt</span> <span onmouseout="hideTip(event, 'fs9', 24)" onmouseover="showTip(event, 'fs9', 24)" class="i">x</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs14', 25)" onmouseover="showTip(event, 'fs14', 25)" class="i">b</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs11', 26)" onmouseover="showTip(event, 'fs11', 26)" class="f">add10</span> <span onmouseout="hideTip(event, 'fs13', 27)" onmouseover="showTip(event, 'fs13', 27)" class="i">a</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs15', 28)" onmouseover="showTip(event, 'fs15', 28)" class="i">c</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 29)" onmouseover="showTip(event, 'fs8', 29)" class="f">square</span> <span onmouseout="hideTip(event, 'fs14', 30)" onmouseover="showTip(event, 'fs14', 30)" class="i">b</span>
+    <span onmouseout="hideTip(event, 'fs15', 31)" onmouseover="showTip(event, 'fs15', 31)" class="i">c</span>
+
+<span onmouseout="hideTip(event, 'fs12', 32)" onmouseover="showTip(event, 'fs12', 32)" class="f">blub</span> <span class="n">2.0</span> <span class="c">// 130.28</span>
+</code></pre></td>
+</tr>
+</table>
+<p>The above code I wrote probably resembles the way how you write functions in a non-functional
+language that also don't use immutability. But in this case every function returns a new value
+and this style is a little bit verbose. But first lets look how we read this code:</p>
+<div class="svg-code" style="width:50%; margin: 30px auto">
+<img src="/images/2016/application/blub.svg" alt="visualization how we read the blub function" />
+</div>
+<p>I don't know you, but I think reading it is pretty horrible. The amount of <em>jumping around</em>
+is quite high. If you don't think it is horrible then it just shows how much you are used
+to this kind of writing. But lets examine the example a little bit further.</p>
+<p>If you look at the visualization we can see some kind of pattern. We actually can
+see two properties:</p>
+<ol>
+<li>Every value is only used once.</li>
+<li>The input of the next function is the output of the previous function.</li>
+</ol>
+<p>The first property allows us to just embed or <strong>nest</strong> the function calls. There is no
+reason why we store the result of a function explicitly in a variable if we anyway just use
+the result once. We just can nest the code:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs12', 33)" onmouseover="showTip(event, 'fs12', 33)" class="f">blub</span> <span onmouseout="hideTip(event, 'fs9', 34)" onmouseover="showTip(event, 'fs9', 34)" class="i">x</span> <span class="o">=</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs14', 35)" onmouseover="showTip(event, 'fs14', 35)" class="i">b</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs11', 36)" onmouseover="showTip(event, 'fs11', 36)" class="f">add10</span> (<span onmouseout="hideTip(event, 'fs3', 37)" onmouseover="showTip(event, 'fs3', 37)" class="f">sqrt</span> <span onmouseout="hideTip(event, 'fs9', 38)" onmouseover="showTip(event, 'fs9', 38)" class="i">x</span>)
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs15', 39)" onmouseover="showTip(event, 'fs15', 39)" class="i">c</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 40)" onmouseover="showTip(event, 'fs8', 40)" class="f">square</span> <span onmouseout="hideTip(event, 'fs14', 41)" onmouseover="showTip(event, 'fs14', 41)" class="i">b</span>
+    <span onmouseout="hideTip(event, 'fs15', 42)" onmouseover="showTip(event, 'fs15', 42)" class="i">c</span>
+</code></pre></td>
+</tr>
+</table>
+<p>We can repeat this step again. Also <code>b</code> is only used once, so we nest <code>b</code> again.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs12', 43)" onmouseover="showTip(event, 'fs12', 43)" class="f">blub</span> <span onmouseout="hideTip(event, 'fs9', 44)" onmouseover="showTip(event, 'fs9', 44)" class="i">x</span> <span class="o">=</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs15', 45)" onmouseover="showTip(event, 'fs15', 45)" class="i">c</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 46)" onmouseover="showTip(event, 'fs8', 46)" class="f">square</span> (<span onmouseout="hideTip(event, 'fs11', 47)" onmouseover="showTip(event, 'fs11', 47)" class="f">add10</span> (<span onmouseout="hideTip(event, 'fs3', 48)" onmouseover="showTip(event, 'fs3', 48)" class="f">sqrt</span> <span onmouseout="hideTip(event, 'fs9', 49)" onmouseover="showTip(event, 'fs9', 49)" class="i">x</span>))
+    <span onmouseout="hideTip(event, 'fs15', 50)" onmouseover="showTip(event, 'fs15', 50)" class="i">c</span>
+</code></pre></td>
+</tr>
+</table>
+<p>we also don't need <code>c</code>:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs12', 255)" onmouseover="showTip(event, 'fs12', 255)" class="f">blub</span> <span onmouseout="hideTip(event, 'fs9', 256)" onmouseover="showTip(event, 'fs9', 256)" class="i">x</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 257)" onmouseover="showTip(event, 'fs8', 257)" class="f">square</span> (<span onmouseout="hideTip(event, 'fs11', 258)" onmouseover="showTip(event, 'fs11', 258)" class="f">add10</span> (<span onmouseout="hideTip(event, 'fs3', 259)" onmouseover="showTip(event, 'fs3', 259)" class="f">sqrt</span> <span onmouseout="hideTip(event, 'fs9', 260)" onmouseover="showTip(event, 'fs9', 260)" class="i">x</span>))
+</code></pre></td>
+</tr>
+</table>
+<p>The final result is quite a lot shorter, but how do we read this code?</p>
+<div class="svg-code" style="width:75%; margin: 30px auto">
+<img src="/images/2016/application/blub-nested.svg" alt="visualization how we read the nested blub function" />
+</div>
+<p>The final result resembles a normal function call. We just can read it straight from
+right to left. Every function call returns a new result that is directly used as the
+input of another function. With nesting we have once again a simple chain of execution.
+No <em>jumping around</em> anymore to understand the code.</p>
+<h2>Piping with |&gt;</h2>
+<p>Up so far I only discussed the first property that a variable was only used once. But we
+also had another property that the output of one function is the input of the
+next function. We also could say, we have a chain of execution. The last visualization
+already showed that chain as you could start on the right side and read the code to the left
+until you are done.</p>
+<p>But we also can reverse that chain so we can read it from left-to-right. We achieve that
+style with the <code>|&gt;</code> operator. The <code>|&gt;</code> operator allows us to write the input of a function
+on the left side and the function to execute on the right side.</p>
+<div class="svg-code" style="width:25%; margin: 30px auto">
+<img src="/images/2016/application/pipe.svg" alt="Example of a single function with piping" />
+</div>
+<p>With this idea we can reverse the input step by step like this:</p>
+<div class="svg-code" style="width:75%; margin: 30px auto">
+<img src="/images/2016/application/blub-pipe.svg" alt="blub function with piping" />
+</div>
+<p>The advantage is that <code>|&gt;</code> is left-associative and has low precedence. In overall that means
+when we see code like this:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp">(<span class="o">..</span><span class="o">..</span><span class="o">.</span>) <span class="o">|&gt;</span> <span class="k">function</span>
+</code></pre></td>
+</tr>
+</table>
+<p>we can remove the parenthesis from the left-side of <code>|&gt;</code> so we just end up with:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="o">..</span><span class="o">..</span><span class="o">.</span> <span class="o">|&gt;</span> <span class="k">function</span>
+</code></pre></td>
+</tr>
+</table>
+<p>This means the last version:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs12', 57)" onmouseover="showTip(event, 'fs12', 57)" class="f">blub</span> <span onmouseout="hideTip(event, 'fs9', 58)" onmouseover="showTip(event, 'fs9', 58)" class="i">x</span> <span class="o">=</span> ((<span onmouseout="hideTip(event, 'fs9', 59)" onmouseover="showTip(event, 'fs9', 59)" class="i">x</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs3', 60)" onmouseover="showTip(event, 'fs3', 60)" class="f">sqrt</span>) <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs11', 61)" onmouseover="showTip(event, 'fs11', 61)" class="f">add10</span>) <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs8', 62)" onmouseover="showTip(event, 'fs8', 62)" class="f">square</span>
+</code></pre></td>
+</tr>
+</table>
+<p>also can be written without any parenthesis:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs12', 63)" onmouseover="showTip(event, 'fs12', 63)" class="f">blub</span> <span onmouseout="hideTip(event, 'fs9', 64)" onmouseover="showTip(event, 'fs9', 64)" class="i">x</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs9', 65)" onmouseover="showTip(event, 'fs9', 65)" class="i">x</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs3', 66)" onmouseover="showTip(event, 'fs3', 66)" class="f">sqrt</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs11', 67)" onmouseover="showTip(event, 'fs11', 67)" class="f">add10</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs8', 68)" onmouseover="showTip(event, 'fs8', 68)" class="f">square</span>
+</code></pre></td>
+</tr>
+</table>
+<p>This kind of style is often preferred in the F# community and can be read from left-to-right.</p>
+<div class="svg-code" style="width:75%; margin: 30px auto">
+<img src="/images/2016/application/blub-pipe-read.svg" alt="Shows that blub can be read from left-to-right" />
+</div>
+<p>You often see this style in List manipulations:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp">[<span class="n">1.0</span>; <span class="n">3.0</span>; <span class="n">5.0</span>; <span class="n">7.0</span>; <span class="n">11.0</span>; <span class="n">13.0</span>]
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs16', 69)" onmouseover="showTip(event, 'fs16', 69)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 70)" onmouseover="showTip(event, 'fs17', 70)" class="f">map</span> <span onmouseout="hideTip(event, 'fs3', 71)" onmouseover="showTip(event, 'fs3', 71)" class="f">sqrt</span>
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs16', 72)" onmouseover="showTip(event, 'fs16', 72)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 73)" onmouseover="showTip(event, 'fs17', 73)" class="f">map</span> <span onmouseout="hideTip(event, 'fs11', 74)" onmouseover="showTip(event, 'fs11', 74)" class="f">add10</span>
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs16', 75)" onmouseover="showTip(event, 'fs16', 75)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 76)" onmouseover="showTip(event, 'fs17', 76)" class="f">map</span> <span onmouseout="hideTip(event, 'fs8', 77)" onmouseover="showTip(event, 'fs8', 77)" class="f">square</span>
+<span class="c">// [121.0; 137.64; 149.72; 159.91; 177.33; 185.11]</span>
+</code></pre></td>
+</tr>
+</table>
+<p>We start with the data, and every new command is put on a new line. This way we easily
+can create longer chains that are still readable and extensible.</p>
+<h2>Never use &lt;|</h2>
+<p>We can summarize <code>|&gt;</code> as an operator that swaps the function and the input of a function. Usually
+the input is on the right and the function on the left, and we say we read it from right-to-left.</p>
+<p>With <code>|&gt;</code> we swap the function and the input. The input is now on the left, and we read the code
+from left to right. That's why I name it just left-piping.</p>
+<p>F# also provides another operator <code>&lt;|</code>. Before we look into what it really does, the question
+is: What do you <strong>expect</strong> it should do?</p>
+<p>Lets think about it. <code>|&gt;</code> allows us to have the input on the left side of the function. We can
+think of it that we pipe the input from left into the function on the right. So when we see <code>&lt;|</code>
+we just expect the opposite. We could say, the input on the right is piped to the function on
+the left side. This opens up a new question: What is the difference between <code>&lt;|</code> and
+normal function application?</p>
+<p>So let us explore <code>&lt;|</code> step-by-step, and to understand why you never ever should use this
+operator. We start with a simple case:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs3', 78)" onmouseover="showTip(event, 'fs3', 78)" class="i">sqrt</span> <span class="n">2.0</span>
+</code></pre></td>
+</tr>
+</table>
+<p>We can insert <code>&lt;|</code> in this term. But <code>&lt;|</code> does not change the order of anything, we still
+write the input on the right side. So we end up with:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs3', 79)" onmouseover="showTip(event, 'fs3', 79)" class="i">sqrt</span> <span class="o">&lt;|</span> <span class="n">2.0</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Seems pretty useless at this point. But if you remember, one advantage of <code>|&gt;</code> was
+that we also could eliminate some parenthesis. So lets create a small example where the
+input is a more complex term that needs to be calculated:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs3', 80)" onmouseover="showTip(event, 'fs3', 80)" class="i">sqrt</span> (<span class="n">1.0</span> <span class="o">+</span> <span class="n">1.0</span>)
+</code></pre></td>
+</tr>
+</table>
+<p>At this point it is also helpful to understand what happens if we don't write the parenthesis.
+The code above means. First calculate <code>(1.0 + 1.0)</code> and use the result <code>2.0</code> as the input
+to <code>sqrt</code>. When we write:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs3', 81)" onmouseover="showTip(event, 'fs3', 81)" class="i">sqrt</span> <span class="n">1.0</span> <span class="o">+</span> <span class="n">1.0</span>
+</code></pre></td>
+</tr>
+</table>
+<p>it basically means:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp">(<span onmouseout="hideTip(event, 'fs3', 82)" onmouseover="showTip(event, 'fs3', 82)" class="i">sqrt</span> <span class="n">1.0</span>) <span class="o">+</span> <span class="n">1.0</span>
+</code></pre></td>
+</tr>
+</table>
+<p>that means, first calculate <code>sqrt 1</code> and then add <code>1</code> to the result. If we use <code>&lt;|</code>,
+we can get rid of the parenthesis and still maintain the same behaviour.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs3', 83)" onmouseover="showTip(event, 'fs3', 83)" class="i">sqrt</span> <span class="o">&lt;|</span> <span class="n">1.0</span> <span class="o">+</span> <span class="n">1.0</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Believe me or not, but I don't see any improvement so far. I have seen a lot of people arguing
+that the last version is better as the version with parenthesis. I don't think so. Reading
+parenthesis and the idea that everything inside of parenthesis is calculated first is something
+that we already learn in elementary school:</p>
+<div class="svg-code" style="width:50%; margin: 30px auto">
+<img src="/images/2016/application/math.svg" alt="A Math example with parenthesis" />
+</div>
+<p>Now instead of a clearly visible grouping with characters that human mankind already use
+for centuries, now you just use two different characters instead. It could be that you have
+another opinion on this, this is okay, but let's continue to see more problems of <code>&lt;|</code>.</p>
+<p>The problem of <code>&lt;|</code> is, we just think of it as right-piping. We <strong>expect</strong> that <code>&lt;|</code> is
+the reverse of <code>|&gt;</code>. With a single function and a single argument, it also seems to work
+this way. But this breaks as soon we try to extend the code. For example, when we now want
+to add 10 to the result with our <code>add10</code> function.</p>
+<p>With nesting we just write:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="i">add10</span> (<span onmouseout="hideTip(event, 'fs3', 84)" onmouseover="showTip(event, 'fs3', 84)" class="i">sqrt</span> (<span class="n">1.0</span> <span class="o">+</span> <span class="n">1.0</span>))
+</code></pre></td>
+</tr>
+</table>
+<p>with left-piping we write:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="n">1.0</span> <span class="o">+</span> <span class="n">1.0</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs3', 85)" onmouseover="showTip(event, 'fs3', 85)" class="i">sqrt</span> <span class="o">|&gt;</span> <span class="i">add10</span>
+</code></pre></td>
+</tr>
+</table>
+<p>with right-piping you probably assume to write something like this:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="c">// This code does not work</span>
+<span class="i">add10</span> <span class="o">&lt;|</span> <span onmouseout="hideTip(event, 'fs3', 86)" onmouseover="showTip(event, 'fs3', 86)" class="i">sqrt</span> <span class="o">&lt;|</span> <span class="n">1.0</span> <span class="o">+</span> <span class="n">1.0</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Probably that is what you <strong>expect</strong>. But this <strong>isn't</strong> how <code>&lt;|</code> works! In fact, the above code
+will just give you a compile-time error. Because of this, piping with <code>&lt;|</code> is just an exceptional
+bad idea. If you see code like this:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">blub</span> <span class="i">x</span> <span class="o">=</span> <span class="i">x</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs3', 87)" onmouseover="showTip(event, 'fs3', 87)" class="i">sqrt</span> <span class="o">|&gt;</span> <span class="i">add10</span> <span class="o">|&gt;</span> <span class="i">square</span>
+</code></pre></td>
+</tr>
+</table>
+<p>you would probably assume that <code>&lt;|</code> just reverse the pipe:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="c">// This code does not work</span>
+<span class="k">let</span> <span class="i">blub</span> <span class="i">x</span> <span class="o">=</span> <span class="i">square</span> <span class="o">&lt;|</span> <span class="i">add10</span> <span class="o">&lt;|</span> <span onmouseout="hideTip(event, 'fs3', 88)" onmouseover="showTip(event, 'fs3', 88)" class="i">sqrt</span> <span class="o">&lt;|</span> <span class="i">x</span>
+</code></pre></td>
+</tr>
+</table>
+<p>but this isn't at all how it works. So how does <code>&lt;|</code> work instead? Probably at this point it
+makes sense to add explicit parenthesis to understand how it works. And if you think
+<code>&lt;|</code> is better because of the elimination of parenthesis. Isn't it funny that I need to
+add parenthesis so you are able to understand how <code>&lt;|</code> actually works?</p>
+<p>We actually <strong>expect</strong> that <code>&lt;|</code> works in this way.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">blub</span> <span class="i">x</span> <span class="o">=</span> <span class="i">square</span> <span class="o">&lt;|</span> (<span class="i">add10</span> <span class="o">&lt;|</span> (<span onmouseout="hideTip(event, 'fs3', 89)" onmouseover="showTip(event, 'fs3', 89)" class="i">sqrt</span> <span class="o">&lt;|</span> <span class="i">x</span>))
+</code></pre></td>
+</tr>
+</table>
+<p>The above code is valid and will compile. But it is no improvement over:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">blub</span> <span class="i">x</span> <span class="o">=</span> <span class="i">square</span> (<span class="i">add10</span> (<span onmouseout="hideTip(event, 'fs3', 90)" onmouseover="showTip(event, 'fs3', 90)" class="i">sqrt</span> <span class="i">x</span>))
+</code></pre></td>
+</tr>
+</table>
+<p>But when we remove the explicit parenthesis in the first example. The code is interpreted like this:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">blub</span> <span class="i">x</span> <span class="o">=</span> ((<span class="i">square</span> <span class="o">&lt;|</span> <span class="i">add10</span>) <span class="o">&lt;|</span> <span onmouseout="hideTip(event, 'fs3', 91)" onmouseover="showTip(event, 'fs3', 91)" class="i">sqrt</span>) <span class="o">&lt;|</span> <span class="i">x</span>
+</code></pre></td>
+</tr>
+</table>
+<p>And this is a truly exceptional bad idea. The problem of <code>&lt;|</code> is that it is still
+left-associative. That means, the thing on the left side is executed first. In the above case it
+means. First <code>square</code> is executed and we pass it <code>add10</code> a function as the first argument
+to <code>square</code>. This is a compile-time error because <code>square</code> expects a float, not a function.</p>
+<p>But if we still continue to interpret this code, and ignore this error, we then expect that
+<code>square &lt;| add10</code> returns a new function as a result. We then execute that function by passing
+<code>sqrt</code> as an argument. Well, <code>square</code> does not return a function, so this also cannot work.</p>
+<p>And if we still ignore this error, we once again assume that this will return another new function
+as a result that we then finally pass <code>x</code> as a value.</p>
+<p>Already confused? And that's why <code>&lt;|</code> is just an exceptional bad idea, and you never ever
+should use <code>&lt;|</code>. <code>&lt;|</code> is just broken, it isn't at all how someone thinks it works or should work.</p>
+<p>At least let me give you a quick example that shows how <code>&lt;|</code> works and in which situation
+it would <em>theoretically</em> make sense. First you need a function that expects at least two arguments:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs18', 92)" onmouseover="showTip(event, 'fs18', 92)" class="f">add</span> <span onmouseout="hideTip(event, 'fs5', 93)" onmouseover="showTip(event, 'fs5', 93)" class="i">x</span> <span onmouseout="hideTip(event, 'fs6', 94)" onmouseover="showTip(event, 'fs6', 94)" class="i">y</span> <span onmouseout="hideTip(event, 'fs19', 95)" onmouseover="showTip(event, 'fs19', 95)" class="i">z</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs5', 96)" onmouseover="showTip(event, 'fs5', 96)" class="i">x</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs6', 97)" onmouseover="showTip(event, 'fs6', 97)" class="i">y</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs19', 98)" onmouseover="showTip(event, 'fs19', 98)" class="i">z</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Now imagine all arguments are some more complex terms that you compute, usually you have to
+put parenthesis around every term to group them:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs18', 99)" onmouseover="showTip(event, 'fs18', 99)" class="f">add</span> (<span class="n">1</span> <span class="o">+</span> <span class="n">1</span>) (<span class="n">2</span> <span class="o">+</span> <span class="n">2</span>) (<span class="n">3</span> <span class="o">+</span> <span class="n">3</span>)
+</code></pre></td>
+</tr>
+</table>
+<p>This is just a function call with three arguments. But every arguments is calculated before
+<code>add</code> is called. In such a case, you could use <code>&lt;|</code> instead of parenthesis:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs18', 100)" onmouseover="showTip(event, 'fs18', 100)" class="f">add</span> <span class="o">&lt;|</span> <span class="n">1</span> <span class="o">+</span> <span class="n">1</span> <span class="o">&lt;|</span> <span class="n">2</span> <span class="o">+</span> <span class="n">2</span> <span class="o">&lt;|</span> <span class="n">3</span> <span class="o">+</span> <span class="n">3</span>
+</code></pre></td>
+</tr>
+</table>
+<p>The whole example is read like this:</p>
+<div class="svg-code" style="width:50%; margin: 30px auto">
+<img src="/images/2016/application/right-piping.svg" alt="How you read right-piping" />
+</div>
+<p>Overall <code>&lt;|</code> is just another delimiter that you could use instead of parenthesis. But
+this kind of behaviour is not really how you would expect it to work. As left-piping with
+<code>|&gt;</code> is used a lot, you would think <code>&lt;|</code> just does the reverse. So in general right-piping
+only adds more confusion and it is better to not use it at all.</p>
+<div class="info">
+If it is unclear why `<|` works in this way. Lets add the parenthesis back in the last example.
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp">((<span class="i">add</span> <span class="o">&lt;|</span> <span class="n">1</span> <span class="o">+</span> <span class="n">1</span>) <span class="o">&lt;|</span> <span class="n">2</span> <span class="o">+</span> <span class="n">2</span>) <span class="o">&lt;|</span> <span class="n">3</span> <span class="o">+</span> <span class="n">3</span>
+</code></pre></td>
+</tr>
+</table>
+<p>The first thing that is executed is <code>(add &lt;| 1 + 1)</code>. This means first <code>1 + 1</code> is calculated and
+the result <code>2</code> is passed to the <code>add</code> function as the first argument. But the parenthesis around
+this term end this term. So what do we really do? We basically <em>partial apply</em> <code>add</code> with a single
+argument. This then returns a new anonymous function that expects the remaining arguments
+<code>y</code> and <code>z</code> of <code>add</code>.</p>
+<p>Then <code>2 + 2</code> is calculated and this is once again <em>partial applied</em> to that anonymous function. This
+then returns another new anonymous function that expects the last argument <code>z</code>. And to this function
+we finally apply <code>3 + 3</code> to it what then executes everything.
+</div></p>
+<h2>Nesting again</h2>
+<p>Writing code in a piping style with left-piping is probably the most common and most used
+way you see in F#. Its not that this is in general a bad idea, but it can be bad if people
+try to solve everything this way. It is important to understand when it is a good idea
+and when not.</p>
+<p>Piping is only a good idea if:</p>
+<ol>
+<li>The last argument of a function is a more complex computation</li>
+<li>A function only has a single argument that is the result of another function</li>
+<li>You need to chain multiple of those functions in one explicit order</li>
+</ol>
+<p>To understand those restriction better, let's talk about the List module. Why can we usually
+chain most of the List functions? For example we can create something like this:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp">[<span class="n">1..</span><span class="n">100</span>]
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs16', 101)" onmouseover="showTip(event, 'fs16', 101)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs20', 102)" onmouseover="showTip(event, 'fs20', 102)" class="f">filter</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs5', 103)" onmouseover="showTip(event, 'fs5', 103)" class="i">x</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs5', 104)" onmouseover="showTip(event, 'fs5', 104)" class="i">x</span> <span class="o">%</span> <span class="n">2</span> <span class="o">=</span> <span class="n">0</span>)   <span class="c">// [2; 4; 6; 8; ...]</span>
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs16', 105)" onmouseover="showTip(event, 'fs16', 105)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 106)" onmouseover="showTip(event, 'fs17', 106)" class="f">map</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs5', 107)" onmouseover="showTip(event, 'fs5', 107)" class="i">x</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs5', 108)" onmouseover="showTip(event, 'fs5', 108)" class="i">x</span> <span class="o">*</span> <span class="n">2</span>)          <span class="c">// [4; 8; 12, 16; ...]</span>
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs16', 109)" onmouseover="showTip(event, 'fs16', 109)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs21', 110)" onmouseover="showTip(event, 'fs21', 110)" class="f">fold</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs22', 111)" onmouseover="showTip(event, 'fs22', 111)" class="i">acc</span> <span onmouseout="hideTip(event, 'fs5', 112)" onmouseover="showTip(event, 'fs5', 112)" class="i">x</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs22', 113)" onmouseover="showTip(event, 'fs22', 113)" class="i">acc</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs5', 114)" onmouseover="showTip(event, 'fs5', 114)" class="i">x</span>) <span class="n">0</span> <span class="c">// 5100</span>
+</code></pre></td>
+</tr>
+</table>
+<p>The first reason is the order of the arguments. All of those functions expects the list as the
+last argument:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs16', 115)" onmouseover="showTip(event, 'fs16', 115)" class="i">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs20', 116)" onmouseover="showTip(event, 'fs20', 116)" class="i">filter</span> <span class="i">predicate</span> <span onmouseout="hideTip(event, 'fs23', 117)" onmouseover="showTip(event, 'fs23', 117)" class="i">list</span>
+<span onmouseout="hideTip(event, 'fs16', 118)" onmouseover="showTip(event, 'fs16', 118)" class="i">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 119)" onmouseover="showTip(event, 'fs17', 119)" class="i">map</span> <span class="i">mapper</span> <span onmouseout="hideTip(event, 'fs23', 120)" onmouseover="showTip(event, 'fs23', 120)" class="i">list</span>
+<span onmouseout="hideTip(event, 'fs16', 121)" onmouseover="showTip(event, 'fs16', 121)" class="i">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs21', 122)" onmouseover="showTip(event, 'fs21', 122)" class="i">fold</span> <span class="i">folder</span> <span class="i">state</span> <span onmouseout="hideTip(event, 'fs23', 123)" onmouseover="showTip(event, 'fs23', 123)" class="i">list</span>
+</code></pre></td>
+</tr>
+</table>
+<p>But even if we switch the order of the arguments we always can use piping, but it probably isn't
+more readable anymore. If we for example assume the <code>List.map</code> functions first expects a list
+and then the <em>mapper</em> function, we would write something like this with piping:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp">(<span class="k">fun</span> <span class="i">x</span> <span class="k">-&gt;</span> <span class="i">x</span> <span class="o">*</span> <span class="n">2</span>) <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs16', 124)" onmouseover="showTip(event, 'fs16', 124)" class="i">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 125)" onmouseover="showTip(event, 'fs17', 125)" class="i">map</span> <span onmouseout="hideTip(event, 'fs23', 126)" onmouseover="showTip(event, 'fs23', 126)" class="i">list</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Let's consider we had the same swapping in List.filter</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp">(<span class="k">fun</span> <span class="i">x</span> <span class="k">-&gt;</span> <span class="i">x</span> <span class="o">%</span> <span class="n">2</span> <span class="o">=</span> <span class="n">0</span>) <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs16', 127)" onmouseover="showTip(event, 'fs16', 127)" class="i">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs20', 128)" onmouseover="showTip(event, 'fs20', 128)" class="i">filter</span> [<span class="n">1..</span><span class="n">100</span>]
+</code></pre></td>
+</tr>
+</table>
+<p>As <code>List.map</code> used the result of <code>List.filter</code> in our first example we would end with something
+like this if <em>map</em> and <em>filter</em> had swapped arguments:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp">(<span class="k">fun</span> <span class="i">x</span> <span class="k">-&gt;</span> <span class="i">x</span> <span class="o">*</span> <span class="n">2</span>) <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs16', 129)" onmouseover="showTip(event, 'fs16', 129)" class="i">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 130)" onmouseover="showTip(event, 'fs17', 130)" class="i">map</span> ((<span class="k">fun</span> <span class="i">x</span> <span class="k">-&gt;</span> <span class="i">x</span> <span class="o">%</span> <span class="n">2</span> <span class="o">=</span> <span class="n">0</span>) <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs16', 131)" onmouseover="showTip(event, 'fs16', 131)" class="i">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs20', 132)" onmouseover="showTip(event, 'fs20', 132)" class="i">filter</span> [<span class="n">1..</span><span class="n">100</span>])
+</code></pre></td>
+</tr>
+</table>
+<p>But this kind of code is not readable or understandable at all. So a good choice for the
+last argument is usually some kind of immutable data-type. But that is not everything. In
+<code>List.fold</code> we have two immutable data-types. The <code>state</code> and the <code>list</code>. So why is <code>list</code>
+the better choice? Because a list is very likely the result of a more complex computation.
+The <code>state</code> is almost always just a plain direct value like <code>0</code> or an empty list and so on.
+Very unlikely will you have a complex computation that computes the <code>state</code>.</p>
+<p>As a thumb of rule we can say: It is a good idea if the output type of a function and the type of the
+last argument is the same. Most of the functions from the List module are build that way. Most of those
+functions return a new list, and most of them also expect a list as the last argument. It is in some
+sense only natural that if you have dozens of functions that operate, transforms or create list that
+you want to compose these functions together.</p>
+<p>Picking the correct last argument of a function is important, but that is not everything. The
+problem is, sometimes you don't have one clear value to put as the last argument, sometimes more
+than the last value gets computed, and so on. Whether or not piping is a good case also depends
+on the argument itself. Let's pick another function to explore this behaviour: <code>List.append</code></p>
+<p>The purpose of <code>List.append</code> is to append two lists together into one list. Whether or not piping is a
+good choice now depends on the arguments itself. If only one argument is computed, it still works
+fine with piping.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp">[<span class="n">1..</span><span class="n">100</span>]
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs16', 133)" onmouseover="showTip(event, 'fs16', 133)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs20', 134)" onmouseover="showTip(event, 'fs20', 134)" class="f">filter</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs5', 135)" onmouseover="showTip(event, 'fs5', 135)" class="i">x</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs5', 136)" onmouseover="showTip(event, 'fs5', 136)" class="i">x</span> <span class="o">%</span> <span class="n">2</span> <span class="o">=</span> <span class="n">0</span>)   <span class="c">// [2; 4; 6; 8; ...]</span>
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs16', 137)" onmouseover="showTip(event, 'fs16', 137)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 138)" onmouseover="showTip(event, 'fs17', 138)" class="f">map</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs5', 139)" onmouseover="showTip(event, 'fs5', 139)" class="i">x</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs5', 140)" onmouseover="showTip(event, 'fs5', 140)" class="i">x</span> <span class="o">*</span> <span class="n">2</span>)          <span class="c">// [4; 8; 12, 16; ...]</span>
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs16', 141)" onmouseover="showTip(event, 'fs16', 141)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs24', 142)" onmouseover="showTip(event, 'fs24', 142)" class="f">append</span> [<span class="n">100</span>;<span class="n">50</span>]               <span class="c">// [100; 50; 4; 8; 12; ...]</span>
+</code></pre></td>
+</tr>
+</table>
+<p>But if both lists are the result of a computation, then nesting is a much better choice.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+<span class="l">16: </span>
+<span class="l">17: </span>
+<span class="l">18: </span>
+<span class="l">19: </span>
+<span class="l">20: </span>
+<span class="l">21: </span>
+<span class="l">22: </span>
+<span class="l">23: </span>
+<span class="l">24: </span>
+<span class="l">25: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs25', 143)" onmouseover="showTip(event, 'fs25', 143)" class="f">add1</span> <span onmouseout="hideTip(event, 'fs9', 144)" onmouseover="showTip(event, 'fs9', 144)" class="i">x</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs9', 145)" onmouseover="showTip(event, 'fs9', 145)" class="i">x</span> <span class="o">+</span> <span class="n">1.0</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs26', 146)" onmouseover="showTip(event, 'fs26', 146)" class="f">sub1</span> <span onmouseout="hideTip(event, 'fs9', 147)" onmouseover="showTip(event, 'fs9', 147)" class="i">x</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs9', 148)" onmouseover="showTip(event, 'fs9', 148)" class="i">x</span> <span class="o">-</span> <span class="n">1.0</span>
+
+<span class="c">// Using Nesting</span>
+<span onmouseout="hideTip(event, 'fs16', 149)" onmouseover="showTip(event, 'fs16', 149)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs24', 150)" onmouseover="showTip(event, 'fs24', 150)" class="f">append</span>
+  (<span onmouseout="hideTip(event, 'fs16', 151)" onmouseover="showTip(event, 'fs16', 151)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 152)" onmouseover="showTip(event, 'fs17', 152)" class="f">map</span> <span onmouseout="hideTip(event, 'fs8', 153)" onmouseover="showTip(event, 'fs8', 153)" class="f">square</span> (<span onmouseout="hideTip(event, 'fs16', 154)" onmouseover="showTip(event, 'fs16', 154)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 155)" onmouseover="showTip(event, 'fs17', 155)" class="f">map</span> <span onmouseout="hideTip(event, 'fs25', 156)" onmouseover="showTip(event, 'fs25', 156)" class="f">add1</span> [<span class="n">1.0</span> <span class="o">..</span> <span class="n">5.0</span>]))
+  (<span onmouseout="hideTip(event, 'fs16', 157)" onmouseover="showTip(event, 'fs16', 157)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 158)" onmouseover="showTip(event, 'fs17', 158)" class="f">map</span> <span onmouseout="hideTip(event, 'fs8', 159)" onmouseover="showTip(event, 'fs8', 159)" class="f">square</span> (<span onmouseout="hideTip(event, 'fs16', 160)" onmouseover="showTip(event, 'fs16', 160)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 161)" onmouseover="showTip(event, 'fs17', 161)" class="f">map</span> <span onmouseout="hideTip(event, 'fs26', 162)" onmouseover="showTip(event, 'fs26', 162)" class="f">sub1</span> [<span class="n">1.0</span> <span class="o">..</span> <span class="n">5.0</span>]))
+
+<span class="c">// The same as above with partial piping...</span>
+[<span class="n">1.0</span> <span class="o">..</span> <span class="n">5.0</span>]
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs16', 163)" onmouseover="showTip(event, 'fs16', 163)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 164)" onmouseover="showTip(event, 'fs17', 164)" class="f">map</span> <span onmouseout="hideTip(event, 'fs26', 165)" onmouseover="showTip(event, 'fs26', 165)" class="f">sub1</span>
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs16', 166)" onmouseover="showTip(event, 'fs16', 166)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 167)" onmouseover="showTip(event, 'fs17', 167)" class="f">map</span> <span onmouseout="hideTip(event, 'fs8', 168)" onmouseover="showTip(event, 'fs8', 168)" class="f">square</span>
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs16', 169)" onmouseover="showTip(event, 'fs16', 169)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs24', 170)" onmouseover="showTip(event, 'fs24', 170)" class="f">append</span> (<span onmouseout="hideTip(event, 'fs16', 171)" onmouseover="showTip(event, 'fs16', 171)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 172)" onmouseover="showTip(event, 'fs17', 172)" class="f">map</span> <span onmouseout="hideTip(event, 'fs8', 173)" onmouseover="showTip(event, 'fs8', 173)" class="f">square</span> (<span onmouseout="hideTip(event, 'fs16', 174)" onmouseover="showTip(event, 'fs16', 174)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 175)" onmouseover="showTip(event, 'fs17', 175)" class="f">map</span> <span onmouseout="hideTip(event, 'fs25', 176)" onmouseover="showTip(event, 'fs25', 176)" class="f">add1</span> [<span class="n">1.0</span> <span class="o">..</span> <span class="n">5.0</span>]))
+
+<span class="c">// ...with even more piping</span>
+[<span class="n">1.0</span> <span class="o">..</span> <span class="n">5.0</span>]
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs16', 177)" onmouseover="showTip(event, 'fs16', 177)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 178)" onmouseover="showTip(event, 'fs17', 178)" class="f">map</span> <span onmouseout="hideTip(event, 'fs26', 179)" onmouseover="showTip(event, 'fs26', 179)" class="f">sub1</span>
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs16', 180)" onmouseover="showTip(event, 'fs16', 180)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 181)" onmouseover="showTip(event, 'fs17', 181)" class="f">map</span> <span onmouseout="hideTip(event, 'fs8', 182)" onmouseover="showTip(event, 'fs8', 182)" class="f">square</span>
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs16', 183)" onmouseover="showTip(event, 'fs16', 183)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs24', 184)" onmouseover="showTip(event, 'fs24', 184)" class="f">append</span> ([<span class="n">1.0</span> <span class="o">..</span> <span class="n">5.0</span>] <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs16', 185)" onmouseover="showTip(event, 'fs16', 185)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 186)" onmouseover="showTip(event, 'fs17', 186)" class="f">map</span> <span onmouseout="hideTip(event, 'fs25', 187)" onmouseover="showTip(event, 'fs25', 187)" class="f">add1</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs16', 188)" onmouseover="showTip(event, 'fs16', 188)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 189)" onmouseover="showTip(event, 'fs17', 189)" class="f">map</span> <span onmouseout="hideTip(event, 'fs8', 190)" onmouseover="showTip(event, 'fs8', 190)" class="f">square</span>)
+
+<span class="c">// ...full piping including the evil &lt;|</span>
+[<span class="n">1.0</span> <span class="o">..</span> <span class="n">5.0</span>]
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs16', 191)" onmouseover="showTip(event, 'fs16', 191)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 192)" onmouseover="showTip(event, 'fs17', 192)" class="f">map</span> <span onmouseout="hideTip(event, 'fs25', 193)" onmouseover="showTip(event, 'fs25', 193)" class="f">add1</span>   <span class="c">// &lt;-- add1 instead of sub1!!!</span>
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs16', 194)" onmouseover="showTip(event, 'fs16', 194)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 195)" onmouseover="showTip(event, 'fs17', 195)" class="f">map</span> <span onmouseout="hideTip(event, 'fs8', 196)" onmouseover="showTip(event, 'fs8', 196)" class="f">square</span>
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs16', 197)" onmouseover="showTip(event, 'fs16', 197)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs24', 198)" onmouseover="showTip(event, 'fs24', 198)" class="f">append</span> <span class="o">&lt;|</span> ([<span class="n">1.0</span> <span class="o">..</span> <span class="n">5.0</span>] <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs16', 199)" onmouseover="showTip(event, 'fs16', 199)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 200)" onmouseover="showTip(event, 'fs17', 200)" class="f">map</span> <span onmouseout="hideTip(event, 'fs26', 201)" onmouseover="showTip(event, 'fs26', 201)" class="f">sub1</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs16', 202)" onmouseover="showTip(event, 'fs16', 202)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 203)" onmouseover="showTip(event, 'fs17', 203)" class="f">map</span> <span onmouseout="hideTip(event, 'fs8', 204)" onmouseover="showTip(event, 'fs8', 204)" class="f">square</span>)
+</code></pre></td>
+</tr>
+</table>
+<p>Also notice that in the last version, the parenthesis at the right of <code>&lt;|</code> are still important
+and the whole order of <code>List.map add1</code> and <code>List.map sub1</code> changed!</p>
+<div class="info">
+Do you understand why <code>add1</code> and <code>sub1</code> needs to be swapped in the last example?
+Consider the following function:
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">sub</span> <span class="i">x</span> <span class="i">y</span> <span class="o">=</span> <span class="i">x</span> <span class="o">-</span> <span class="i">y</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Now look at those three definitions and their results:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="i">sub</span> <span class="n">5</span> <span class="n">3</span>       <span class="c">// 2</span>
+<span class="n">3</span> <span class="o">|&gt;</span> <span class="i">sub</span> <span class="n">5</span>    <span class="c">// 2</span>
+<span class="n">3</span> <span class="o">|&gt;</span> <span class="i">sub</span> <span class="o">&lt;|</span> <span class="n">5</span> <span class="c">// -2</span>
+</code></pre></td>
+</tr>
+</table>
+<p>In the first and second example <code>5</code> is the first argument to <code>sub</code>. It is also the
+first argument in the second example because function application has a higher precedence
+as <code>|&gt;</code>. In the last example there is no direct function application anymore and <code>3 |&gt; sub</code>
+is executed first and <code>3</code> becomes the first argument of <code>sub</code>. With explicit parenthesis, the code
+is interpreted like this:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="i">sub</span> <span class="n">5</span> <span class="n">3</span>         <span class="c">// 2</span>
+<span class="n">3</span> <span class="o">|&gt;</span> (<span class="i">sub</span> <span class="n">5</span>)    <span class="c">// 2</span>
+(<span class="n">3</span> <span class="o">|&gt;</span> <span class="i">sub</span>) <span class="o">&lt;|</span> <span class="n">5</span> <span class="c">// -2</span>
+</code></pre></td>
+</tr>
+</table>
+</div>
+<p>Before we go further lets formalize why this kind of code is so hard to write with piping.
+We have this problem because we don't have a single chain of computations anymore. We have two paths
+of computation that are different. When we call <code>List.append</code> it is just a way to combine
+those two computations. In other words, our computation resembles a tree.</p>
+<div class="svg-code" style="width:50%; margin: 30px auto">
+<img src="/images/2016/application/tree.svg" alt="Shows the computation as a tree" />
+</div>
+<p>Piping is not a good tool for those kind of trees. Piping is only a good option for
+computations that works in a linear/sequential way. Nesting on the other hand don't have
+this problem. If some argument is a more complex computation we always can surround the term
+with parenthesis and embed the term where we need it. Look once again at the math example
+to understand this:</p>
+<div class="svg-code" style="width:50%; margin: 30px auto">
+<img src="/images/2016/application/math.svg" alt="A Math example" />
+</div>
+<p>If you don't see the tree in it. First consider that operators like <code>+</code>, <code>-</code> or <code>*</code> are just
+binary operators that expects two arguments. So a term like <code>5 + 5</code> also could be represented
+as a tree. <code>+</code> is the node with two arguments.</p>
+<div class="svg-code" style="width:25%; margin: 30px auto">
+<img src="/images/2016/application/add5-tree.svg" alt="Shows how 5 + 5 can be read as a tree" />
+</div>
+<p>You can apply this idea to the whole math formula <code>(5 + 5) * (3 + (6 * 2))</code>:</p>
+<div class="svg-code" style="width:100%; margin: 30px auto">
+<img src="/images/2016/application/math-tree.svg" alt="Visualize the math formula as a tree" />
+</div>
+<p>The only problem we have is to properly write those nesting so it is still readable. It isn't
+useful if a line expand further and further. We need to properly format the code so we can
+better understand it. And there is an easy way to format code with nesting. If things starts
+to get too long we just can put every argument on a new line and indent it. We already have
+seen this in the nested <code>List.append</code> example.</p>
+<div class="svg-code" style="width:100%; margin: 30px auto">
+<img src="/images/2016/application/append.svg" alt="List.append example" />
+</div>
+<p>In fact these kind of formatting works with any kind of tree like structure no matter how
+complicated it seems. Here you can see a visualization of a tree and how you represent
+it with indentation.</p>
+<div class="svg-code" style="width:100%; margin: 30px auto">
+<img src="/images/2016/application/tree2.svg" alt="More complex example of a tree structure" />
+</div>
+<p>In fact, if you ever have written HTML or XML you should be comfortable with this. Both document
+formats are tree structures. You have a starting and an end-tag. Inside of a tag you can nest
+other tags to create hierachical structures. The rules you already use to properly indent
+and format HTML also can be used to format and indent nested code with parenthesis.</p>
+<p>Up so far we have seen two kinds of code. One kind is sequential. With sequential code we can
+use piping for a better representation. But if we have tree like structures just normal
+nesting is quite better. The question we should ask is: Should we try to represent
+anything as a sequence?</p>
+<p>The answer is actually, no. Not everything can be written in a linear way. I would even argue
+that representing things as trees is easier. Trying to fit everything into a piping style just
+can limit the view in how to solve problems in general. This is best described with
+an example.</p>
+<h2>Binary Converter</h2>
+<p>In our example we want to write a function that can convert any number into a binary string
+representation. Before we start coding we actually need to know an algorithm that
+solves our problem.</p>
+<p>The algorithm I describe does not only work for converting numbers to binary, we also can
+convert numbers to other bases like octal, hexadecimal and so on. For demonstrating the
+algorithm I first show how we convert a number into decimal because it is a lot easier to follow.</p>
+<p>In general the algorithm works by removing one digit from a number, convert it into a string
+and repeat that process for the remaining number. That description also already tell us that we
+have a recursive algorithm.</p>
+<p>The first step is to remove one digit from a number. We achieve this by using the modulo operation.
+When we calculate <code>x % 10</code> we always get the right most digit of a number. This is just
+a single digit between zero and nine. This allows us to create a function that just can convert
+any digit to its string representation.</p>
+<p>For example when we start with the number <code>225</code> we calculate <code>225 % 10</code> and get <code>5</code> out of it.
+This <code>5</code> then can be passed to a function that knows how to transform the numbers zero to nine
+to a string.</p>
+<p>But we are not finished after this step. We only transformed the <code>5</code> from <code>225</code> into a string.
+But we still need to transform the remaining digits <code>22</code>. So we actually need a way to <em>remove</em>
+<code>5</code> from <code>225</code>.</p>
+<p>We achieve that by dividing by the base. First we subtract <code>5</code> from <code>225</code>. So we get <code>220</code>.
+Then we divide by ten to get <code>22</code>. In general dividing or multiplying a number by its base means
+we can shift the value. Multiplying by the base means we add zeros at the right of a number. Dividing
+by the base means we remove zeros.</p>
+<p>So the step to transform 225 into a string are:</p>
+<div class="svg-code" style="width:25%; margin: 0 0 1rem 30px">
+<img src="/images/2016/application/algorithm-decimal.svg" alt="Shows the steps to transform 255 into a decimal string" />
+</div>
+<p>As you can see. Every modulo operation returns the right most digit of a number. By subtracting that
+digit and dividing by 10. We get a new number. We just repeat that process until we end up at zero.</p>
+<p>As said at the beginning. This algorithm works for any base. If we want to convert a number into a
+binary representation we just do modulo 2 and divide by 2.</p>
+<div class="svg-code" style="width:25%; margin: 0 0 1rem 30px">
+<img src="/images/2016/application/algorithm-binary.svg" alt="Shows the steps to transform 255 into a binary string" />
+</div>
+<p>If we concatenate the modulo operation we get "1110 0001" as the result. So, how do we transform
+this algorithm into code? We could write the whole computations directly. But it is usually
+easier to decompose the problem into smaller parts, or functions in our case. So lets split the
+various steps into functions with meaningful names.</p>
+<p>First we need a way to extract the right most digit from a number. So we just create a function
+<code>extract</code> that does this step.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs27', 205)" onmouseover="showTip(event, 'fs27', 205)" class="f">extract</span> <span onmouseout="hideTip(event, 'fs5', 206)" onmouseover="showTip(event, 'fs5', 206)" class="i">x</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs5', 207)" onmouseover="showTip(event, 'fs5', 207)" class="i">x</span> <span class="o">%</span> <span class="n">2</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Once we have such a function, we actually need a way to transform the digits
+returned by <code>extract</code> to a string.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs28', 208)" onmouseover="showTip(event, 'fs28', 208)" class="f">toString</span> <span onmouseout="hideTip(event, 'fs5', 209)" onmouseover="showTip(event, 'fs5', 209)" class="i">x</span> <span class="o">=</span>
+    <span class="k">match</span> <span onmouseout="hideTip(event, 'fs5', 210)" onmouseover="showTip(event, 'fs5', 210)" class="i">x</span> <span class="k">with</span>
+    | <span class="n">0</span> <span class="k">-&gt;</span> <span class="s">&quot;0&quot;</span>
+    | <span class="n">1</span> <span class="k">-&gt;</span> <span class="s">&quot;1&quot;</span>
+    | _ <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs29', 211)" onmouseover="showTip(event, 'fs29', 211)" class="f">failwith</span> <span class="s">&quot;This should not happen&quot;</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Another function we need is the idea of right-shift a number. With a decimal number we turn the
+number <code>225</code> to <code>22</code>, with binary we turn <code>225</code> into <code>112</code> ((225 - 1) / 2)</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs30', 212)" onmouseover="showTip(event, 'fs30', 212)" class="f">rightShift</span> <span onmouseout="hideTip(event, 'fs5', 213)" onmouseover="showTip(event, 'fs5', 213)" class="i">x</span> <span class="o">=</span> (<span onmouseout="hideTip(event, 'fs5', 214)" onmouseover="showTip(event, 'fs5', 214)" class="i">x</span> <span class="o">-</span> (<span onmouseout="hideTip(event, 'fs27', 215)" onmouseover="showTip(event, 'fs27', 215)" class="f">extract</span> <span onmouseout="hideTip(event, 'fs5', 216)" onmouseover="showTip(event, 'fs5', 216)" class="i">x</span>)) <span class="o">/</span> <span class="n">2</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Are we done? Well, let's try to create a binary convert at this point. We could come up with
+code like this:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="k">rec</span> <span class="i">toBinary</span> <span class="i">x</span> <span class="o">=</span>
+    <span class="k">let</span> <span class="i">rightEnd</span> <span class="o">=</span> <span class="i">toString</span> (<span class="i">extract</span> <span class="i">x</span>)
+    <span class="k">let</span> <span class="i">rest</span>     <span class="o">=</span> <span class="i">toBinary</span> (<span class="i">rightShift</span> <span class="i">x</span>)
+    <span class="o">..</span><span class="o">.</span>
+</code></pre></td>
+</tr>
+</table>
+<p>So we calculate two values. First we extract the right most digit and convert it into a string.
+If we have <code>225</code> as input this would be the first step in our calculation and the string <code>"1"</code>
+is stored in <code>rightEnd</code>.</p>
+<p>When we call <code>rightShift x</code> the result is <code>112</code>. But what do we do with that? Well, this is the
+reason why it is a recursive function. We need to repeat the calculation until we end up
+with zero. That's why we pass the result to <code>toBinary</code> immediately.</p>
+<p>If you are not used to recursion it can probably be hard to understand what this will return.
+In recursion you just make the assumption the the recursive call just somehow works. So what is
+the result of <code>toBinary (rightShift 112)</code>? It is the string representation of the number <code>112</code>.</p>
+<p>So what do we have exactly? We have the first right most bit. It is stored inside <code>rightEnd</code>,
+and in <code>rest</code> the rest of the transformation is saved. In our example this means:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="i">rightEnd</span> <span class="o">=</span> <span class="s">&quot;1&quot;</span>
+<span class="i">rest</span>     <span class="o">=</span> <span class="s">&quot;1110000&quot;</span>
+</code></pre></td>
+</tr>
+</table>
+<p>The "missing" part we currently have is, that we need to combine those two strings into a single
+string. So we need another function that can concatenate two strings:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs31', 217)" onmouseover="showTip(event, 'fs31', 217)" class="f">concat</span> <span onmouseout="hideTip(event, 'fs32', 218)" onmouseover="showTip(event, 'fs32', 218)" class="i">x</span> <span onmouseout="hideTip(event, 'fs33', 219)" onmouseover="showTip(event, 'fs33', 219)" class="i">y</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs34', 220)" onmouseover="showTip(event, 'fs34', 220)" class="t">String</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs35', 221)" onmouseover="showTip(event, 'fs35', 221)" class="f">concat</span> <span class="s">&quot;&quot;</span> [|<span onmouseout="hideTip(event, 'fs32', 222)" onmouseover="showTip(event, 'fs32', 222)" class="i">x</span>;<span onmouseout="hideTip(event, 'fs33', 223)" onmouseover="showTip(event, 'fs33', 223)" class="i">y</span>|]
+</code></pre></td>
+</tr>
+</table>
+<p>Now we have two computations that we merge together, we write:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="k">rec</span> <span class="i">toBinary</span> <span class="o">=</span>
+    <span class="i">concat</span>
+        (<span class="i">toBinary</span> (<span class="i">rightShift</span> <span class="i">x</span>))
+        (<span class="i">toString</span> (<span class="i">extract</span> <span class="i">x</span>))
+</code></pre></td>
+</tr>
+</table>
+<p>But we are still not done. We need a way to abort the recursion. Currently the function
+would loop forever (Theoretically, practically it blows up with a stack overflow exception).</p>
+<p>So we need to check if <code>rightShift x</code> reached zero. If it reached zero we just use an empty
+string for the string concatenation, otherwise we use the result of the recursive call
+for the string concatenation.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="k">rec</span> <span class="i">toBinary</span> <span class="o">=</span>
+    <span class="i">concat</span>
+        (<span class="k">if</span> (<span class="i">rightShift</span> <span class="i">x</span>) <span class="o">=</span> <span class="n">0</span> <span class="k">then</span> <span class="s">&quot;&quot;</span> <span class="k">else</span> <span class="i">toBinary</span> (<span class="i">rightShift</span> <span class="i">x</span>))
+        (<span class="i">toString</span> (<span class="i">extract</span> <span class="i">x</span>))
+</code></pre></td>
+</tr>
+</table>
+<p>All functions we created are only useful for the <code>toBinary</code> function, we also can embed
+all functions inside <code>toBinary</code> in this case. So our final solution looks like:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+<span class="l">16: </span>
+<span class="l">17: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="k">rec</span> <span onmouseout="hideTip(event, 'fs36', 224)" onmouseover="showTip(event, 'fs36', 224)" class="f">toBinary</span> <span onmouseout="hideTip(event, 'fs5', 225)" onmouseover="showTip(event, 'fs5', 225)" class="i">x</span> <span class="o">=</span>
+    <span class="c">// Helper functions</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs37', 226)" onmouseover="showTip(event, 'fs37', 226)" class="f">extract</span> <span onmouseout="hideTip(event, 'fs5', 227)" onmouseover="showTip(event, 'fs5', 227)" class="i">x</span>    <span class="o">=</span> <span onmouseout="hideTip(event, 'fs5', 228)" onmouseover="showTip(event, 'fs5', 228)" class="i">x</span> <span class="o">%</span> <span class="n">2</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs38', 229)" onmouseover="showTip(event, 'fs38', 229)" class="f">rightShift</span> <span onmouseout="hideTip(event, 'fs5', 230)" onmouseover="showTip(event, 'fs5', 230)" class="i">x</span> <span class="o">=</span> (<span onmouseout="hideTip(event, 'fs5', 231)" onmouseover="showTip(event, 'fs5', 231)" class="i">x</span> <span class="o">-</span> (<span onmouseout="hideTip(event, 'fs37', 232)" onmouseover="showTip(event, 'fs37', 232)" class="f">extract</span> <span onmouseout="hideTip(event, 'fs5', 233)" onmouseover="showTip(event, 'fs5', 233)" class="i">x</span>)) <span class="o">/</span> <span class="n">2</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs39', 234)" onmouseover="showTip(event, 'fs39', 234)" class="f">toString</span>     <span class="o">=</span> <span class="k">function</span>
+        | <span class="n">0</span> <span class="k">-&gt;</span> <span class="s">&quot;0&quot;</span> | <span class="n">1</span> <span class="k">-&gt;</span> <span class="s">&quot;1&quot;</span>
+        | _ <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs29', 235)" onmouseover="showTip(event, 'fs29', 235)" class="f">failwith</span> <span class="s">&quot;This should not happen&quot;</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs40', 236)" onmouseover="showTip(event, 'fs40', 236)" class="f">concat</span> <span onmouseout="hideTip(event, 'fs32', 237)" onmouseover="showTip(event, 'fs32', 237)" class="i">x</span> <span onmouseout="hideTip(event, 'fs33', 238)" onmouseover="showTip(event, 'fs33', 238)" class="i">y</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs34', 239)" onmouseover="showTip(event, 'fs34', 239)" class="t">String</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs35', 240)" onmouseover="showTip(event, 'fs35', 240)" class="f">concat</span> <span class="s">&quot;&quot;</span> [|<span onmouseout="hideTip(event, 'fs32', 241)" onmouseover="showTip(event, 'fs32', 241)" class="i">x</span>;<span onmouseout="hideTip(event, 'fs33', 242)" onmouseover="showTip(event, 'fs33', 242)" class="i">y</span>|]
+
+    <span class="c">// Main algorithm</span>
+    <span onmouseout="hideTip(event, 'fs40', 243)" onmouseover="showTip(event, 'fs40', 243)" class="f">concat</span>
+        (<span class="k">if</span> (<span onmouseout="hideTip(event, 'fs38', 244)" onmouseover="showTip(event, 'fs38', 244)" class="f">rightShift</span> <span onmouseout="hideTip(event, 'fs5', 245)" onmouseover="showTip(event, 'fs5', 245)" class="i">x</span>) <span class="o">=</span> <span class="n">0</span> <span class="k">then</span> <span class="s">&quot;&quot;</span> <span class="k">else</span> <span onmouseout="hideTip(event, 'fs36', 246)" onmouseover="showTip(event, 'fs36', 246)" class="f">toBinary</span> (<span onmouseout="hideTip(event, 'fs38', 247)" onmouseover="showTip(event, 'fs38', 247)" class="f">rightShift</span> <span onmouseout="hideTip(event, 'fs5', 248)" onmouseover="showTip(event, 'fs5', 248)" class="i">x</span>))
+        (<span onmouseout="hideTip(event, 'fs39', 249)" onmouseover="showTip(event, 'fs39', 249)" class="f">toString</span> (<span onmouseout="hideTip(event, 'fs37', 250)" onmouseover="showTip(event, 'fs37', 250)" class="f">extract</span> <span onmouseout="hideTip(event, 'fs5', 251)" onmouseover="showTip(event, 'fs5', 251)" class="i">x</span>))
+
+<span onmouseout="hideTip(event, 'fs36', 252)" onmouseover="showTip(event, 'fs36', 252)" class="f">toBinary</span> <span class="n">0</span>   <span class="c">// &quot;0&quot;</span>
+<span onmouseout="hideTip(event, 'fs36', 253)" onmouseover="showTip(event, 'fs36', 253)" class="f">toBinary</span> <span class="n">178</span> <span class="c">// &quot;10110010&quot;</span>
+<span onmouseout="hideTip(event, 'fs36', 254)" onmouseover="showTip(event, 'fs36', 254)" class="f">toBinary</span> <span class="n">225</span> <span class="c">// &quot;11100001&quot;</span>
+</code></pre></td>
+</tr>
+</table>
+<p>As a summary, what did we learn so far? I hoped to show, that working with a nesting style
+of functions is actually more easier to work with, and also a lot more natural in some cases. In
+the case of a binary converter we really have two computations or a tree of computations. Not trying
+to think with piping in mind actually makes a lot of stuff easier.</p>
+<p>When we face a problem we just decompose a problem into solvable small functions. Once we decomposed
+a problem we need to compose the small parts back together. The problem is, sometimes that problem
+can be naturally represented as a sequence of operations, but most of the time it can't. In our
+case we also don't have a single sequence of computation. On every recursive step we really
+have two computations.</p>
+<p>One computation determines the next character for our result. And another computation calculates
+the next number we need to recurs on. We end up with two computations, two strings that
+in the end need to put together into a single result. This algorithm is best visualized by a tree.</p>
+<div class="svg-code" style="width:50%; margin: 30px auto">
+<img src="/images/2016/application/tree-tobinary.svg" alt="Shows the toBinary function as a Tree" />
+</div>
+<p>And the classical way to represent trees with code is by nesting and indentions. Piping is
+not a good approach to represent tree structures. If you want to try to solve everything by
+some kind of piping even before you determined if the problem is even solvable in a sequential
+manner, you will only run into problems and will have a hard time to solve these kind of problems.</p>
+<h2>Composition</h2>
+<p>What we have seen so far is function application. Function application means to apply a value to
+a function, or in other words. Execute a function to get the result of a function. Function
+composition on the other hand is completely different. It means, combine two or more functions
+together to create a new function. Even if it seems like two different tasks in theory, in practice
+the difference isn't too big.</p>
+<p>Let's go back to our <code>blub</code> function. We started with:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs12', 255)" onmouseover="showTip(event, 'fs12', 255)" class="f">blub</span> <span onmouseout="hideTip(event, 'fs9', 256)" onmouseover="showTip(event, 'fs9', 256)" class="i">x</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 257)" onmouseover="showTip(event, 'fs8', 257)" class="f">square</span> (<span onmouseout="hideTip(event, 'fs11', 258)" onmouseover="showTip(event, 'fs11', 258)" class="f">add10</span> (<span onmouseout="hideTip(event, 'fs3', 259)" onmouseover="showTip(event, 'fs3', 259)" class="f">sqrt</span> <span onmouseout="hideTip(event, 'fs9', 260)" onmouseover="showTip(event, 'fs9', 260)" class="i">x</span>))
+</code></pre></td>
+</tr>
+</table>
+<p>This code is written with nesting. But as you can see, the real goal was not to execute
+the chain of functions we have. The goal was to create a new function. In such a case, we also
+can use function composition instead.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs41', 261)" onmouseover="showTip(event, 'fs41', 261)" class="f">blub</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 262)" onmouseover="showTip(event, 'fs8', 262)" class="f">square</span> <span class="o">&lt;&lt;</span> <span onmouseout="hideTip(event, 'fs11', 263)" onmouseover="showTip(event, 'fs11', 263)" class="f">add10</span> <span class="o">&lt;&lt;</span> <span onmouseout="hideTip(event, 'fs3', 264)" onmouseover="showTip(event, 'fs3', 264)" class="f">sqrt</span>
+</code></pre></td>
+</tr>
+</table>
+<p>In this example you can see that the most natural way to write nesting as function composition
+is to use <code>&lt;&lt;</code>. With nesting we read the code from right to left. On the right is the input of
+a function, on its left the output. The <code>&lt;&lt;</code> operator preserves this structure. The input of
+<code>square</code> is the result of <code>add10</code>. The input of <code>add10</code> is the result of <code>sqrt</code>. And the input
+of <code>sqrt</code> becomes the input of the <code>blub</code> function.</p>
+<p>The advantage of function composition is that we can omit parenthesis and variables even further.
+We also don't need explicit function arguments. If we use <code>&gt;&gt;</code> instead of <code>&lt;&lt;</code> we just can
+reverse the whole chain this time.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs41', 265)" onmouseover="showTip(event, 'fs41', 265)" class="f">blub</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs3', 266)" onmouseover="showTip(event, 'fs3', 266)" class="f">sqrt</span> <span class="o">&gt;</span><span class="o">&gt;</span> <span onmouseout="hideTip(event, 'fs11', 267)" onmouseover="showTip(event, 'fs11', 267)" class="f">add10</span> <span class="o">&gt;</span><span class="o">&gt;</span> <span onmouseout="hideTip(event, 'fs8', 268)" onmouseover="showTip(event, 'fs8', 268)" class="f">square</span>
+</code></pre></td>
+</tr>
+</table>
+<p>This is also an even further example why <code>&lt;|</code> is bad. It is only natural to think that <code>&lt;&lt;</code> and
+<code>&gt;&gt;</code> are somewhat the same only in reverse order, and sure they are. But this is not the case
+for the combination <code>&lt;|</code> and <code>|&gt;</code>. The piping operators are really two completely distinct operators
+that work differently.</p>
+<p>While function composition is a little bit shorter compared to piping, the difference isn't that much.
+Because of some problems in F# with the type-inference it also can be that this approach sometimes
+creates a <strong>Value restriction</strong> error. If you encounter such an error, the best fix to those kind
+of error is just to create a function with explicit arguments instead of function composition.
+As the difference is anyway not too big, you also always can use nesting or piping instead of
+function composition.</p>
+<p>One place where function composition is a better choice is if you want to pass a function
+as an argument to another function. Let's look at our <code>blub</code> function again. We first can
+create the <code>blub</code> function and then use it in <code>List.map</code>.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs41', 269)" onmouseover="showTip(event, 'fs41', 269)" class="f">blub</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 270)" onmouseover="showTip(event, 'fs8', 270)" class="f">square</span> <span class="o">&lt;&lt;</span> <span onmouseout="hideTip(event, 'fs11', 271)" onmouseover="showTip(event, 'fs11', 271)" class="f">add10</span> <span class="o">&lt;&lt;</span> <span onmouseout="hideTip(event, 'fs3', 272)" onmouseover="showTip(event, 'fs3', 272)" class="f">sqrt</span>
+<span onmouseout="hideTip(event, 'fs16', 273)" onmouseover="showTip(event, 'fs16', 273)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 274)" onmouseover="showTip(event, 'fs17', 274)" class="f">map</span> <span onmouseout="hideTip(event, 'fs41', 275)" onmouseover="showTip(event, 'fs41', 275)" class="f">blub</span> [<span class="n">1.0</span> <span class="o">..</span> <span class="n">100.0</span>]
+</code></pre></td>
+</tr>
+</table>
+<p>But if you need <code>blub</code> only in a single place, it is a little bit annoying to explicitly create and
+name a function. It is just better to inline the whole function. Without function composition we need
+to write something like this:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs16', 276)" onmouseover="showTip(event, 'fs16', 276)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 277)" onmouseover="showTip(event, 'fs17', 277)" class="f">map</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs9', 278)" onmouseover="showTip(event, 'fs9', 278)" class="i">x</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs8', 279)" onmouseover="showTip(event, 'fs8', 279)" class="f">square</span> (<span onmouseout="hideTip(event, 'fs11', 280)" onmouseover="showTip(event, 'fs11', 280)" class="f">add10</span> (<span onmouseout="hideTip(event, 'fs3', 281)" onmouseover="showTip(event, 'fs3', 281)" class="f">sqrt</span> <span onmouseout="hideTip(event, 'fs9', 282)" onmouseover="showTip(event, 'fs9', 282)" class="i">x</span>))) [<span class="n">1.0</span> <span class="o">..</span> <span class="n">100.0</span>]
+</code></pre></td>
+</tr>
+</table>
+<p>With function composition on the other hand we can shorten this example to:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs16', 283)" onmouseover="showTip(event, 'fs16', 283)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs17', 284)" onmouseover="showTip(event, 'fs17', 284)" class="f">map</span> (<span onmouseout="hideTip(event, 'fs8', 285)" onmouseover="showTip(event, 'fs8', 285)" class="f">square</span> <span class="o">&lt;&lt;</span> <span onmouseout="hideTip(event, 'fs11', 286)" onmouseover="showTip(event, 'fs11', 286)" class="f">add10</span> <span class="o">&lt;&lt;</span> <span onmouseout="hideTip(event, 'fs3', 287)" onmouseover="showTip(event, 'fs3', 287)" class="f">sqrt</span>) [<span class="n">1.0</span> <span class="o">..</span> <span class="n">100.0</span>]
+</code></pre></td>
+</tr>
+</table>
+<h2>Best Practices</h2>
+<p>At the end I just want to gather some best practices. Those are best practices from me and
+like always, every person usually disagree with another 10%.</p>
+<ol>
+<li>Never use <code>&lt;|</code>. People think of it as the reverse of <code>|&gt;</code> but it isn't.</li>
+<li>If you disagree with 1. then at least never mix <code>|&gt;</code> and <code>&lt;|</code> in a single statement.</li>
+<li>
+Never mix <code>&lt;&lt;</code> and <code>&gt;&gt;</code> in a single-statement. <code>f &gt;&gt; g &gt;&gt; h &gt;&gt; i</code> or <code>f &lt;&lt; g &lt;&lt; h &lt;&lt; i</code> is
+easy to understand. <code>f &lt;&lt; g &gt;&gt; h &lt;&lt; i</code> isn't.
+</li>
+<li>
+Don't favour piping over nesting. Piping is only good for strict sequential code. Favour piping
+over nesting means you limit the way you think.
+</li>
+<li>
+If you create new functions. Don't think of piping too much. It is good if you can pipe
+functions, but it is not bad if you cannot do that. Not every function works good with piping.
+</li>
+<li>
+Try to <strong>solve your problem first</strong>. Because nesting is good for any kind of tree structure and
+thus more powerful. Try to use nesting by default.
+</li>
+<li>
+<strong>After</strong> you solved a problem and realized that the code can be represented by a sequence with
+piping. Refactor the code with piping.
+</li>
+<li>If possible, use function composition if you pass functions as arguments instead of lambda functions.</li>
+</ol>
+<h2>Summary</h2>
+<p>Overall we covered function application and composition. We saw function application with nesting
+or piping with operators like <code>|&gt;</code> or <code>&lt;|</code>. We also can use function composition with <code>&lt;&lt;</code> or
+<code>&gt;&gt;</code> in certain situation.</p>
+<p>I hope in this article you learned how all of those operators work, and more important, when you should
+use which kind of style. Nesting, piping and function composition are three ways to either execute
+or compose functions. But not any of those are good in any situation.</p>
+<p>Especially piping is overused in F# in my opinion. Not every problem can be expressed naturally
+in a sequential way of piping. So don't view any problem as a nail that you solve with a hammer.</p>
+
+
+<div class="tip" id="fs1">module Main</div>
+<div class="tip" id="fs2">val x : float<br /><br />Full name: Main.x</div>
+<div class="tip" id="fs3">val sqrt : value:&#39;T -&gt; &#39;U (requires member Sqrt)<br /><br />Full name: Microsoft.FSharp.Core.Operators.sqrt</div>
+<div class="tip" id="fs4">val add : x:int -&gt; y:int -&gt; int<br /><br />Full name: Main.add</div>
+<div class="tip" id="fs5">val x : int</div>
+<div class="tip" id="fs6">val y : int</div>
+<div class="tip" id="fs7">val add1 : (int -&gt; int)<br /><br />Full name: Main.add1</div>
+<div class="tip" id="fs8">val square : x:float -&gt; float<br /><br />Full name: Main.square</div>
+<div class="tip" id="fs9">val x : float</div>
+<div class="tip" id="fs10">val pown : x:&#39;T -&gt; n:int -&gt; &#39;T (requires member get_One and member ( * ) and member ( / ))<br /><br />Full name: Microsoft.FSharp.Core.Operators.pown</div>
+<div class="tip" id="fs11">val add10 : x:float -&gt; float<br /><br />Full name: Main.add10</div>
+<div class="tip" id="fs12">val blub : x:float -&gt; float<br /><br />Full name: Main.blub</div>
+<div class="tip" id="fs13">val a : float</div>
+<div class="tip" id="fs14">val b : float</div>
+<div class="tip" id="fs15">val c : float</div>
+<div class="tip" id="fs16">Multiple items<br />module List<br /><br />from Microsoft.FSharp.Collections<br /><br />--------------------<br />type List&lt;&#39;T&gt; =<br />&#160;&#160;| ( [] )<br />&#160;&#160;| ( :: ) of Head: &#39;T * Tail: &#39;T list<br />&#160;&#160;interface IEnumerable<br />&#160;&#160;interface IEnumerable&lt;&#39;T&gt;<br />&#160;&#160;member GetSlice : startIndex:int option * endIndex:int option -&gt; &#39;T list<br />&#160;&#160;member Head : &#39;T<br />&#160;&#160;member IsEmpty : bool<br />&#160;&#160;member Item : index:int -&gt; &#39;T with get<br />&#160;&#160;member Length : int<br />&#160;&#160;member Tail : &#39;T list<br />&#160;&#160;static member Cons : head:&#39;T * tail:&#39;T list -&gt; &#39;T list<br />&#160;&#160;static member Empty : &#39;T list<br /><br />Full name: Microsoft.FSharp.Collections.List&lt;_&gt;</div>
+<div class="tip" id="fs17">val map : mapping:(&#39;T -&gt; &#39;U) -&gt; list:&#39;T list -&gt; &#39;U list<br /><br />Full name: Microsoft.FSharp.Collections.List.map</div>
+<div class="tip" id="fs18">val add : x:int -&gt; y:int -&gt; z:int -&gt; int<br /><br />Full name: Main.add</div>
+<div class="tip" id="fs19">val z : int</div>
+<div class="tip" id="fs20">val filter : predicate:(&#39;T -&gt; bool) -&gt; list:&#39;T list -&gt; &#39;T list<br /><br />Full name: Microsoft.FSharp.Collections.List.filter</div>
+<div class="tip" id="fs21">val fold : folder:(&#39;State -&gt; &#39;T -&gt; &#39;State) -&gt; state:&#39;State -&gt; list:&#39;T list -&gt; &#39;State<br /><br />Full name: Microsoft.FSharp.Collections.List.fold</div>
+<div class="tip" id="fs22">val acc : int</div>
+<div class="tip" id="fs23">type &#39;T list = List&lt;&#39;T&gt;<br /><br />Full name: Microsoft.FSharp.Collections.list&lt;_&gt;</div>
+<div class="tip" id="fs24">val append : list1:&#39;T list -&gt; list2:&#39;T list -&gt; &#39;T list<br /><br />Full name: Microsoft.FSharp.Collections.List.append</div>
+<div class="tip" id="fs25">val add1 : x:float -&gt; float<br /><br />Full name: Main.add1</div>
+<div class="tip" id="fs26">val sub1 : x:float -&gt; float<br /><br />Full name: Main.sub1</div>
+<div class="tip" id="fs27">val extract : x:int -&gt; int<br /><br />Full name: Main.extract</div>
+<div class="tip" id="fs28">val toString : x:int -&gt; string<br /><br />Full name: Main.toString</div>
+<div class="tip" id="fs29">val failwith : message:string -&gt; &#39;T<br /><br />Full name: Microsoft.FSharp.Core.Operators.failwith</div>
+<div class="tip" id="fs30">val rightShift : x:int -&gt; int<br /><br />Full name: Main.rightShift</div>
+<div class="tip" id="fs31">val concat : x:string -&gt; y:string -&gt; string<br /><br />Full name: Main.concat</div>
+<div class="tip" id="fs32">val x : string</div>
+<div class="tip" id="fs33">val y : string</div>
+<div class="tip" id="fs34">module String<br /><br />from Microsoft.FSharp.Core</div>
+<div class="tip" id="fs35">val concat : sep:string -&gt; strings:seq&lt;string&gt; -&gt; string<br /><br />Full name: Microsoft.FSharp.Core.String.concat</div>
+<div class="tip" id="fs36">val toBinary : x:int -&gt; string<br /><br />Full name: Main.toBinary</div>
+<div class="tip" id="fs37">val extract : (int -&gt; int)</div>
+<div class="tip" id="fs38">val rightShift : (int -&gt; int)</div>
+<div class="tip" id="fs39">val toString : (int -&gt; string)</div>
+<div class="tip" id="fs40">val concat : (string -&gt; string -&gt; string)</div>
+<div class="tip" id="fs41">val blub : (float -&gt; float)<br /><br />Full name: Main.blub</div>
+
+</div>
+
+<div class="related">
+  <h2>Related Posts</h2>
+
+  
+  
+  
+
+  <ul class="related-posts">
+  
+    
+    
+
+    
+  
+    
+    
+
+    
+      <li><h3><a href="https://sidburn.github.io/blog/2017/03/19/understanding-fold">Understanding Fold</a></h3></li>
+      
+      
+    
+  
+    
+    
+
+    
+      <li><h3><a href="https://sidburn.github.io/blog/2017/03/13/variable-arguments">Variable Arguments in F#</a></h3></li>
+      
+      
+    
+  
+    
+    
+
+    
+      <li><h3><a href="https://sidburn.github.io/blog/2017/02/27/mutability-vs-immutability-validation">Mutability vs. Immutability: Valid objects</a></h3></li>
+      
+      
+    
+  
+    
+    
+
+    
+  
+    
+    
+
+    
+      <li><h3><a href="https://sidburn.github.io/blog/2016/05/28/catamorphisms">Catamorphisms</a></h3></li>
+      
+      
+    
+  
+    
+    
+
+    
+      <li><h3><a href="https://sidburn.github.io/blog/2016/05/24/monoids">Monoids</a></h3></li>
+      
+      
+        
+  </ul>
+</div>
+
+<div id="disqus_thread"></div>
+<script>
+var disqus_config = function () {
+    this.page.title = "Function Application and Composition"
+    this.page.url = "http://sidburn.github.io/blog/2016/09/25/function-application-and-composition";
+    this.page.identifier = "/blog/2016/09/25/function-application-and-composition";
+};
+(function() {
+    var d = document, s = d.createElement('script');
+    s.src = '//davidraab.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+    </div>
+    
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-74950849-1', 'auto');
+  ga('send', 'pageview');
+</script>
+    <script id="dsq-count-scr" src="https://davidraab.disqus.com/count.js" async></script>
+  </body>
+</html>

@@ -1,5 +1,3 @@
-destination:      ../
-
 # Dependencies
 markdown:         kramdown
 highlighter:      rouge
