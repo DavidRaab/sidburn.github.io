@@ -1,0 +1,1667 @@
+---
+layout: post
+title: "Introduction to Functional Programming"
+tags: [F#,C#,intro,data,oop,currying,closure]
+description: "Gives an introduction to functional programming and shows how the ideas relates to object-oriented programming"
+keywords: f#, fsharp, introduction, functional, programming, oop, closures, currying, combinators
+---
+
+<p>In this article I want to give a general introduction to some of the fundamental ideas of
+functional programming. I just start with the idea of function as data, and explain
+why functions are viewed as data and why it makes sense to pass functions as arguments.</p>
+<p>When we understand this concept, I start explaining lambda expression,
+currying, partial application and closures. All of this ideas built on each other.</p>
+<p>But I don't stop at functional programming. Instead I will go back to OO programming
+and show you, how you can translate all of these ideas into OO code. Probably
+you will be surprised how similar functional and OO code is, and that most ideas
+are things you already know.</p>
+<p>Overall I show why functional programming and object-oriented programming are
+orthogonal. I hope that by the end of the article you learned something about
+functional programming, but also widen your view on object-oriented programming.</p>
+<h2>Table of Content</h2>
+<ul class="toc">
+  <li>Functional Programming</li>
+  <ul>
+    <li><a href="#fp-data">Functions as Data</a></li>
+    <li><a href="#fp-function">What is a function?</a></li>
+    <li><a href="#fp-exp-functions">Exploiting Functions</a></li>
+    <li><a href="#fp-retn-functions">Functions as return values</a></li>
+    <li><a href="#fp-lambda">There is only lambda</a></li>
+    <li><a href="#fp-currying">Currying</a></li>
+    <li><a href="#fp-closures">Closures</a></li>
+    <li><a href="#fp-example">Example: Currying and Closures</a></li>
+  </ul>
+  <li><a href="#oo">Object-Oriented Programming</a></li>
+  <ul>
+    <li><a href="#oo-class">What is a Class?</a></li>
+    <li><a href="#oo-function">Functions as Data</a></li>
+    <li><a href="#oo-curry-partial-closure">Currying, Partial Application and Closures</a></li>
+    <li><a href="#oo-currying">Currying</a></li>
+    <li><a href="#oo-exercise">Exercise</a></li>
+  </ul>
+  <li><a href="#summary">Summary</a></li>
+  <li><a href="#reading">Further Reading</a></li>
+  <li><a href="#comments">Comments</a></li>
+</ul>
+<a name="fp-data"></a>
+<h2>Functions as data</h2>
+<p>One important concept in functional programming is the ability to use functions just
+as data. This means you can create functions and store them in variables.
+But that also means you can pass those functions to other functions as arguments
+or retrieve a function from a function.</p>
+<p>Sometimes people new to functional programming have some problems to understand
+this idea and how it is useful, but in fact, when you do OO programming
+you do that kind of idea basically all over the place. You do it even more
+often as in a functional language.</p>
+<p>But even if you don't see the connection at the moment, you still could ask
+yourself if that idea really makes sense, or what useful thinks you can
+do with that idea.</p>
+<a name="fp-function"></a>
+<h2>What is a function?</h2>
+<p>Before we go deeper we have to ask ourself: What is a function anyway? Depending
+on the language there are also multiple terms for the word function. Terms
+like procedures, static methods or subroutines.</p>
+<p>When I talk about functions I just mean the concept that you have some kind
+of thing that you can pass some arguments, and it returns a result. As a simple
+example we can think of a <code>square</code> function.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs2', 89)" onmouseover="showTip(event, 'fs2', 89)" class="f">square</span> <span onmouseout="hideTip(event, 'fs3', 90)" onmouseover="showTip(event, 'fs3', 90)" class="i">x</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs3', 91)" onmouseover="showTip(event, 'fs3', 91)" class="i">x</span> <span class="o">*</span> <span onmouseout="hideTip(event, 'fs3', 92)" onmouseover="showTip(event, 'fs3', 92)" class="i">x</span>
+</code></pre></td>
+</tr>
+</table>
+<p>We can pass it several different values, and it will return a result.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs2', 6)" onmouseover="showTip(event, 'fs2', 6)" class="f">square</span> <span class="n">0</span>  <span class="c">// 0</span>
+<span onmouseout="hideTip(event, 'fs2', 7)" onmouseover="showTip(event, 'fs2', 7)" class="f">square</span> <span class="n">1</span>  <span class="c">// 1</span>
+<span onmouseout="hideTip(event, 'fs2', 8)" onmouseover="showTip(event, 'fs2', 8)" class="f">square</span> <span class="n">2</span>  <span class="c">// 4</span>
+<span onmouseout="hideTip(event, 'fs2', 9)" onmouseover="showTip(event, 'fs2', 9)" class="f">square</span> <span class="n">3</span>  <span class="c">// 9</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Despite its simpleness. There are two ways how we can interpret <code>square</code>.</p>
+<ul>
+<li>A function is a series of commands that executes one by one returning some value.</li>
+<li>A function is a transformation of values. We pass some value in, and we get some value out.</li>
+</ul>
+<p>Even if those definitions seems similar, the focus is different. The first definition is
+often used by imperative languages. Functions are <em>just</em> a tool to get rid of
+code-duplication. You have a series of commands? Put them in a function and you later
+can call it again. What do you do if you want to understand
+what a function does? Just explore the commands it executes step-by-step.</p>
+<p>The second definition is how functional languages interpret functions. The focus lies on the
+input and the output. A function is not just a series of commands, it transforms an
+input to an output. You want to know what a function does? Examine the input and output
+of a function. The best would be if the types of a function is already self-speaking enough.
+Otherwise the function name itself should give us enough information what it does.</p>
+<p>But we don't really care how a function work or how it exactly achieve the output
+it returns. South Park teaches this thinking already:</p>
+<p><img src="/images/2016/south_park_profit.png" alt="Underpants and Profit" /></p>
+<p>A function is just something that takes some underpants, then do something, and
+we get some profit out of it. We just have:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="i">Underpants</span> <span class="k">-&gt;</span> <span class="i">Profit</span>
+</code></pre></td>
+</tr>
+</table>
+<p>What happens between those steps? We don't know, but we also don't care. The only
+thing that matters is that we can somehow turn underpants into profit.</p>
+<a name="fp-exp-functions"></a>
+<h2>Exploiting functions</h2>
+<p>The idea that only the input and output of a function matters is quite interesting.
+We could take that idea further and for example rewrite our <code>square</code> function
+into the following way:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs4', 10)" onmouseover="showTip(event, 'fs4', 10)" class="f">squareM</span> <span onmouseout="hideTip(event, 'fs3', 11)" onmouseover="showTip(event, 'fs3', 11)" class="i">x</span> <span class="o">=</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs5', 12)" onmouseover="showTip(event, 'fs5', 12)" class="i">output</span> <span class="o">=</span>
+        <span onmouseout="hideTip(event, 'fs6', 13)" onmouseover="showTip(event, 'fs6', 13)" class="t">Map</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs7', 14)" onmouseover="showTip(event, 'fs7', 14)" class="f">ofList</span> [
+            (<span class="n">1</span>, <span class="n">1</span>)
+            (<span class="n">2</span>, <span class="n">4</span>)
+            (<span class="n">3</span>, <span class="n">9</span>)
+            (<span class="n">4</span>, <span class="n">16</span>)
+        ]
+    <span onmouseout="hideTip(event, 'fs8', 15)" onmouseover="showTip(event, 'fs8', 15)" class="f">defaultArg</span> (<span onmouseout="hideTip(event, 'fs6', 16)" onmouseover="showTip(event, 'fs6', 16)" class="t">Map</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs9', 17)" onmouseover="showTip(event, 'fs9', 17)" class="f">tryFind</span> <span onmouseout="hideTip(event, 'fs3', 18)" onmouseover="showTip(event, 'fs3', 18)" class="i">x</span> <span onmouseout="hideTip(event, 'fs5', 19)" onmouseover="showTip(event, 'fs5', 19)" class="i">output</span>) <span class="n">0</span>
+
+<span onmouseout="hideTip(event, 'fs4', 20)" onmouseover="showTip(event, 'fs4', 20)" class="f">squareM</span> <span class="n">1</span>  <span class="c">// 1</span>
+<span onmouseout="hideTip(event, 'fs4', 21)" onmouseover="showTip(event, 'fs4', 21)" class="f">squareM</span> <span class="n">2</span>  <span class="c">// 4</span>
+<span onmouseout="hideTip(event, 'fs4', 22)" onmouseover="showTip(event, 'fs4', 22)" class="f">squareM</span> <span class="n">3</span>  <span class="c">// 9</span>
+<span onmouseout="hideTip(event, 'fs4', 23)" onmouseover="showTip(event, 'fs4', 23)" class="f">squareM</span> <span class="n">4</span>  <span class="c">// 16</span>
+<span onmouseout="hideTip(event, 'fs4', 24)" onmouseover="showTip(event, 'fs4', 24)" class="f">squareM</span> <span class="n">5</span>  <span class="c">// 0</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Okay, now you are probably saying that this is cheating and not the same. We also get
+a wrong output when we pass it <code>5</code>. We only get correct output for the numbers one
+to four. But actually the previous version was also not <em>correct</em>. When we do:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs2', 25)" onmouseover="showTip(event, 'fs2', 25)" class="f">square</span> <span class="n">100000</span> <span class="c">// 1410065408</span>
+</code></pre></td>
+</tr>
+</table>
+<p>we also get a wrong result. The problem is that we have an integer overflow here.
+<code>square</code> is also not correct, it only happens that our first <code>square</code> function returns
+right result for a lot more arguments, but still not for all inputs.</p>
+<p>But the more important idea is that we could replace a function just with a data-structure.
+A functions just maps some input to its output. That is exactly what the <code>Map</code> data-structure
+does.</p>
+<div class="info">
+A <code>Map</code> is basically a key/value store. In F# it is immutable. In other
+languages a <code>Map</code> is a Dictionary, Hash or Associative Array. In
+non-functional languages they are most often mutable. Another example:
+In JavaScript it is also called an object.
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+<span class="l">7: </span>
+<span class="l">8: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="js"><span class="k">var</span> squares <span class="o">=</span> {
+    <span class="n">1</span>: <span class="n">1</span>,
+    <span class="n">2</span>: <span class="n">4</span>,
+    <span class="n">3</span>: <span class="n">9</span>,
+    <span class="n">4</span>: <span class="n">16</span>
+}
+
+squares[<span class="n">3</span>] <span class="c">// 9</span>
+</code></pre></td></tr></table>
+</div>
+<p>We could spent a lot of time filling out the remaining inputs in <code>squareM</code> to get it
+<em>more correct</em>, but doing a task like this feels a little bit silly. But wait.</p>
+<ol>
+<li>A function and a map data-structure are equivalent</li>
+<li>It makes sense to pass a data-structure as an argument</li>
+<li>Then it also must make sense to pass a function instead</li>
+<li>
+If it feels silly to create all possible input/output combinations in
+a map data-structure to emulate a function, then passing a function
+makes more sense as passing a data-structure.
+</li>
+</ol>
+<p>When you look at it then it indeed makes more sense. We actually can think
+of a function just as a lazy-data-structure. Instead of generating all
+possible input/output values that could exists and save them into a
+data-structure. We just describe how every element can be computed, and
+pass this description instead.</p>
+<p>But lets at least once imagine our language don't support passing functions
+as values. How could we create something similar to the <code>List.map</code> function?
+This is the <code>List.map</code> function:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs10', 26)" onmouseover="showTip(event, 'fs10', 26)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs11', 27)" onmouseover="showTip(event, 'fs11', 27)" class="f">map</span> <span onmouseout="hideTip(event, 'fs2', 28)" onmouseover="showTip(event, 'fs2', 28)" class="f">square</span> [<span class="n">1</span>;<span class="n">2</span>;<span class="n">3</span>;<span class="n">4</span>] <span class="c">// [1;4;9;16]</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Without the ability to pass functions as values we just expect a <code>Map</code>
+data-structure as the first argument instead.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="c">// The map function with a `Map` data-structure</span>
+<span class="k">let</span> <span class="k">rec</span> <span onmouseout="hideTip(event, 'fs12', 29)" onmouseover="showTip(event, 'fs12', 29)" class="f">map</span> <span onmouseout="hideTip(event, 'fs13', 30)" onmouseover="showTip(event, 'fs13', 30)" class="i">data</span> <span onmouseout="hideTip(event, 'fs14', 31)" onmouseover="showTip(event, 'fs14', 31)" class="i">list</span> <span class="o">=</span>
+    <span class="k">match</span> <span onmouseout="hideTip(event, 'fs14', 32)" onmouseover="showTip(event, 'fs14', 32)" class="i">list</span> <span class="k">with</span>
+    | []      <span class="k">-&gt;</span> []
+    | <span onmouseout="hideTip(event, 'fs15', 33)" onmouseover="showTip(event, 'fs15', 33)" class="i">x</span><span class="o">::</span><span onmouseout="hideTip(event, 'fs14', 34)" onmouseover="showTip(event, 'fs14', 34)" class="i">list</span> <span class="k">-&gt;</span> (<span onmouseout="hideTip(event, 'fs6', 35)" onmouseover="showTip(event, 'fs6', 35)" class="t">Map</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs16', 36)" onmouseover="showTip(event, 'fs16', 36)" class="f">find</span> <span onmouseout="hideTip(event, 'fs15', 37)" onmouseover="showTip(event, 'fs15', 37)" class="i">x</span> <span onmouseout="hideTip(event, 'fs13', 38)" onmouseover="showTip(event, 'fs13', 38)" class="i">data</span>) <span class="o">::</span> (<span onmouseout="hideTip(event, 'fs12', 39)" onmouseover="showTip(event, 'fs12', 39)" class="f">map</span> <span onmouseout="hideTip(event, 'fs13', 40)" onmouseover="showTip(event, 'fs13', 40)" class="i">data</span> <span onmouseout="hideTip(event, 'fs14', 41)" onmouseover="showTip(event, 'fs14', 41)" class="i">list</span>)
+
+<span class="c">// We pre-compute the squares from 1 to 10000</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs17', 42)" onmouseover="showTip(event, 'fs17', 42)" class="i">squares</span> <span class="o">=</span>
+    <span onmouseout="hideTip(event, 'fs6', 43)" onmouseover="showTip(event, 'fs6', 43)" class="t">Map</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs7', 44)" onmouseover="showTip(event, 'fs7', 44)" class="f">ofList</span> [
+        <span class="k">for</span> <span onmouseout="hideTip(event, 'fs3', 45)" onmouseover="showTip(event, 'fs3', 45)" class="i">x</span> <span class="k">in</span> <span class="n">1..</span><span class="n">10000</span> <span class="k">do</span>
+            <span class="k">yield</span> <span onmouseout="hideTip(event, 'fs3', 46)" onmouseover="showTip(event, 'fs3', 46)" class="i">x</span>, (<span onmouseout="hideTip(event, 'fs2', 47)" onmouseover="showTip(event, 'fs2', 47)" class="f">square</span> <span onmouseout="hideTip(event, 'fs3', 48)" onmouseover="showTip(event, 'fs3', 48)" class="i">x</span>)
+    ]
+
+<span class="c">// Now we call map with our pre-computed values</span>
+<span onmouseout="hideTip(event, 'fs12', 49)" onmouseover="showTip(event, 'fs12', 49)" class="f">map</span> <span onmouseout="hideTip(event, 'fs17', 50)" onmouseover="showTip(event, 'fs17', 50)" class="i">squares</span> [<span class="n">1</span>;<span class="n">4</span>;<span class="n">20</span>] <span class="c">// [1;16;400]</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Instead of writing all possible value combinations ourself we even could use the <code>square</code>
+function to create the needed data-structure. This even shows more clearly why a function
+and a <code>Map</code> data-structure is basically the same. Our own <code>map</code> function with a
+data-structure is basically the same as the built-in <code>List.map</code>.</p>
+<div class="info">
+The fact that our own <code>map</code> is not tail-recursive and fails with big input lists is not important
+for this article. We could spent some more time in optimizing our own <code>map</code> and make it tail-recursive,
+but the focus is not tail-recursion or performance, the focus is to understand that we can substitute
+a function with a <code>Map</code> data-structure.
+</div>
+<p>It is even interesting to see how similar both <code>map</code> functions are. When we look at both
+definitions we see:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs10', 51)" onmouseover="showTip(event, 'fs10', 51)" class="i">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs11', 52)" onmouseover="showTip(event, 'fs11', 52)" class="i">map</span> <span class="o">:</span> (<span class="o">&#39;</span><span class="i">a</span> <span class="k">-&gt;</span> <span class="o">&#39;</span><span class="i">b</span>) <span class="k">-&gt;</span> <span class="o">&#39;</span><span class="i">a</span> <span onmouseout="hideTip(event, 'fs18', 53)" onmouseover="showTip(event, 'fs18', 53)" class="i">list</span> <span class="k">-&gt;</span> <span class="o">&#39;</span><span class="i">b</span> <span onmouseout="hideTip(event, 'fs18', 54)" onmouseover="showTip(event, 'fs18', 54)" class="i">list</span>
+<span class="i">map</span>      <span class="o">:</span> <span onmouseout="hideTip(event, 'fs6', 55)" onmouseover="showTip(event, 'fs6', 55)" class="i">Map</span><span class="o">&lt;</span><span class="o">&#39;</span><span class="i">a</span>,<span class="o">&#39;</span><span class="i">b</span><span class="o">&gt;</span> <span class="k">-&gt;</span> <span class="o">&#39;</span><span class="i">a</span> <span onmouseout="hideTip(event, 'fs18', 56)" onmouseover="showTip(event, 'fs18', 56)" class="i">list</span> <span class="k">-&gt;</span> <span class="o">&#39;</span><span class="i">b</span> <span onmouseout="hideTip(event, 'fs18', 57)" onmouseover="showTip(event, 'fs18', 57)" class="i">list</span>
+</code></pre></td>
+</tr>
+</table>
+<p><code>List.map</code> expects a function that maps <code>'a</code> values to <code>'b</code> values, while our own <code>map</code> expects
+a <code>Map</code> data-structure that maps <code>'a</code> to <code>'b</code> values.</p>
+<p>But once again, generating all possible input values before-hand feels a little bit silly.
+We need to create a lot of possible values that we probably never need. It also costs more
+memory as we need to save all possible combinations. That is why we pass a function instead.
+We just pass the description how to compute the values instead.</p>
+<div class="info">
+<p>
+It is quite important to understand that passing a data-structure instead of a function is only
+<em>theoretically</em> possible. <em>Practically</em> there exists a lot of cases where
+such an approach will not work. When we for example try to create a data-structure that
+maps any string to the length of a string, then it is practically impossible to create
+a data-structure.
+</p>
+<p>We actually would need to create a data-structure that contains any possible input string and returns
+the length of it. Even when we just consider the stone-age view that they are only 128 characters
+(aka ASCII) and we restrict us on a maximum length of 10 characters there already exists
+1.180.591.620.717.411.303.424 possible input strings we need to handle.</p>
+<p>Creating a data-structure that contains all possible input strings that maps it to the
+length is theoretically possible. But already for 10 characters and just considering ASCII
+we have such a large amount of possible input strings that it just exceeds the amount of memory
+a single computer could have.</p>
+<p>That doesn't mean passing functions doesn't make sense. It is quite the opposite, because the needed
+data to represent a function is so huge, it is even more important that we can pass a function
+that only calculates those things we truly need.
+</div></p>
+<a name="fp-retn-functions"></a>
+<h2>Functions as return values</h2>
+<p>Let's consider the following function.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs19', 58)" onmouseover="showTip(event, 'fs19', 58)" class="f">generateAdd</span> <span onmouseout="hideTip(event, 'fs3', 59)" onmouseover="showTip(event, 'fs3', 59)" class="i">x</span> <span class="o">=</span>
+    <span onmouseout="hideTip(event, 'fs6', 60)" onmouseover="showTip(event, 'fs6', 60)" class="t">Map</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs7', 61)" onmouseover="showTip(event, 'fs7', 61)" class="f">ofList</span> [
+        <span class="k">for</span> <span onmouseout="hideTip(event, 'fs20', 62)" onmouseover="showTip(event, 'fs20', 62)" class="i">i</span> <span class="k">in</span> <span class="n">1..</span><span class="n">5</span> <span class="k">do</span>
+            <span class="k">yield</span> <span onmouseout="hideTip(event, 'fs20', 63)" onmouseover="showTip(event, 'fs20', 63)" class="i">i</span>, (<span onmouseout="hideTip(event, 'fs20', 64)" onmouseover="showTip(event, 'fs20', 64)" class="i">i</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs3', 65)" onmouseover="showTip(event, 'fs3', 65)" class="i">x</span>)
+    ]
+
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs21', 66)" onmouseover="showTip(event, 'fs21', 66)" class="i">add10</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs19', 67)" onmouseover="showTip(event, 'fs19', 67)" class="f">generateAdd</span> <span class="n">10</span>
+
+<span onmouseout="hideTip(event, 'fs21', 68)" onmouseover="showTip(event, 'fs21', 68)" class="i">add10</span><span class="o">.</span>[<span class="n">1</span>] <span class="c">// 11</span>
+<span onmouseout="hideTip(event, 'fs21', 69)" onmouseover="showTip(event, 'fs21', 69)" class="i">add10</span><span class="o">.</span>[<span class="n">2</span>] <span class="c">// 12</span>
+<span onmouseout="hideTip(event, 'fs21', 70)" onmouseover="showTip(event, 'fs21', 70)" class="i">add10</span><span class="o">.</span>[<span class="n">3</span>] <span class="c">// 13</span>
+</code></pre></td>
+</tr>
+</table>
+<p>We have a function that returns a new Map structure. When we call <code>generateAdd 10</code> we get
+the following Map data-structure back.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp">[(<span class="n">1</span>,<span class="n">11</span>); (<span class="n">2</span>,<span class="n">12</span>); (<span class="n">3</span>,<span class="n">13</span>); (<span class="n">4</span>,<span class="n">14</span>); (<span class="n">5</span>,<span class="n">15</span>)]
+</code></pre></td>
+</tr>
+</table>
+<p>But we already have seen this kind of code before. This was the way how we turned
+our <code>square</code> function into a data-structure, so we could pass it to our own <code>map</code> function. But
+this time we create a <code>Map</code> data-structure inside a function and return it from a function.
+This is the same as creating a function inside a function and returning it.</p>
+<p>When we look at <code>generateAdd</code> then we see the following. We loop over the number from <code>1</code> to <code>5</code>.
+Those represents the inputs of a function we pre-calculate. With <code>yield</code> we return the mapping
+<code>i</code> to <code>(i + x)</code>.</p>
+<p>When we want to turn it into a function we just need to return the code <code>(i + x)</code> somehow.
+So how do we return a function with that code? That is the purpose of <em>lambda</em>. <em>lambda</em>
+is the idea of a function as a value. In F# we just use the <code>fun</code> keyword to create
+a function/lambda.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+<span class="l">7: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs22', 71)" onmouseover="showTip(event, 'fs22', 71)" class="f">generateAdd</span> <span onmouseout="hideTip(event, 'fs3', 72)" onmouseover="showTip(event, 'fs3', 72)" class="i">x</span> <span class="o">=</span> <span class="k">fun</span> <span onmouseout="hideTip(event, 'fs20', 73)" onmouseover="showTip(event, 'fs20', 73)" class="i">i</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs20', 74)" onmouseover="showTip(event, 'fs20', 74)" class="i">i</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs3', 75)" onmouseover="showTip(event, 'fs3', 75)" class="i">x</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs23', 76)" onmouseover="showTip(event, 'fs23', 76)" class="f">add10</span>         <span class="o">=</span> <span onmouseout="hideTip(event, 'fs22', 77)" onmouseover="showTip(event, 'fs22', 77)" class="f">generateAdd</span> <span class="n">10</span>
+
+<span onmouseout="hideTip(event, 'fs23', 78)" onmouseover="showTip(event, 'fs23', 78)" class="f">add10</span> <span class="n">1</span>   <span class="c">// 11</span>
+<span onmouseout="hideTip(event, 'fs23', 79)" onmouseover="showTip(event, 'fs23', 79)" class="f">add10</span> <span class="n">2</span>   <span class="c">// 12</span>
+<span onmouseout="hideTip(event, 'fs23', 80)" onmouseover="showTip(event, 'fs23', 80)" class="f">add10</span> <span class="n">5</span>   <span class="c">// 15</span>
+<span onmouseout="hideTip(event, 'fs23', 81)" onmouseover="showTip(event, 'fs23', 81)" class="f">add10</span> <span class="n">100</span> <span class="c">// 120</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Instead of pre-calculating <code>i + x</code> for a dozen of numbers, now we just return the whole
+computation itself. When we call <code>generateAdd 10</code> we now get a new function back that
+can turn any input <code>int</code> into an output <code>int</code> where we added <code>10</code> to it.</p>
+<p>As you can see, both versions with a data-structure or the functions are quite similar.
+But the last version still contains some interesting things that are worth to talk about.</p>
+<a name="fp-lambda"></a>
+<h2>There is only lambda</h2>
+<p>When we want to create an <code>int</code>. How do we do that? Well we just write it. For example <code>5</code> is
+just <code>5</code>. We can work with <code>5</code> however we want. We can pass it to a function, use it in
+calculations and so on.</p>
+<p>This works with any number, but when we for example want to work with <code>587452198</code> then
+always rewriting this number can become annoying and tedious. Instead of working with numbers
+directly we can bind a number to a symbol and give it a name. We bind something to
+a name with <code>let</code>.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">x</span> <span class="o">=</span> <span class="n">587452198</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Once we have written this kind of thing, we now can use <code>bigNumber</code>. But what happens exactly
+when we write something like this:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">y</span> <span class="o">=</span> <span class="i">bigNumber</span> <span class="o">+</span> <span class="i">bigNumber</span>
+</code></pre></td>
+</tr>
+</table>
+<p>A process named <em>Substitution</em> starts. The language cannot do anything with <code>bigNumber</code> but
+<code>bigNumber</code> was anyway just a name for something different. The language just replaces <code>bigNumber</code>
+with the number it stands for. And now we see something like:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">y</span> <span class="o">=</span> <span class="n">587452198</span> <span class="o">+</span> <span class="n">587452198</span>
+</code></pre></td>
+</tr>
+</table>
+<p>After the <em>substitution</em> we can calculate the result <code>1174904396</code> and bind the result to <code>y</code>.
+Now also <code>y</code> can be used in other calculations. This substitution process is quite
+important. It is basically the foundation of a function. Previously we defined <code>square</code>
+like that.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">square</span> <span class="i">x</span> <span class="o">=</span> <span class="i">x</span> <span class="o">*</span> <span class="i">x</span>
+</code></pre></td>
+</tr>
+</table>
+<p>In fact, the language cannot execute anything in this example, as there is nothing to
+execute. <code>x</code> has no meaning at this point. To really calculate something we must substitute <code>x</code> with
+something different. How do we substitute it? We do it when we write:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="i">square</span> <span class="n">10</span>
+</code></pre></td>
+</tr>
+</table>
+<p>We then say that <code>x</code> in <code>square</code> should be substituted with <code>10</code>. Instead of <code>x * x</code> it
+substitutes <code>x</code> with <code>10</code> and it calculates <code>10 * 10</code>. What we see here are three things:</p>
+<ol>
+<li>We have a concrete value like <code>10</code></li>
+<li>We can bind a concrete value to a symbol with <code>let</code></li>
+<li>Symbols get substituted with a concrete value</li>
+</ol>
+<p>The interesting part is. Technically a function definition does not exists. The only
+way to create a function is through the <code>fun</code> keyword (also named: lambda expression). So when
+we want to write a calculation with a symbol. We just write.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp">(<span class="k">fun</span> <span class="i">x</span> <span class="k">-&gt;</span> <span class="i">x</span> <span class="o">*</span> <span class="i">x</span>)
+</code></pre></td>
+</tr>
+</table>
+<p>How do we execute the lambda? We just provide a value that should be substituted for <code>x</code>
+after the lambda expression.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp">(<span class="k">fun</span> <span class="i">x</span> <span class="k">-&gt;</span> <span class="i">x</span> <span class="o">*</span> <span class="i">x</span>) <span class="n">2</span> <span class="c">//  4</span>
+(<span class="k">fun</span> <span class="i">x</span> <span class="k">-&gt;</span> <span class="i">x</span> <span class="o">*</span> <span class="i">x</span>) <span class="n">3</span> <span class="c">//  9</span>
+(<span class="k">fun</span> <span class="i">x</span> <span class="k">-&gt;</span> <span class="i">x</span> <span class="o">*</span> <span class="i">x</span>) <span class="n">5</span> <span class="c">// 25</span>
+</code></pre></td>
+</tr>
+</table>
+<p>But this overall makes less sense. We also could have written <code>2 * 2</code> or <code>4 * 4</code> directly. And
+overall we don't want to rewrite the function all over again and again because that is annoying.
+But we already have seen what we do in such a case. We just bind it to a symbol with <code>let</code>!</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs2', 82)" onmouseover="showTip(event, 'fs2', 82)" class="f">square</span> <span class="o">=</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs3', 83)" onmouseover="showTip(event, 'fs3', 83)" class="i">x</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs3', 84)" onmouseover="showTip(event, 'fs3', 84)" class="i">x</span> <span class="o">*</span> <span onmouseout="hideTip(event, 'fs3', 85)" onmouseover="showTip(event, 'fs3', 85)" class="i">x</span>)
+</code></pre></td>
+</tr>
+</table>
+<p>How do we work with <code>square</code>? You already have done it before.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs2', 86)" onmouseover="showTip(event, 'fs2', 86)" class="f">square</span> <span class="n">5</span>  <span class="c">//  25</span>
+<span onmouseout="hideTip(event, 'fs2', 87)" onmouseover="showTip(event, 'fs2', 87)" class="f">square</span> <span class="n">10</span> <span class="c">// 100</span>
+<span onmouseout="hideTip(event, 'fs2', 88)" onmouseover="showTip(event, 'fs2', 88)" class="f">square</span> <span class="n">25</span> <span class="c">// 625</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Actually what really happens. <code>square</code> is just a symbol and it is once again substituted by
+<code>(fun x -&gt; x * x)</code>. When we write <code>5</code> after it, then <code>x</code> in our function gets substituted by <code>5</code>.
+But creating functions and binding it to a symbol happens so often that we just have a shortcut
+for that.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs2', 89)" onmouseover="showTip(event, 'fs2', 89)" class="f">square</span> <span onmouseout="hideTip(event, 'fs3', 90)" onmouseover="showTip(event, 'fs3', 90)" class="i">x</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs3', 91)" onmouseover="showTip(event, 'fs3', 91)" class="i">x</span> <span class="o">*</span> <span onmouseout="hideTip(event, 'fs3', 92)" onmouseover="showTip(event, 'fs3', 92)" class="i">x</span>
+</code></pre></td>
+</tr>
+</table>
+<p>This definition is the exact same as the <code>square</code> definition with an explicit <code>fun</code>. That is also
+the reason why calling <code>square</code> looks exactly the same. We have two different ways to define
+a function.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs24', 93)" onmouseover="showTip(event, 'fs24', 93)" class="f">squareA</span>   <span class="o">=</span> <span class="k">fun</span> <span onmouseout="hideTip(event, 'fs3', 94)" onmouseover="showTip(event, 'fs3', 94)" class="i">x</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs3', 95)" onmouseover="showTip(event, 'fs3', 95)" class="i">x</span> <span class="o">*</span> <span onmouseout="hideTip(event, 'fs3', 96)" onmouseover="showTip(event, 'fs3', 96)" class="i">x</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs25', 97)" onmouseover="showTip(event, 'fs25', 97)" class="f">squareB</span> <span onmouseout="hideTip(event, 'fs3', 98)" onmouseover="showTip(event, 'fs3', 98)" class="i">x</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs3', 99)" onmouseover="showTip(event, 'fs3', 99)" class="i">x</span> <span class="o">*</span> <span onmouseout="hideTip(event, 'fs3', 100)" onmouseover="showTip(event, 'fs3', 100)" class="i">x</span>
+</code></pre></td>
+</tr>
+</table>
+<p>But there is no difference in calling both functions.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs24', 101)" onmouseover="showTip(event, 'fs24', 101)" class="f">squareA</span> <span class="n">5</span> <span class="c">// 25</span>
+<span onmouseout="hideTip(event, 'fs25', 102)" onmouseover="showTip(event, 'fs25', 102)" class="f">squareB</span> <span class="n">5</span> <span class="c">// 25</span>
+</code></pre></td>
+</tr>
+</table>
+<p>It just shows that the second <code>let</code> definition that already includes the function arguments
+is only a shortcut to the more explicit lambda expression.</p>
+<a name="fp-currying"></a>
+<h2>Currying</h2>
+<p>In fact the simplification don't stop here. We don't even have functions with more than one
+argument. There only exists functions with one arguments. So what do you do when you for
+example want to add two numbers?</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+<span class="l">7: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs26', 103)" onmouseover="showTip(event, 'fs26', 103)" class="f">add</span> <span class="o">=</span>
+    <span class="k">fun</span> <span onmouseout="hideTip(event, 'fs3', 104)" onmouseover="showTip(event, 'fs3', 104)" class="i">x</span> <span class="k">-&gt;</span>
+        <span class="k">fun</span> <span onmouseout="hideTip(event, 'fs27', 105)" onmouseover="showTip(event, 'fs27', 105)" class="i">y</span> <span class="k">-&gt;</span>
+            <span onmouseout="hideTip(event, 'fs3', 106)" onmouseover="showTip(event, 'fs3', 106)" class="i">x</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs27', 107)" onmouseover="showTip(event, 'fs27', 107)" class="i">y</span>
+
+<span onmouseout="hideTip(event, 'fs26', 108)" onmouseover="showTip(event, 'fs26', 108)" class="f">add</span> <span class="n">10</span> <span class="n">20</span> <span class="c">// 30</span>
+<span onmouseout="hideTip(event, 'fs26', 109)" onmouseover="showTip(event, 'fs26', 109)" class="f">add</span> <span class="n">50</span> <span class="n">50</span> <span class="c">// 100</span>
+</code></pre></td>
+</tr>
+</table>
+<p>But creating such kind of nested functions is quite annoying. So there is a shortcut. You just can
+use <code>fun</code> with multiple arguments and it creates the nesting for you.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs28', 110)" onmouseover="showTip(event, 'fs28', 110)" class="f">add&#39;</span> <span class="o">=</span>
+    <span class="k">fun</span> <span onmouseout="hideTip(event, 'fs3', 111)" onmouseover="showTip(event, 'fs3', 111)" class="i">x</span> <span onmouseout="hideTip(event, 'fs27', 112)" onmouseover="showTip(event, 'fs27', 112)" class="i">y</span> <span class="k">-&gt;</span>
+        <span onmouseout="hideTip(event, 'fs3', 113)" onmouseover="showTip(event, 'fs3', 113)" class="i">x</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs27', 114)" onmouseover="showTip(event, 'fs27', 114)" class="i">y</span>
+
+<span onmouseout="hideTip(event, 'fs28', 115)" onmouseover="showTip(event, 'fs28', 115)" class="f">add&#39;</span> <span class="n">10</span> <span class="n">20</span> <span class="c">// 30</span>
+<span onmouseout="hideTip(event, 'fs28', 116)" onmouseover="showTip(event, 'fs28', 116)" class="f">add&#39;</span> <span class="n">50</span> <span class="n">50</span> <span class="c">// 100</span>
+</code></pre></td>
+</tr>
+</table>
+<p>And there is once again a shortcut by just using <code>let</code></p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs29', 117)" onmouseover="showTip(event, 'fs29', 117)" class="f">add&#39;&#39;</span> <span onmouseout="hideTip(event, 'fs3', 118)" onmouseover="showTip(event, 'fs3', 118)" class="i">x</span> <span onmouseout="hideTip(event, 'fs27', 119)" onmouseover="showTip(event, 'fs27', 119)" class="i">y</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs3', 120)" onmouseover="showTip(event, 'fs3', 120)" class="i">x</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs27', 121)" onmouseover="showTip(event, 'fs27', 121)" class="i">y</span>
+
+<span onmouseout="hideTip(event, 'fs29', 122)" onmouseover="showTip(event, 'fs29', 122)" class="f">add&#39;&#39;</span> <span class="n">10</span> <span class="n">20</span> <span class="c">// 30</span>
+<span onmouseout="hideTip(event, 'fs29', 123)" onmouseover="showTip(event, 'fs29', 123)" class="f">add&#39;&#39;</span> <span class="n">50</span> <span class="n">50</span> <span class="c">// 100</span>
+</code></pre></td>
+</tr>
+</table>
+<p>In practice you will usually only use the last way of defining a function. But it is quite
+important to understand that all three ways of writing a function are interchangeable
+and mean the exact same.</p>
+<p>How does those information help us? We can rewrite our <code>add10</code> function that we created
+previously. Previously we wrote <code>add10</code> like this.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs22', 124)" onmouseover="showTip(event, 'fs22', 124)" class="f">generateAdd</span> <span onmouseout="hideTip(event, 'fs3', 125)" onmouseover="showTip(event, 'fs3', 125)" class="i">x</span> <span class="o">=</span> <span class="k">fun</span> <span onmouseout="hideTip(event, 'fs20', 126)" onmouseover="showTip(event, 'fs20', 126)" class="i">i</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs20', 127)" onmouseover="showTip(event, 'fs20', 127)" class="i">i</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs3', 128)" onmouseover="showTip(event, 'fs3', 128)" class="i">x</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs23', 129)" onmouseover="showTip(event, 'fs23', 129)" class="f">add10</span>         <span class="o">=</span> <span onmouseout="hideTip(event, 'fs22', 130)" onmouseover="showTip(event, 'fs22', 130)" class="f">generateAdd</span> <span class="n">10</span>
+</code></pre></td>
+</tr>
+</table>
+<p>But this is the same as:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs26', 131)" onmouseover="showTip(event, 'fs26', 131)" class="f">add</span> <span onmouseout="hideTip(event, 'fs3', 132)" onmouseover="showTip(event, 'fs3', 132)" class="i">x</span> <span onmouseout="hideTip(event, 'fs27', 133)" onmouseover="showTip(event, 'fs27', 133)" class="i">y</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs3', 134)" onmouseover="showTip(event, 'fs3', 134)" class="i">x</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs27', 135)" onmouseover="showTip(event, 'fs27', 135)" class="i">y</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs23', 136)" onmouseover="showTip(event, 'fs23', 136)" class="f">add10</span>   <span class="o">=</span> <span onmouseout="hideTip(event, 'fs26', 137)" onmouseover="showTip(event, 'fs26', 137)" class="f">add</span> <span class="n">10</span>
+
+<span onmouseout="hideTip(event, 'fs23', 138)" onmouseover="showTip(event, 'fs23', 138)" class="f">add10</span> <span class="n">5</span>  <span class="c">// 15</span>
+<span onmouseout="hideTip(event, 'fs23', 139)" onmouseover="showTip(event, 'fs23', 139)" class="f">add10</span> <span class="n">10</span> <span class="c">// 20</span>
+</code></pre></td>
+</tr>
+</table>
+<p>It is quite important to understand what happens here. We start with <code>add</code>, but this is
+a function that expects a single value <code>x</code>. That is the reason why we just can call <code>add 10</code> with
+one argument. This then returns a lambda like <code>(fun y -&gt; 10 + y)</code>. That means
+we substituted <code>x</code> with <code>10</code> and then returned a new function.</p>
+<p>This new function is then bounded to the symbol <code>add10</code>. When we finally call <code>add10 5</code> then
+we also substitute <code>y</code> and we get <code>10 + 5</code> and this evaluates to <code>15</code>.</p>
+<p>Only passing some arguments is what we call <em>Partial Application</em>. But it is more important
+to understand that we get <em>Partial Application</em> for free because we have Currying and all
+functions are one-argument functions that return new functions.</p>
+<div class="info">
+<p>
+If you wonder about the apostrophes in <code>add'</code> or <code>add''</code>. They are
+not special and just part of the function name. This is usual the way how
+functional programmers say: This is another version/implementation of a function.
+</p>
+<p>I also could just numbered the functions with <code>add2</code>, <code>add3</code> and so on.
+But this creates conflict with Partial Applied functions. When i write <code>add3</code> i
+would expect that it is a partial applied function with the first argument set to <code>3</code>.
+</div></p>
+<a name="fp-closures"></a>
+<h2>Closures</h2>
+<p>Previously I said that when you call a function then some kind of substitution happens.
+When you call <code>add 10</code> in the last example then <code>x</code> gets substituted by <code>10</code> and it returns
+a function <code>10 + y</code>. But this is not quite correct. What really happens is that the actual
+variable <code>x</code> is just <em>remembered</em>.</p>
+<p>It seems not like a big distinction, but the difference becomes more obvious when we use
+a mutable variable.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+<span class="l">7: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs30', 140)" onmouseover="showTip(event, 'fs30', 140)" class="v">x</span>       <span class="o">=</span> <span onmouseout="hideTip(event, 'fs31', 141)" onmouseover="showTip(event, 'fs31', 141)" class="f">ref</span> <span class="n">10</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs32', 142)" onmouseover="showTip(event, 'fs32', 142)" class="f">add</span> <span onmouseout="hideTip(event, 'fs33', 143)" onmouseover="showTip(event, 'fs33', 143)" class="v">x</span> <span onmouseout="hideTip(event, 'fs27', 144)" onmouseover="showTip(event, 'fs27', 144)" class="i">y</span> <span class="o">=</span> <span class="o">!</span><span onmouseout="hideTip(event, 'fs33', 145)" onmouseover="showTip(event, 'fs33', 145)" class="v">x</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs27', 146)" onmouseover="showTip(event, 'fs27', 146)" class="i">y</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs23', 147)" onmouseover="showTip(event, 'fs23', 147)" class="f">add10</span>   <span class="o">=</span> <span onmouseout="hideTip(event, 'fs32', 148)" onmouseover="showTip(event, 'fs32', 148)" class="f">add</span> <span onmouseout="hideTip(event, 'fs30', 149)" onmouseover="showTip(event, 'fs30', 149)" class="v">x</span>
+
+<span onmouseout="hideTip(event, 'fs23', 150)" onmouseover="showTip(event, 'fs23', 150)" class="f">add10</span> <span class="n">5</span> <span class="c">// 15</span>
+<span onmouseout="hideTip(event, 'fs30', 151)" onmouseover="showTip(event, 'fs30', 151)" class="v">x</span> <span class="o">:=</span> <span class="n">5</span>
+<span onmouseout="hideTip(event, 'fs23', 152)" onmouseover="showTip(event, 'fs23', 152)" class="f">add10</span> <span class="n">5</span> <span class="c">// 10</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Because the value of <code>x</code> changes between both calls we now get <code>15</code> and <code>10</code>. The
+reason why we anyway get different values is because the returned function only refers
+to <code>x</code> and does not do a real substitution of the value.</p>
+<div class="info">
+<p>
+Usually the difference between referring and substitution only becomes a problem with
+mutable variables. Something we anyway avoid in functional programming. When we think
+of referential transparency (this is how functional programming is usually defined)
+we could even say that this code is not functional at all.
+</p>
+<p>But i don't go further into this topic. Usually we don't use mutable variables, but
+as F# is not a pure-functional language and it supports mutation, i still think it
+is important to mention.
+</div></p>
+<p>But there is an even more fundamental idea that emerges from that example. How long do
+we need to keep <code>x</code> in memory? The answer is, as long we have some code that still refers
+to it. In our case <code>add10</code> refers to <code>x</code>, we always must keep <code>x</code> in memory, as long
+we have access to <code>add10</code>.</p>
+<p>This is also the reason why the first Lisp compiler already provided automatic memory
+management with garbage collection (invented 1962). More precisely I don't even know
+of any functional language that don't provide automatic memory management. While it
+might be theoretically possible to not provide automatic memory management. It
+is probably not a good practical decision.</p>
+<p>Whenever we <em>remember</em> a variable or refer to a variable from a lambda expression,
+we call it a <em>Closure</em>.</p>
+<a name="fp-example"></a>
+<h2>Example: Currying and Closures</h2>
+<p>I want to give a small example that shows functions as value and return values,
+currying and closures all in action. In F# we have an option type. An option type can have
+two states, <code>Some</code> or <code>None</code>. The <code>Some</code> state can carry an additional value with it.
+Usually the option type is used for the idea of <em>No Value</em>, but it also can be used as
+the idea of a <em>Success</em> or <em>Failure</em>, or how I use it as <em>Valid</em> or <em>Invalid</em>.</p>
+<p>We could for example write two functions that check if a number is greater or smaller
+than a limit. If the number is valid (smaller or greater) then we just return the number
+unchanged, otherwise we return <code>None</code>. But it also could be that we already get a <code>None</code> as
+input. In this case we just return <code>None</code>. We could write <code>smaller</code> and <code>greater</code> like this.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+<span class="l">16: </span>
+<span class="l">17: </span>
+<span class="l">18: </span>
+<span class="l">19: </span>
+<span class="l">20: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs34', 153)" onmouseover="showTip(event, 'fs34', 153)" class="f">smaller</span> <span onmouseout="hideTip(event, 'fs35', 154)" onmouseover="showTip(event, 'fs35', 154)" class="i">min</span> <span onmouseout="hideTip(event, 'fs36', 155)" onmouseover="showTip(event, 'fs36', 155)" class="i">x</span> <span class="o">=</span>
+    <span class="k">match</span> <span onmouseout="hideTip(event, 'fs36', 156)" onmouseover="showTip(event, 'fs36', 156)" class="i">x</span> <span class="k">with</span>
+    | <span onmouseout="hideTip(event, 'fs37', 157)" onmouseover="showTip(event, 'fs37', 157)" class="p">None</span>        <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs37', 158)" onmouseover="showTip(event, 'fs37', 158)" class="p">None</span>
+    | <span onmouseout="hideTip(event, 'fs38', 159)" onmouseover="showTip(event, 'fs38', 159)" class="p">Some</span> <span onmouseout="hideTip(event, 'fs39', 160)" onmouseover="showTip(event, 'fs39', 160)" class="i">number</span> <span class="k">-&gt;</span>
+        <span class="k">if</span>   <span onmouseout="hideTip(event, 'fs39', 161)" onmouseover="showTip(event, 'fs39', 161)" class="i">number</span> <span class="o">&lt;</span> <span onmouseout="hideTip(event, 'fs35', 162)" onmouseover="showTip(event, 'fs35', 162)" class="i">min</span>
+        <span class="k">then</span> <span onmouseout="hideTip(event, 'fs38', 163)" onmouseover="showTip(event, 'fs38', 163)" class="p">Some</span> <span onmouseout="hideTip(event, 'fs39', 164)" onmouseover="showTip(event, 'fs39', 164)" class="i">number</span>
+        <span class="k">else</span> <span onmouseout="hideTip(event, 'fs37', 165)" onmouseover="showTip(event, 'fs37', 165)" class="p">None</span>
+
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs40', 166)" onmouseover="showTip(event, 'fs40', 166)" class="f">greater</span> <span onmouseout="hideTip(event, 'fs41', 167)" onmouseover="showTip(event, 'fs41', 167)" class="i">max</span> <span onmouseout="hideTip(event, 'fs36', 168)" onmouseover="showTip(event, 'fs36', 168)" class="i">x</span> <span class="o">=</span>
+    <span class="k">match</span> <span onmouseout="hideTip(event, 'fs36', 169)" onmouseover="showTip(event, 'fs36', 169)" class="i">x</span> <span class="k">with</span>
+    | <span onmouseout="hideTip(event, 'fs37', 170)" onmouseover="showTip(event, 'fs37', 170)" class="p">None</span>        <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs37', 171)" onmouseover="showTip(event, 'fs37', 171)" class="p">None</span>
+    | <span onmouseout="hideTip(event, 'fs38', 172)" onmouseover="showTip(event, 'fs38', 172)" class="p">Some</span> <span onmouseout="hideTip(event, 'fs39', 173)" onmouseover="showTip(event, 'fs39', 173)" class="i">number</span> <span class="k">-&gt;</span>
+        <span class="k">if</span>   <span onmouseout="hideTip(event, 'fs39', 174)" onmouseover="showTip(event, 'fs39', 174)" class="i">number</span> <span class="o">&gt;</span> <span onmouseout="hideTip(event, 'fs41', 175)" onmouseover="showTip(event, 'fs41', 175)" class="i">max</span>
+        <span class="k">then</span> <span onmouseout="hideTip(event, 'fs38', 176)" onmouseover="showTip(event, 'fs38', 176)" class="p">Some</span> <span onmouseout="hideTip(event, 'fs39', 177)" onmouseover="showTip(event, 'fs39', 177)" class="i">number</span>
+        <span class="k">else</span> <span onmouseout="hideTip(event, 'fs37', 178)" onmouseover="showTip(event, 'fs37', 178)" class="p">None</span>
+
+<span onmouseout="hideTip(event, 'fs34', 179)" onmouseover="showTip(event, 'fs34', 179)" class="f">smaller</span> <span class="n">10</span> (<span onmouseout="hideTip(event, 'fs38', 180)" onmouseover="showTip(event, 'fs38', 180)" class="p">Some</span> <span class="n">3</span>)  <span class="c">// Some 3</span>
+<span onmouseout="hideTip(event, 'fs34', 181)" onmouseover="showTip(event, 'fs34', 181)" class="f">smaller</span> <span class="n">10</span> (<span onmouseout="hideTip(event, 'fs38', 182)" onmouseover="showTip(event, 'fs38', 182)" class="p">Some</span> <span class="n">11</span>) <span class="c">// None</span>
+<span onmouseout="hideTip(event, 'fs40', 183)" onmouseover="showTip(event, 'fs40', 183)" class="f">greater</span> <span class="n">10</span> (<span onmouseout="hideTip(event, 'fs38', 184)" onmouseover="showTip(event, 'fs38', 184)" class="p">Some</span> <span class="n">3</span>)  <span class="c">// None</span>
+<span onmouseout="hideTip(event, 'fs40', 185)" onmouseover="showTip(event, 'fs40', 185)" class="f">greater</span> <span class="n">10</span> (<span onmouseout="hideTip(event, 'fs38', 186)" onmouseover="showTip(event, 'fs38', 186)" class="p">Some</span> <span class="n">11</span>) <span class="c">// Some 11</span>
+</code></pre></td>
+</tr>
+</table>
+<p>But when we look closer, <code>smaller</code> and <code>greater</code> are nearly identical functions. The only
+difference is the <code>if</code> check itself. But what does the <code>if</code> anyway? The <code>if</code> itself
+just turns a <code>number</code> somehow into a boolean value.</p>
+<p>Instead of hard-coding the <code>if</code> behaviour we also could call a function that we give the number
+and returns us a boolean. This way we could get rid of the whole code-duplication. We just
+abstract both functions into a new function that expects a function for the transformation
+of <code>number -&gt; Bool</code>.</p>
+<p>With such a new function we then could easily rewrite <code>smaller</code> and <code>greater</code>.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs42', 187)" onmouseover="showTip(event, 'fs42', 187)" class="f">is</span> <span onmouseout="hideTip(event, 'fs43', 188)" onmouseover="showTip(event, 'fs43', 188)" class="f">predicate</span> <span onmouseout="hideTip(event, 'fs44', 189)" onmouseover="showTip(event, 'fs44', 189)" class="i">x</span> <span class="o">=</span>
+    <span class="k">match</span> <span onmouseout="hideTip(event, 'fs44', 190)" onmouseover="showTip(event, 'fs44', 190)" class="i">x</span> <span class="k">with</span>
+    | <span onmouseout="hideTip(event, 'fs37', 191)" onmouseover="showTip(event, 'fs37', 191)" class="p">None</span>        <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs37', 192)" onmouseover="showTip(event, 'fs37', 192)" class="p">None</span>
+    | <span onmouseout="hideTip(event, 'fs38', 193)" onmouseover="showTip(event, 'fs38', 193)" class="p">Some</span> <span onmouseout="hideTip(event, 'fs45', 194)" onmouseover="showTip(event, 'fs45', 194)" class="i">number</span> <span class="k">-&gt;</span>
+        <span class="k">if</span>   <span onmouseout="hideTip(event, 'fs43', 195)" onmouseover="showTip(event, 'fs43', 195)" class="f">predicate</span> <span onmouseout="hideTip(event, 'fs45', 196)" onmouseover="showTip(event, 'fs45', 196)" class="i">number</span>
+        <span class="k">then</span> <span onmouseout="hideTip(event, 'fs38', 197)" onmouseover="showTip(event, 'fs38', 197)" class="p">Some</span> <span onmouseout="hideTip(event, 'fs45', 198)" onmouseover="showTip(event, 'fs45', 198)" class="i">number</span>
+        <span class="k">else</span> <span onmouseout="hideTip(event, 'fs37', 199)" onmouseover="showTip(event, 'fs37', 199)" class="p">None</span>
+
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs46', 200)" onmouseover="showTip(event, 'fs46', 200)" class="f">smaller</span> <span onmouseout="hideTip(event, 'fs35', 201)" onmouseover="showTip(event, 'fs35', 201)" class="i">min</span> <span onmouseout="hideTip(event, 'fs15', 202)" onmouseover="showTip(event, 'fs15', 202)" class="i">x</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs15', 203)" onmouseover="showTip(event, 'fs15', 203)" class="i">x</span> <span class="o">&lt;</span> <span onmouseout="hideTip(event, 'fs35', 204)" onmouseover="showTip(event, 'fs35', 204)" class="i">min</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs47', 205)" onmouseover="showTip(event, 'fs47', 205)" class="f">greater</span> <span onmouseout="hideTip(event, 'fs41', 206)" onmouseover="showTip(event, 'fs41', 206)" class="i">max</span> <span onmouseout="hideTip(event, 'fs15', 207)" onmouseover="showTip(event, 'fs15', 207)" class="i">x</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs15', 208)" onmouseover="showTip(event, 'fs15', 208)" class="i">x</span> <span class="o">&gt;</span> <span onmouseout="hideTip(event, 'fs41', 209)" onmouseover="showTip(event, 'fs41', 209)" class="i">max</span>
+
+<span onmouseout="hideTip(event, 'fs42', 210)" onmouseover="showTip(event, 'fs42', 210)" class="f">is</span> (<span onmouseout="hideTip(event, 'fs46', 211)" onmouseover="showTip(event, 'fs46', 211)" class="f">smaller</span> <span class="n">10</span>) (<span onmouseout="hideTip(event, 'fs38', 212)" onmouseover="showTip(event, 'fs38', 212)" class="p">Some</span> <span class="n">3</span>)  <span class="c">// Some 3</span>
+<span onmouseout="hideTip(event, 'fs42', 213)" onmouseover="showTip(event, 'fs42', 213)" class="f">is</span> (<span onmouseout="hideTip(event, 'fs46', 214)" onmouseover="showTip(event, 'fs46', 214)" class="f">smaller</span> <span class="n">10</span>) (<span onmouseout="hideTip(event, 'fs38', 215)" onmouseover="showTip(event, 'fs38', 215)" class="p">Some</span> <span class="n">11</span>) <span class="c">// None</span>
+<span onmouseout="hideTip(event, 'fs42', 216)" onmouseover="showTip(event, 'fs42', 216)" class="f">is</span> (<span onmouseout="hideTip(event, 'fs47', 217)" onmouseover="showTip(event, 'fs47', 217)" class="f">greater</span> <span class="n">10</span>) (<span onmouseout="hideTip(event, 'fs38', 218)" onmouseover="showTip(event, 'fs38', 218)" class="p">Some</span> <span class="n">3</span>)  <span class="c">// None</span>
+<span onmouseout="hideTip(event, 'fs42', 219)" onmouseover="showTip(event, 'fs42', 219)" class="f">is</span> (<span onmouseout="hideTip(event, 'fs47', 220)" onmouseover="showTip(event, 'fs47', 220)" class="f">greater</span> <span class="n">10</span>) (<span onmouseout="hideTip(event, 'fs38', 221)" onmouseover="showTip(event, 'fs38', 221)" class="p">Some</span> <span class="n">11</span>) <span class="c">// Some 11</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Now the whole code is written with currying in mind. <code>is</code> expects a function that turns
+a number into a <code>bool</code>. When we write <code>(smaller 10)</code> we just get back such a function.
+We get back a new function that contains <code>10</code> as a closure. This function is then passed
+as a value to the <code>is</code> function.</p>
+<p>We also could nest the calls, for example when we want to do two checks at once. The second
+argument to <code>is</code> must be an option value. But this is also what <code>is</code> returns. So we could
+use the output of another <code>is</code> as the input for the first <code>is</code>. What we then get is very
+Lisp-like code.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp">(<span onmouseout="hideTip(event, 'fs42', 222)" onmouseover="showTip(event, 'fs42', 222)" class="f">is</span> (<span onmouseout="hideTip(event, 'fs47', 223)" onmouseover="showTip(event, 'fs47', 223)" class="f">greater</span> <span class="n">0</span>)
+  (<span onmouseout="hideTip(event, 'fs42', 224)" onmouseover="showTip(event, 'fs42', 224)" class="f">is</span> (<span onmouseout="hideTip(event, 'fs46', 225)" onmouseover="showTip(event, 'fs46', 225)" class="f">smaller</span> <span class="n">10</span>)
+    (<span onmouseout="hideTip(event, 'fs38', 226)" onmouseover="showTip(event, 'fs38', 226)" class="p">Some</span> <span class="n">3</span>))) <span class="c">// Some 3</span>
+</code></pre></td>
+</tr>
+</table>
+<p>At least in F# most people would prefer the piping idiom. With pipe we can write
+the last argument of a function in front of the function. With this idea we end up with a
+more sequential way.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp">(<span onmouseout="hideTip(event, 'fs38', 227)" onmouseover="showTip(event, 'fs38', 227)" class="p">Some</span> <span class="n">3</span>)
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs42', 228)" onmouseover="showTip(event, 'fs42', 228)" class="f">is</span> (<span onmouseout="hideTip(event, 'fs47', 229)" onmouseover="showTip(event, 'fs47', 229)" class="f">greater</span> <span class="n">0</span>)
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs42', 230)" onmouseover="showTip(event, 'fs42', 230)" class="f">is</span> (<span onmouseout="hideTip(event, 'fs46', 231)" onmouseover="showTip(event, 'fs46', 231)" class="f">smaller</span> <span class="n">10</span>) <span class="c">// Some 3</span>
+</code></pre></td>
+</tr>
+</table>
+<p><code>(Some 3)</code> is now the input to <code>is (greater 0)</code> the return value of this is then the input value
+to <code>is (smaller 10)</code> and so on. But checking if a number is between some values is quite common.
+Why not combine both things into a single function?</p>
+<p>We already have <code>is</code> that does the handling of the option for us. But it only works
+with a single predicate function. This is okay, but to be more flexible we should write
+a way to combine two predicate functions into a single new predicate function.</p>
+<div class="info">
+A predicate is a function that always returns a <code>bool</code>. Predicates are often used for
+validation or filtering. For example:
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp">[<span class="n">1</span>;<span class="n">2</span>;<span class="n">3</span>;<span class="n">4</span>;<span class="n">5</span>;<span class="n">6</span>] <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs10', 232)" onmouseover="showTip(event, 'fs10', 232)" class="i">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs48', 233)" onmouseover="showTip(event, 'fs48', 233)" class="i">filter</span> (<span class="k">fun</span> <span class="i">x</span> <span class="k">-&gt;</span> <span class="i">x</span> <span class="o">%</span> <span class="n">2</span> <span class="o">=</span> <span class="n">0</span>) <span class="c">// [2;4;6]</span>
+</code></pre></td>
+</tr>
+</table>
+</div>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs49', 234)" onmouseover="showTip(event, 'fs49', 234)" class="f">combine</span> <span onmouseout="hideTip(event, 'fs50', 235)" onmouseover="showTip(event, 'fs50', 235)" class="f">f</span> <span onmouseout="hideTip(event, 'fs51', 236)" onmouseover="showTip(event, 'fs51', 236)" class="f">g</span> <span onmouseout="hideTip(event, 'fs52', 237)" onmouseover="showTip(event, 'fs52', 237)" class="i">x</span> <span class="o">=</span> (<span onmouseout="hideTip(event, 'fs50', 238)" onmouseover="showTip(event, 'fs50', 238)" class="f">f</span> <span onmouseout="hideTip(event, 'fs52', 239)" onmouseover="showTip(event, 'fs52', 239)" class="i">x</span>) <span class="o">&amp;&amp;</span> (<span onmouseout="hideTip(event, 'fs51', 240)" onmouseover="showTip(event, 'fs51', 240)" class="f">g</span> <span onmouseout="hideTip(event, 'fs52', 241)" onmouseover="showTip(event, 'fs52', 241)" class="i">x</span>)
+</code></pre></td>
+</tr>
+</table>
+<p>The idea is simple, we have two functions, and both functions must return <code>true</code> for the given
+input <code>x</code>. Only when both return <code>true</code> our <code>combine</code> function also returns <code>true</code>. Now we can
+easily combine two predicates into a single new predicate.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs53', 242)" onmouseover="showTip(event, 'fs53', 242)" class="f">between</span> <span onmouseout="hideTip(event, 'fs35', 243)" onmouseover="showTip(event, 'fs35', 243)" class="i">min</span> <span onmouseout="hideTip(event, 'fs41', 244)" onmouseover="showTip(event, 'fs41', 244)" class="i">max</span> <span class="o">=</span> (<span onmouseout="hideTip(event, 'fs49', 245)" onmouseover="showTip(event, 'fs49', 245)" class="f">combine</span> (<span onmouseout="hideTip(event, 'fs46', 246)" onmouseover="showTip(event, 'fs46', 246)" class="f">smaller</span> <span onmouseout="hideTip(event, 'fs41', 247)" onmouseover="showTip(event, 'fs41', 247)" class="i">max</span>) (<span onmouseout="hideTip(event, 'fs47', 248)" onmouseover="showTip(event, 'fs47', 248)" class="f">greater</span> <span onmouseout="hideTip(event, 'fs35', 249)" onmouseover="showTip(event, 'fs35', 249)" class="i">min</span>))
+
+(<span onmouseout="hideTip(event, 'fs38', 250)" onmouseover="showTip(event, 'fs38', 250)" class="p">Some</span> <span class="n">0</span>)  <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs42', 251)" onmouseover="showTip(event, 'fs42', 251)" class="f">is</span> (<span onmouseout="hideTip(event, 'fs53', 252)" onmouseover="showTip(event, 'fs53', 252)" class="f">between</span> <span class="n">0</span> <span class="n">10</span>) <span class="c">// None</span>
+(<span onmouseout="hideTip(event, 'fs38', 253)" onmouseover="showTip(event, 'fs38', 253)" class="p">Some</span> <span class="n">3</span>)  <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs42', 254)" onmouseover="showTip(event, 'fs42', 254)" class="f">is</span> (<span onmouseout="hideTip(event, 'fs53', 255)" onmouseover="showTip(event, 'fs53', 255)" class="f">between</span> <span class="n">0</span> <span class="n">10</span>) <span class="c">// Some 3</span>
+(<span onmouseout="hideTip(event, 'fs38', 256)" onmouseover="showTip(event, 'fs38', 256)" class="p">Some</span> <span class="n">11</span>) <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs42', 257)" onmouseover="showTip(event, 'fs42', 257)" class="f">is</span> (<span onmouseout="hideTip(event, 'fs53', 258)" onmouseover="showTip(event, 'fs53', 258)" class="f">between</span> <span class="n">0</span> <span class="n">10</span>) <span class="c">// None</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Once again you can see how we use currying. We don't provide the second argument to <code>smaller</code> or
+<code>greater</code>. That means both calls return predicates. And those two predicates are then provided
+to <code>combine</code>.</p>
+<p>But we also don't provide the third argument to <code>combine</code>. That means once again we get another
+new predicate function back. This way we can create the <code>between</code> predicate. It doesn't look like
+it, but <code>between</code> is a function that takes three arguments. <code>min</code> and <code>max</code> are the visible
+arguments. But we only called <code>combine</code> with two arguments. That means it returns a lambda,
+that makes <code>between</code> a three argument function (or a chain of three functions taking one-argument).</p>
+<p>What do we do if we want to combine three, four or more predicate functions? <code>combine</code> currently
+can turn two predicates into a single predicate. So we only need to <code>combine</code> all our predicates until
+we end up with a single predicate. This task is already written for us and named <code>reduce</code>.
+Let's create a <code>check</code> function that we can pass a list of predicates that combines it
+into a single predicate.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs54', 259)" onmouseover="showTip(event, 'fs54', 259)" class="f">check</span> <span onmouseout="hideTip(event, 'fs55', 260)" onmouseover="showTip(event, 'fs55', 260)" class="i">predicates</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs10', 261)" onmouseover="showTip(event, 'fs10', 261)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs56', 262)" onmouseover="showTip(event, 'fs56', 262)" class="f">reduce</span> <span onmouseout="hideTip(event, 'fs49', 263)" onmouseover="showTip(event, 'fs49', 263)" class="f">combine</span> <span onmouseout="hideTip(event, 'fs55', 264)" onmouseover="showTip(event, 'fs55', 264)" class="i">predicates</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Now let's combine three predicates at once to create a new predicate.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+<span class="l">7: </span>
+<span class="l">8: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs57', 265)" onmouseover="showTip(event, 'fs57', 265)" class="f">isEven</span> <span onmouseout="hideTip(event, 'fs3', 266)" onmouseover="showTip(event, 'fs3', 266)" class="i">x</span>    <span class="o">=</span> <span onmouseout="hideTip(event, 'fs3', 267)" onmouseover="showTip(event, 'fs3', 267)" class="i">x</span> <span class="o">%</span> <span class="n">2</span> <span class="o">=</span> <span class="n">0</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs58', 268)" onmouseover="showTip(event, 'fs58', 268)" class="f">evenAnd1To9</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs54', 269)" onmouseover="showTip(event, 'fs54', 269)" class="f">check</span> [<span onmouseout="hideTip(event, 'fs47', 270)" onmouseover="showTip(event, 'fs47', 270)" class="f">greater</span> <span class="n">0</span>; <span onmouseout="hideTip(event, 'fs46', 271)" onmouseover="showTip(event, 'fs46', 271)" class="f">smaller</span> <span class="n">10</span>; <span onmouseout="hideTip(event, 'fs57', 272)" onmouseover="showTip(event, 'fs57', 272)" class="f">isEven</span>]
+
+(<span onmouseout="hideTip(event, 'fs38', 273)" onmouseover="showTip(event, 'fs38', 273)" class="p">Some</span> <span class="n">0</span>)  <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs42', 274)" onmouseover="showTip(event, 'fs42', 274)" class="f">is</span> <span onmouseout="hideTip(event, 'fs58', 275)" onmouseover="showTip(event, 'fs58', 275)" class="f">evenAnd1To9</span> <span class="c">// None</span>
+(<span onmouseout="hideTip(event, 'fs38', 276)" onmouseover="showTip(event, 'fs38', 276)" class="p">Some</span> <span class="n">3</span>)  <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs42', 277)" onmouseover="showTip(event, 'fs42', 277)" class="f">is</span> <span onmouseout="hideTip(event, 'fs58', 278)" onmouseover="showTip(event, 'fs58', 278)" class="f">evenAnd1To9</span> <span class="c">// None</span>
+(<span onmouseout="hideTip(event, 'fs38', 279)" onmouseover="showTip(event, 'fs38', 279)" class="p">Some</span> <span class="n">4</span>)  <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs42', 280)" onmouseover="showTip(event, 'fs42', 280)" class="f">is</span> <span onmouseout="hideTip(event, 'fs58', 281)" onmouseover="showTip(event, 'fs58', 281)" class="f">evenAnd1To9</span> <span class="c">// Some 4</span>
+(<span onmouseout="hideTip(event, 'fs38', 282)" onmouseover="showTip(event, 'fs38', 282)" class="p">Some</span> <span class="n">6</span>)  <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs42', 283)" onmouseover="showTip(event, 'fs42', 283)" class="f">is</span> <span onmouseout="hideTip(event, 'fs58', 284)" onmouseover="showTip(event, 'fs58', 284)" class="f">evenAnd1To9</span> <span class="c">// Some 6</span>
+(<span onmouseout="hideTip(event, 'fs38', 285)" onmouseover="showTip(event, 'fs38', 285)" class="p">Some</span> <span class="n">11</span>) <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs42', 286)" onmouseover="showTip(event, 'fs42', 286)" class="f">is</span> <span onmouseout="hideTip(event, 'fs58', 287)" onmouseover="showTip(event, 'fs58', 287)" class="f">evenAnd1To9</span> <span class="c">// None</span>
+</code></pre></td>
+</tr>
+</table>
+<p>This idea of writing small functions, or basically decomposing a task into small functions and
+then composing them into bigger functions is the heart of functional programming. In functional
+programming we directly work with functions and we even write our own combinators
+to compose functions.</p>
+<a name="oo"></a>
+<h2>Object-Oriented programming</h2>
+<p>At the start of the article i said we can achieve the same ideas in Object-Oriented programming
+or that you probably already know these things. I want to show you some C# code to achieve the
+same things. C# already has some functional features like lambda-expressions. But there is
+really no point in showing C# code that uses functional features as an example that OO
+and functional programming are orthogonal. Because of this i will only use classes.</p>
+<a name="oo-class"></a>
+<h2>What is a class?</h2>
+<p>We start with the same idea. What is actually a class anyway? A class is actually some
+kind of compose-able type. It always has at least one constructor, beyond that it can contain
+multiple data in the form of public and private fields, additional it can contain multiple
+functions operating on those data, often named <em>methods</em>. I make no distinction between
+functions and methods.</p>
+<p>But one important aspect is that there is no technical restriction to create classes with no
+data or no functions. There is also no restriction that tells you how many data fields or
+functions you must implement.</p>
+<a name="oo-function"></a>
+<h2>Function as data</h2>
+<p>I started with the idea of functions as data. I created a <code>square</code> function and passed the function
+around. We wrote our own <code>map</code> function that showed that we could replace a function by data.
+But also the opposite that we could pass a function instead of a data-structure. Re-doing that
+proof makes less sense as this idea doesn't invalidate just because we now use classes. But
+you probably wonder how we pass a function.</p>
+<p>In fact, when you do OO programming you pass functions all over the place in your code. You do
+it even more often as in a functional language. Every object is a container for functions. So
+when you pass an object you also pass functions around. In fact you not only pass a single
+function, you usually pass dozens of functions including data as a single object around.</p>
+<p>And because you usually return objects that include functions, you also return functions. In fact
+in OO it is even hard to find a place where you don't do that. Functional programming
+is more a simplification. We only pass a single function. And on top, we have lambda expression
+to easily create a single function directly where we need it. That is why it looks different
+but actually passing a single function or returning it shouldn't be hard to understand. You
+already do that all over the place in an OO language.</p>
+<div class="info">
+Some languages also have the ability to create whole classes/objects inline like you do
+with a lambda expression. In fact F# is such a language and supports
+<a href="https://msdn.microsoft.com/visualfsharpdocs/conceptual/object-expressions-%5bfsharp%5d">Object expressions</a>
+C# also supports <a href="https://msdn.microsoft.com/en-us/library/bb397696.aspx">Anonymous Types</a>,
+but they are more limited. Java supports <a href="https://docs.oracle.com/javase/tutorial/java/javaOO/anonymousclasses.html">Anonymous classes</a>.
+</div>
+<p>So, how do we create a <code>List.map</code> function in C# just with classes and how do we pass it
+a function like <code>square</code>?</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+<span class="l">16: </span>
+<span class="l">17: </span>
+<span class="l">18: </span>
+<span class="l">19: </span>
+<span class="l">20: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="csharp"><span class="k">public</span> <span class="k">interface</span> IFunction&lt;A,B&gt; {
+    B Call(A a);
+}
+
+<span class="k">public</span> <span class="k">class</span> Square <span class="o">:</span> IFunction&lt;<span class="k">int</span>,<span class="k">int</span>&gt; {
+    <span class="k">public</span> <span class="k">int</span> Call(<span class="k">int</span> x) {
+        <span class="k">return</span> x <span class="o">*</span> x;
+    }
+}
+
+<span class="k">public</span> <span class="k">static</span> <span class="k">class</span> List {
+    <span class="k">public</span> <span class="k">static</span> List&lt;B&gt; map&lt;A,B&gt;(IFunction&lt;A,B&gt; func, List&lt;A&gt; values) {
+        <span class="k">var</span> newList <span class="o">=</span> <span class="k">new</span> List&lt;B&gt;();
+        <span class="k">foreach</span> (<span class="k">var</span> x <span class="k">in</span> values) {
+            <span class="k">var</span> mapping <span class="o">=</span> func.Call(x);
+            newList.Add(mapping);
+        }
+        <span class="k">return</span> newList;
+    }
+}
+</code></pre></td></tr></table>
+<p>At first, we need to create a <code>IFunction</code> interface. This interface just tells us that we have
+a single method that takes some input and produces some output. We don't even care how that method
+is named. I use <code>Call</code>, but we also could use <code>Run</code>, <code>Execute</code> or whatever you like.</p>
+<p>Because we want to pass the square function as a value, we now must write a whole class and wrap
+our function inside a class. Now we are able to create an object and pass that function around.</p>
+<p>Our <code>List.map</code> just expects such a one-method interface (functional interface) and executes the
+function for every element. We now can write something like this:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="csharp"><span class="k">var</span> ints    <span class="o">=</span> <span class="k">new</span> List&lt;<span class="k">int</span>&gt; { <span class="n">1</span>,<span class="n">2</span>,<span class="n">3</span>,<span class="n">4</span>,<span class="n">5</span> };
+<span class="k">var</span> squared <span class="o">=</span> List.map(<span class="k">new</span> Square(), ints);
+</code></pre></td></tr></table>
+<p>And <code>squared</code> is a new list with all elements squared. The <code>IFunction</code> interface is sure a thing
+you only need to write once. Because we don't have currying in C#, we probably also want to
+write a version with two or three arguments, but overall you only need to define those once.</p>
+<p>Writing everything this way feels a little bit dumb. Mainly because most often the time there is a
+(IMHO: dumb) rule that tells you to put every class into its own file. The above code leads to
+an explosion of classes/files. But instead of criticizing the code, you should probably criticize
+your rules and OO on why such a simple example is already so complex.</p>
+<div class="info">
+Once again I want to highlight the importance that i ignore the functional features. You
+sure could easily achieve the same with just static methods (functions). Using <code>Func<int,int></code>
+in <code>List.map</code> and using a lambda <code>x => x * x</code> to call <code>List.map</code>.
+But those are the functional features that were added with C# 3. There is no point in showing
+functional concepts with functional features in an OO language to prove that they are orthogonal.
+</div>
+<a name="oo-curry-partial-closure"></a>
+<h2>Currying, Partial Application and Closures</h2>
+<p>All three things are somehow connected to each other. In the functional code I first introduced
+currying, but I primarily used it to show Partial Application (only providing some arguments
+to a function, not all) and explained why this needs the concept of a closure. I will first ignore
+currying and only talk about the later two. So how can we create a function like <code>add</code> and partial apply
+the first argument?</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+<span class="l">7: </span>
+<span class="l">8: </span>
+<span class="l">9: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="csharp"><span class="k">public</span> <span class="k">class</span> Add <span class="o">:</span> IFunction&lt;<span class="k">int</span>,<span class="k">int</span>&gt; {
+    <span class="k">private</span> <span class="k">int</span> x;
+    <span class="k">public</span> Add(<span class="k">int</span> x) {
+        <span class="k">this</span>.x <span class="o">=</span> x;
+    }
+    <span class="k">public</span> <span class="k">int</span> Call(<span class="k">int</span> y) {
+        <span class="k">return</span> x <span class="o">+</span> y;
+    }
+}
+</code></pre></td></tr></table>
+<p>We now can use it like that:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="csharp"><span class="k">var</span> add<span class="n">10</span> <span class="o">=</span> <span class="k">new</span> Add(<span class="n">10</span>);
+add<span class="n">10</span>.Call(<span class="n">5</span>); <span class="c">// 15</span>
+</code></pre></td></tr></table>
+<p>What is Partial Application in OO really? It is just an argument to a constructor that is saved in
+a private field. All other methods in your class then have access to this private field. The value
+that was passed to the constructor is <em>remembered</em>.</p>
+<p>This shows what a closure is. Our <code>add10</code> object just have some internal private fields and
+all of those fields must remain in memory as long we have access to <code>add10</code>. This shows one
+fundamental idea. A closure and an object is the same.</p>
+<p>Whenever you create an object in OO programming. It is the same as calling a function that returns
+a function. The returned function then has access to the input through a closure. In the functional
+code I only returned a single function, but you also can return multiple functions or data-structure
+like a <em>Tuple</em> or <em>Record</em> that contains those functions.</p>
+<p>In C# we could for example create a class like:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="csharp"><span class="k">public</span> <span class="k">class</span> Counter {
+    <span class="k">private</span> <span class="k">int</span> counter;
+    <span class="k">public</span> Counter(<span class="k">int</span> init) {
+        <span class="k">this</span>.counter <span class="o">=</span> init;
+    }
+    <span class="k">public</span> <span class="k">int</span> Current() {
+        <span class="k">return</span> <span class="k">this</span>.counter;
+    }
+    <span class="k">public</span> <span class="k">void</span> Increment() {
+        <span class="k">this</span>.counter <span class="o">+</span><span class="o">=</span> <span class="n">1</span>;
+    }
+    <span class="k">public</span> <span class="k">void</span> Decrement() {
+        <span class="k">this</span>.counter <span class="o">-</span><span class="o">=</span> <span class="n">1</span>;
+    }
+}
+</code></pre></td></tr></table>
+<p>and use it like this:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="csharp"><span class="k">var</span> counter <span class="o">=</span> <span class="k">new</span> Counter(<span class="n">10</span>);
+counter.Increment();
+counter.Increment();
+counter.Decrement();
+Console.WriteLine(counter.Current()); <span class="c">// 11</span>
+</code></pre></td></tr></table>
+<p>In F# (without using classes in F#) we could achieve the same just with a closure</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="c">// A Record describing three functions</span>
+<span class="k">type</span> <span onmouseout="hideTip(event, 'fs59', 288)" onmouseover="showTip(event, 'fs59', 288)" class="t">Counter</span> <span class="o">=</span> {
+    <span onmouseout="hideTip(event, 'fs60', 289)" onmouseover="showTip(event, 'fs60', 289)" class="i">Current</span><span class="o">:</span>   <span onmouseout="hideTip(event, 'fs61', 290)" onmouseover="showTip(event, 'fs61', 290)" class="t">unit</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs62', 291)" onmouseover="showTip(event, 'fs62', 291)" class="t">int</span>
+    <span onmouseout="hideTip(event, 'fs63', 292)" onmouseover="showTip(event, 'fs63', 292)" class="i">Increment</span><span class="o">:</span> <span onmouseout="hideTip(event, 'fs61', 293)" onmouseover="showTip(event, 'fs61', 293)" class="t">unit</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs61', 294)" onmouseover="showTip(event, 'fs61', 294)" class="t">unit</span>
+    <span onmouseout="hideTip(event, 'fs64', 295)" onmouseover="showTip(event, 'fs64', 295)" class="i">Decrement</span><span class="o">:</span> <span onmouseout="hideTip(event, 'fs61', 296)" onmouseover="showTip(event, 'fs61', 296)" class="t">unit</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs61', 297)" onmouseover="showTip(event, 'fs61', 297)" class="t">unit</span>
+}
+
+<span class="c">// A function that has `counter` as a closure and returns a Counter Record</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs65', 298)" onmouseover="showTip(event, 'fs65', 298)" class="f">counter</span> <span onmouseout="hideTip(event, 'fs66', 299)" onmouseover="showTip(event, 'fs66', 299)" class="i">init</span> <span class="o">=</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs67', 300)" onmouseover="showTip(event, 'fs67', 300)" class="v">counter</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs31', 301)" onmouseover="showTip(event, 'fs31', 301)" class="f">ref</span> <span onmouseout="hideTip(event, 'fs66', 302)" onmouseover="showTip(event, 'fs66', 302)" class="i">init</span>
+    {
+        <span class="i">Current</span>   <span class="o">=</span> (<span class="k">fun</span> _ <span class="k">-&gt;</span> <span class="o">!</span><span onmouseout="hideTip(event, 'fs67', 303)" onmouseover="showTip(event, 'fs67', 303)" class="v">counter</span>)
+        <span class="i">Increment</span> <span class="o">=</span> (<span class="k">fun</span> _ <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs67', 304)" onmouseover="showTip(event, 'fs67', 304)" class="v">counter</span> <span class="o">:=</span> <span class="o">!</span><span onmouseout="hideTip(event, 'fs67', 305)" onmouseover="showTip(event, 'fs67', 305)" class="v">counter</span> <span class="o">+</span> <span class="n">1</span>)
+        <span class="i">Decrement</span> <span class="o">=</span> (<span class="k">fun</span> _ <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs67', 306)" onmouseover="showTip(event, 'fs67', 306)" class="v">counter</span> <span class="o">:=</span> <span class="o">!</span><span onmouseout="hideTip(event, 'fs67', 307)" onmouseover="showTip(event, 'fs67', 307)" class="v">counter</span> <span class="o">-</span> <span class="n">1</span>)
+    }
+</code></pre></td>
+</tr>
+</table>
+<p>And you use it like that:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs68', 308)" onmouseover="showTip(event, 'fs68', 308)" class="i">count</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs65', 309)" onmouseover="showTip(event, 'fs65', 309)" class="f">counter</span> <span class="n">10</span>
+<span onmouseout="hideTip(event, 'fs68', 310)" onmouseover="showTip(event, 'fs68', 310)" class="i">count</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs63', 311)" onmouseover="showTip(event, 'fs63', 311)" class="i">Increment</span>()
+<span onmouseout="hideTip(event, 'fs68', 312)" onmouseover="showTip(event, 'fs68', 312)" class="i">count</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs63', 313)" onmouseover="showTip(event, 'fs63', 313)" class="i">Increment</span>()
+<span onmouseout="hideTip(event, 'fs68', 314)" onmouseover="showTip(event, 'fs68', 314)" class="i">count</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs64', 315)" onmouseover="showTip(event, 'fs64', 315)" class="i">Decrement</span>()
+<span onmouseout="hideTip(event, 'fs69', 316)" onmouseover="showTip(event, 'fs69', 316)" class="f">printfn</span> <span class="s">&quot;</span><span class="pf">%d</span><span class="s">&quot;</span> (<span onmouseout="hideTip(event, 'fs68', 317)" onmouseover="showTip(event, 'fs68', 317)" class="i">count</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs60', 318)" onmouseover="showTip(event, 'fs60', 318)" class="i">Current</span>()) <span class="c">// 11</span>
+</code></pre></td>
+</tr>
+</table>
+<p>An object is just a collection of functions that still has access to some hidden fields.
+Objects and closures are the same. Probably you have heard that "Objects are poor man closures",
+now you know why. But it is also the same reversed. "Closures are poor man objects". Why? A
+class is basically an <em>optimization</em> of this use-case.</p>
+<p>A class contains the definition, fields and so on in one unit. Instead of creating a record
+definition, using <code>counter</code> as a closure and return a record, I also could just define
+a class with the members (methods) and a private field. Defining a class is shorter.</p>
+<p>So a class is a poor man closures because it did not add anything more useful as what a
+function with closure already gives you (functional languages, lambdas, closures and so
+on already existed before OO). But on the other hand, OO optimized this use-case in such
+a way that Closures are really "poor man objects".</p>
+<p>As F# also supports classes, if you really want to write something like this i would suggest you
+also should create a class, and not use a record with functions and a closure. A class is just
+much shorter.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">type</span> <span onmouseout="hideTip(event, 'fs70', 319)" onmouseover="showTip(event, 'fs70', 319)" class="t">CounterClass</span>(<span onmouseout="hideTip(event, 'fs66', 320)" onmouseover="showTip(event, 'fs66', 320)" class="i">init</span><span class="o">:</span><span onmouseout="hideTip(event, 'fs62', 321)" onmouseover="showTip(event, 'fs62', 321)" class="t">int</span>) <span class="o">=</span>
+    <span class="k">let</span> <span class="k">mutable</span> <span onmouseout="hideTip(event, 'fs71', 322)" onmouseover="showTip(event, 'fs71', 322)" class="v">counter</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs66', 323)" onmouseover="showTip(event, 'fs66', 323)" class="i">init</span>
+    <span class="k">member</span> <span onmouseout="hideTip(event, 'fs72', 324)" onmouseover="showTip(event, 'fs72', 324)" class="i">this</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs73', 325)" onmouseover="showTip(event, 'fs73', 325)" class="i">Current</span>     <span class="o">=</span> <span onmouseout="hideTip(event, 'fs71', 326)" onmouseover="showTip(event, 'fs71', 326)" class="v">counter</span>
+    <span class="k">member</span> <span onmouseout="hideTip(event, 'fs72', 327)" onmouseover="showTip(event, 'fs72', 327)" class="i">this</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs74', 328)" onmouseover="showTip(event, 'fs74', 328)" class="f">Increment</span>() <span class="o">=</span> <span onmouseout="hideTip(event, 'fs71', 329)" onmouseover="showTip(event, 'fs71', 329)" class="v">counter</span> <span class="o">&lt;-</span> <span onmouseout="hideTip(event, 'fs71', 330)" onmouseover="showTip(event, 'fs71', 330)" class="v">counter</span> <span class="o">+</span> <span class="n">1</span>
+    <span class="k">member</span> <span onmouseout="hideTip(event, 'fs72', 331)" onmouseover="showTip(event, 'fs72', 331)" class="i">this</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs75', 332)" onmouseover="showTip(event, 'fs75', 332)" class="f">Decrement</span>() <span class="o">=</span> <span onmouseout="hideTip(event, 'fs71', 333)" onmouseover="showTip(event, 'fs71', 333)" class="v">counter</span> <span class="o">&lt;-</span> <span onmouseout="hideTip(event, 'fs71', 334)" onmouseover="showTip(event, 'fs71', 334)" class="v">counter</span> <span class="o">-</span> <span class="n">1</span>
+</code></pre></td>
+</tr>
+</table>
+<p>The usage of a class in F# is actually nearly the same as the code with the record:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs76', 335)" onmouseover="showTip(event, 'fs76', 335)" class="i">count</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs70', 336)" onmouseover="showTip(event, 'fs70', 336)" class="t">CounterClass</span> <span class="n">10</span>
+<span onmouseout="hideTip(event, 'fs76', 337)" onmouseover="showTip(event, 'fs76', 337)" class="i">count</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs77', 338)" onmouseover="showTip(event, 'fs77', 338)" class="f">Increment</span>()
+<span onmouseout="hideTip(event, 'fs76', 339)" onmouseover="showTip(event, 'fs76', 339)" class="i">count</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs77', 340)" onmouseover="showTip(event, 'fs77', 340)" class="f">Increment</span>()
+<span onmouseout="hideTip(event, 'fs76', 341)" onmouseover="showTip(event, 'fs76', 341)" class="i">count</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs78', 342)" onmouseover="showTip(event, 'fs78', 342)" class="f">Decrement</span>()
+<span onmouseout="hideTip(event, 'fs69', 343)" onmouseover="showTip(event, 'fs69', 343)" class="f">printfn</span> <span class="s">&quot;</span><span class="pf">%d</span><span class="s">&quot;</span> <span onmouseout="hideTip(event, 'fs76', 344)" onmouseover="showTip(event, 'fs76', 344)" class="i">count</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs79', 345)" onmouseover="showTip(event, 'fs79', 345)" class="i">Current</span>
+</code></pre></td>
+</tr>
+</table>
+<p>But as a final note. Writing things like this is anyway not idiomatic functional code. Functional
+code uses immutability. With immutable data you don't really need a class at all. A class gives you
+the ability to hide <em>mutable data</em> so you only have specific functions that can manipulate those.</p>
+<a name="oo-currying"></a>
+<h2>Currying</h2>
+<p>F# does automatic currying by default, but it doesn't mean just because your language doesn't do
+currying you can't have it. While most modern functional languages usually do it by default some
+older languages especially those based on Lisp also don't do it by default.</p>
+<p>I give a short recap on what currying is, because it is still often miss-interpreted as
+partial application.</p>
+<p>Currying is the idea that every function only has one input and one output argument. A function
+with multiple input arguments must then be converted into a function that returns another
+function. This transformation process is what we name currying. Once a function is in curried
+form we don't have to specify all arguments at once. Not providing all arguments at once is
+partial application. But you don't need currying to use partial application.</p>
+<p>Often beginners have a problem to differentiate both. We also can write a curry
+function in F#. And probably that can help to demonstrate the distinction. First
+we create a function that expects two arguments in tupled form.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs80', 346)" onmouseover="showTip(event, 'fs80', 346)" class="f">add</span> (<span onmouseout="hideTip(event, 'fs3', 347)" onmouseover="showTip(event, 'fs3', 347)" class="i">x</span>,<span onmouseout="hideTip(event, 'fs27', 348)" onmouseover="showTip(event, 'fs27', 348)" class="i">y</span>) <span class="o">=</span> <span onmouseout="hideTip(event, 'fs3', 349)" onmouseover="showTip(event, 'fs3', 349)" class="i">x</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs27', 350)" onmouseover="showTip(event, 'fs27', 350)" class="i">y</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Now <code>add</code> expects a single argument, a tuple that contains two variables. You can use it like that:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs80', 351)" onmouseover="showTip(event, 'fs80', 351)" class="f">add</span>(<span class="n">3</span>,<span class="n">10</span>)  <span class="c">// 13</span>
+<span onmouseout="hideTip(event, 'fs80', 352)" onmouseover="showTip(event, 'fs80', 352)" class="f">add</span>(<span class="n">10</span>,<span class="n">10</span>) <span class="c">// 20</span>
+</code></pre></td>
+</tr>
+</table>
+<p>Probably at this point you will notice how similar this is to a function in a C-style language.
+It is probably not an accident that we use <code>,</code> for the creation of a tuple. The disadvantage
+of a tuple is that we now must provide both values at once. We now could write a <code>curry</code>
+function to turn a function expecting a tuple into a chain of functions.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+<span class="l">7: </span>
+<span class="l">8: </span>
+<span class="l">9: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="c">// Extended version</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs81', 353)" onmouseover="showTip(event, 'fs81', 353)" class="f">curry</span> <span class="o">=</span>
+  <span class="k">fun</span> <span onmouseout="hideTip(event, 'fs82', 354)" onmouseover="showTip(event, 'fs82', 354)" class="f">f</span> <span class="k">-&gt;</span>
+    <span class="k">fun</span> <span onmouseout="hideTip(event, 'fs52', 355)" onmouseover="showTip(event, 'fs52', 355)" class="i">x</span> <span class="k">-&gt;</span>
+      <span class="k">fun</span> <span onmouseout="hideTip(event, 'fs83', 356)" onmouseover="showTip(event, 'fs83', 356)" class="i">y</span> <span class="k">-&gt;</span>
+        <span onmouseout="hideTip(event, 'fs82', 357)" onmouseover="showTip(event, 'fs82', 357)" class="f">f</span> (<span onmouseout="hideTip(event, 'fs52', 358)" onmouseover="showTip(event, 'fs52', 358)" class="i">x</span>,<span onmouseout="hideTip(event, 'fs83', 359)" onmouseover="showTip(event, 'fs83', 359)" class="i">y</span>)
+
+<span class="c">// Short version</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs81', 360)" onmouseover="showTip(event, 'fs81', 360)" class="f">curry</span> <span onmouseout="hideTip(event, 'fs82', 361)" onmouseover="showTip(event, 'fs82', 361)" class="f">f</span> <span onmouseout="hideTip(event, 'fs52', 362)" onmouseover="showTip(event, 'fs52', 362)" class="i">x</span> <span onmouseout="hideTip(event, 'fs83', 363)" onmouseover="showTip(event, 'fs83', 363)" class="i">y</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs82', 364)" onmouseover="showTip(event, 'fs82', 364)" class="f">f</span>(<span onmouseout="hideTip(event, 'fs52', 365)" onmouseover="showTip(event, 'fs52', 365)" class="i">x</span>,<span onmouseout="hideTip(event, 'fs83', 366)" onmouseover="showTip(event, 'fs83', 366)" class="i">y</span>)
+</code></pre></td>
+</tr>
+</table>
+<p>Using <code>curry</code> only with the first argument returns a curried version of <code>add</code>. After we have
+a curried function we can partial apply it.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs84', 367)" onmouseover="showTip(event, 'fs84', 367)" class="f">addC</span>   <span class="o">=</span> <span onmouseout="hideTip(event, 'fs81', 368)" onmouseover="showTip(event, 'fs81', 368)" class="f">curry</span> <span onmouseout="hideTip(event, 'fs80', 369)" onmouseover="showTip(event, 'fs80', 369)" class="f">add</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs85', 370)" onmouseover="showTip(event, 'fs85', 370)" class="f">addC10</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs84', 371)" onmouseover="showTip(event, 'fs84', 371)" class="f">addC</span> <span class="n">10</span>
+<span onmouseout="hideTip(event, 'fs85', 372)" onmouseover="showTip(event, 'fs85', 372)" class="f">addC10</span> <span class="n">5</span> <span class="c">// 15</span>
+</code></pre></td>
+</tr>
+</table>
+<p>To be more formal. We started with a function signature that looked like this:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp">(<span class="i">A</span>,<span class="i">B</span>) <span class="k">-&gt;</span> <span class="i">C</span>
+</code></pre></td>
+</tr>
+</table>
+<p>and <code>curry</code> turned it into a chain of functions</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="i">A</span> <span class="k">-&gt;</span> <span class="i">B</span> <span class="k">-&gt;</span> <span class="i">C</span>
+</code></pre></td>
+</tr>
+</table>
+<p>When you are not used to reading functional signatures. The <code>-&gt;</code> stands for a function. The left
+is the input and the right is the output. <code>-&gt;</code> is left-associative. So you can read it like</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="i">A</span> <span class="k">-&gt;</span> (<span class="i">B</span> <span class="k">-&gt;</span> <span class="i">C</span>)
+</code></pre></td>
+</tr>
+</table>
+<p>A function that takes <code>A</code> and returns a new function that takes a <code>B</code> and returns <code>C</code>. When we
+now go back to the OO world. We already defined a generic interface with one argument and output.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="i">IFunction</span><span class="o">&lt;</span><span class="i">A</span>,<span class="i">B</span><span class="o">&gt;</span>
+</code></pre></td>
+</tr>
+</table>
+<p>How could the interface for a function with two arguments, without currying, look like?</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="i">IFunction</span><span class="o">&lt;</span><span class="i">A</span>,<span class="i">B</span>,<span class="i">C</span><span class="o">&gt;</span>
+</code></pre></td>
+</tr>
+</table>
+<p>How does it look with currying?</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="i">IFunction</span><span class="o">&lt;</span><span class="i">A</span>,<span class="i">IFunction</span><span class="o">&lt;</span><span class="i">B</span>,<span class="i">C</span><span class="o">&gt;</span><span class="o">&gt;</span>
+</code></pre></td>
+</tr>
+</table>
+<p>A <code>curry</code> function would take a <code>IFunction&lt;A,B,C&gt;</code> and return a <code>IFunction&lt;A,IFunction&lt;B,C&gt;&gt;</code>.
+The problem is, without the ability to create a lambda or anonymous classes such a task is hard
+up to impossible.</p>
+<p>Instead of focusing on currying, we could focus on partial application instead. We already
+have seen what partial application means in OO. It just means we already provide the arguments
+to the constructor when we create a class. But it is really bad that we have to do that kind
+of thing explicitly and manually.</p>
+<p>Instead of creating classes that expects its value explicitly in the constructor, we should
+write a generic version that can partial apply any two argument IFunction instead. We
+could write it like that:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+<span class="l">16: </span>
+<span class="l">17: </span>
+<span class="l">18: </span>
+<span class="l">19: </span>
+<span class="l">20: </span>
+<span class="l">21: </span>
+<span class="l">22: </span>
+<span class="l">23: </span>
+<span class="l">24: </span>
+<span class="l">25: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="csharp"><span class="k">public</span> <span class="k">interface</span> IFunction&lt;A,B&gt; {
+    B Call(A a);
+}
+
+<span class="k">public</span> <span class="k">interface</span> IFunction&lt;A,B,C&gt; {
+    C Call(A a, B b);
+}
+
+<span class="k">public</span> <span class="k">class</span> Partial&lt;A,B,C&gt; <span class="o">:</span> IFunction&lt;B,C&gt; {
+    <span class="k">private</span> A a;
+    <span class="k">private</span> IFunction&lt;A,B,C&gt; func;
+    <span class="k">public</span> Partial(IFunction&lt;A,B,C&gt; func, A a) {
+        <span class="k">this</span>.a <span class="o">=</span> a;
+        <span class="k">this</span>.func <span class="o">=</span> func;
+    }
+    <span class="k">public</span> C Call(B b) {
+        <span class="k">return</span> <span class="k">this</span>.func.Call(<span class="k">this</span>.a, b);
+    }
+}
+
+<span class="k">public</span> <span class="k">static</span> <span class="k">class</span> Func {
+    <span class="k">public</span> <span class="k">static</span> IFunction&lt;B,C&gt; <span class="k">partial</span>&lt;A,B,C&gt;(IFunction&lt;A,B,C&gt; func, A a) {
+        <span class="k">return</span> <span class="k">new</span> Partial&lt;A,B,C&gt;(func, a);
+    }
+}
+</code></pre></td></tr></table>
+<p>We don't need the static <code>Func</code> class, but without this helper function and by directly
+using <code>new Partial()</code> we need to specify the generic values like <code>new Partial&lt;int,int,int&gt;()</code>
+as otherwise the C# compiler cannot infer the types. The helper functions helps us here.
+With such a setup we now can write our <code>Add</code> function like this.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="csharp"><span class="k">public</span> <span class="k">class</span> Add <span class="o">:</span> IFunction&lt;<span class="k">int</span>,<span class="k">int</span>,<span class="k">int</span>&gt; {
+    <span class="k">public</span> <span class="k">int</span> Call(<span class="k">int</span> x, <span class="k">int</span> y) {
+        <span class="k">return</span> x <span class="o">+</span> y;
+    }
+}
+</code></pre></td></tr></table>
+<p>And now we are able to partial apply the first argument. We can work with it like this.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="csharp"><span class="k">var</span> add   <span class="o">=</span> <span class="k">new</span> Add();
+<span class="k">var</span> add<span class="n">10</span> <span class="o">=</span> Func.<span class="k">partial</span>(add, <span class="n">10</span>);
+Console.WriteLine(add<span class="n">10</span>.Call(<span class="n">5</span>)); <span class="c">// 15</span>
+</code></pre></td></tr></table>
+<p>It is a little bit boiler-plate to define everything, but we only need to define it once,
+now we are able to partial apply any two argument function without that we explicitly
+need to create a private field or think about which or how many arguments we want
+to partial apply.</p>
+<div class="info">
+When we don't restrict ourself and use all functional features of C#, that means lambdas,
+and static methods (that we then can pass as arguments) then all of the examples become easier.
+We also can easily define <code>curry</code> functions.
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+<span class="l">16: </span>
+<span class="l">17: </span>
+<span class="l">18: </span>
+<span class="l">19: </span>
+<span class="l">20: </span>
+<span class="l">21: </span>
+<span class="l">22: </span>
+<span class="l">23: </span>
+<span class="l">24: </span>
+<span class="l">25: </span>
+<span class="l">26: </span>
+<span class="l">27: </span>
+<span class="l">28: </span>
+<span class="l">29: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="csharp"><span class="k">public</span> <span class="k">static</span> <span class="k">class</span> Lambda {
+    <span class="c">// 2-args</span>
+    <span class="k">public</span> <span class="k">static</span> Func&lt;A,Func&lt;B,C&gt;<span class="o">&gt;</span> Curry&lt;A,B,C&gt;(Func&lt;A,B,C&gt; func) {
+        <span class="k">return</span> a <span class="o">=</span><span class="o">&gt;</span> b <span class="o">=</span><span class="o">&gt;</span> func(a,b);
+    }
+    <span class="c">// 3-args</span>
+    <span class="k">public</span> <span class="k">static</span> Func&lt;A,Func&lt;B,Func&lt;C,D&gt;<span class="o">&gt;</span><span class="o">&gt;</span> Curry&lt;A,B,C,D&gt;(Func&lt;A,B,C,D&gt; func) {
+        <span class="k">return</span> a <span class="o">=</span><span class="o">&gt;</span> b <span class="o">=</span><span class="o">&gt;</span> c <span class="o">=</span><span class="o">&gt;</span> func(a,b,c);
+    }
+}
+
+<span class="k">class</span> MainClass {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">int</span> Add(<span class="k">int</span> x, <span class="k">int</span> y) {
+        <span class="k">return</span> x <span class="o">+</span> y;
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> Main(<span class="k">string</span>[] args) {
+        <span class="c">// We must specify the generic-types when we pass a static method</span>
+        <span class="c">// to the Curry() function as an argument</span>
+        <span class="k">var</span> add <span class="o">=</span> Lambda.Curry&lt;<span class="k">int</span>,<span class="k">int</span>,<span class="k">int</span>&gt;(Add);
+
+        <span class="k">var</span> x <span class="o">=</span> add(<span class="n">10</span>)(<span class="n">5</span>);   <span class="c">// It is now a chained function</span>
+        Console.WriteLine(x); <span class="c">// 15</span>
+
+        <span class="k">var</span> add<span class="n">10</span> <span class="o">=</span> add(<span class="n">10</span>);  <span class="c">// Easily Partial Application</span>
+        <span class="k">var</span> y     <span class="o">=</span> add<span class="n">10</span>(<span class="n">5</span>);
+        Console.WriteLine(y); <span class="c">// 15</span>
+    }
+}
+</code></pre></td></tr></table>
+</div>
+<a name="oo-exercise"></a>
+<h2>Exercise</h2>
+<p>Previously I provided a small exercise with validation, but I leave the task to implement it
+in your favourite language. Up to this point you should know enough about currying and
+partial application. Most languages today also support lambda statements. Not every language
+has automatic currying, but I showed how to create a curry function in F# and C#.</p>
+<p>Otherwise you still can use partial application instead of currying. The example is still
+small and still heavily rely on currying or in general the ability to take functions as
+arguments and return new functions from other functions. When you want a better understanding
+of the concepts then there is no better way to somehow rewrite the given example.</p>
+<p>As a full overview, here is the full F# code.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+<span class="l">16: </span>
+<span class="l">17: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="c">// Takes a predicate and a value and returns a valid/invalid value</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs86', 373)" onmouseover="showTip(event, 'fs86', 373)" class="f">is</span> <span onmouseout="hideTip(event, 'fs50', 374)" onmouseover="showTip(event, 'fs50', 374)" class="f">f</span> <span onmouseout="hideTip(event, 'fs44', 375)" onmouseover="showTip(event, 'fs44', 375)" class="i">x</span> <span class="o">=</span>
+    <span class="k">match</span> <span onmouseout="hideTip(event, 'fs44', 376)" onmouseover="showTip(event, 'fs44', 376)" class="i">x</span> <span class="k">with</span>
+    | <span onmouseout="hideTip(event, 'fs37', 377)" onmouseover="showTip(event, 'fs37', 377)" class="p">None</span>        <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs37', 378)" onmouseover="showTip(event, 'fs37', 378)" class="p">None</span>
+    | <span onmouseout="hideTip(event, 'fs38', 379)" onmouseover="showTip(event, 'fs38', 379)" class="p">Some</span> <span onmouseout="hideTip(event, 'fs45', 380)" onmouseover="showTip(event, 'fs45', 380)" class="i">number</span> <span class="k">-&gt;</span>
+        <span class="k">if</span>   <span onmouseout="hideTip(event, 'fs50', 381)" onmouseover="showTip(event, 'fs50', 381)" class="f">f</span> <span onmouseout="hideTip(event, 'fs45', 382)" onmouseover="showTip(event, 'fs45', 382)" class="i">number</span>
+        <span class="k">then</span> <span onmouseout="hideTip(event, 'fs38', 383)" onmouseover="showTip(event, 'fs38', 383)" class="p">Some</span> <span onmouseout="hideTip(event, 'fs45', 384)" onmouseover="showTip(event, 'fs45', 384)" class="i">number</span>
+        <span class="k">else</span> <span onmouseout="hideTip(event, 'fs37', 385)" onmouseover="showTip(event, 'fs37', 385)" class="p">None</span>
+
+<span class="c">// Combinator</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs49', 386)" onmouseover="showTip(event, 'fs49', 386)" class="f">combine</span> <span onmouseout="hideTip(event, 'fs50', 387)" onmouseover="showTip(event, 'fs50', 387)" class="f">f</span> <span onmouseout="hideTip(event, 'fs51', 388)" onmouseover="showTip(event, 'fs51', 388)" class="f">g</span> <span onmouseout="hideTip(event, 'fs52', 389)" onmouseover="showTip(event, 'fs52', 389)" class="i">x</span> <span class="o">=</span> (<span onmouseout="hideTip(event, 'fs50', 390)" onmouseover="showTip(event, 'fs50', 390)" class="f">f</span> <span onmouseout="hideTip(event, 'fs52', 391)" onmouseover="showTip(event, 'fs52', 391)" class="i">x</span>) <span class="o">&amp;&amp;</span> (<span onmouseout="hideTip(event, 'fs51', 392)" onmouseover="showTip(event, 'fs51', 392)" class="f">g</span> <span onmouseout="hideTip(event, 'fs52', 393)" onmouseover="showTip(event, 'fs52', 393)" class="i">x</span>)
+
+<span class="c">// Predicates</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs46', 394)" onmouseover="showTip(event, 'fs46', 394)" class="f">smaller</span> <span onmouseout="hideTip(event, 'fs35', 395)" onmouseover="showTip(event, 'fs35', 395)" class="i">min</span> <span onmouseout="hideTip(event, 'fs15', 396)" onmouseover="showTip(event, 'fs15', 396)" class="i">x</span>   <span class="o">=</span> <span onmouseout="hideTip(event, 'fs15', 397)" onmouseover="showTip(event, 'fs15', 397)" class="i">x</span> <span class="o">&lt;</span> <span onmouseout="hideTip(event, 'fs35', 398)" onmouseover="showTip(event, 'fs35', 398)" class="i">min</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs47', 399)" onmouseover="showTip(event, 'fs47', 399)" class="f">greater</span> <span onmouseout="hideTip(event, 'fs41', 400)" onmouseover="showTip(event, 'fs41', 400)" class="i">max</span> <span onmouseout="hideTip(event, 'fs15', 401)" onmouseover="showTip(event, 'fs15', 401)" class="i">x</span>   <span class="o">=</span> <span onmouseout="hideTip(event, 'fs15', 402)" onmouseover="showTip(event, 'fs15', 402)" class="i">x</span> <span class="o">&gt;</span> <span onmouseout="hideTip(event, 'fs41', 403)" onmouseover="showTip(event, 'fs41', 403)" class="i">max</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs87', 404)" onmouseover="showTip(event, 'fs87', 404)" class="f">even</span> <span onmouseout="hideTip(event, 'fs3', 405)" onmouseover="showTip(event, 'fs3', 405)" class="i">x</span>          <span class="o">=</span> <span onmouseout="hideTip(event, 'fs3', 406)" onmouseover="showTip(event, 'fs3', 406)" class="i">x</span> <span class="o">%</span> <span class="n">2</span> <span class="o">=</span> <span class="n">0</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs53', 407)" onmouseover="showTip(event, 'fs53', 407)" class="f">between</span> <span onmouseout="hideTip(event, 'fs35', 408)" onmouseover="showTip(event, 'fs35', 408)" class="i">min</span> <span onmouseout="hideTip(event, 'fs41', 409)" onmouseover="showTip(event, 'fs41', 409)" class="i">max</span> <span class="o">=</span> (<span onmouseout="hideTip(event, 'fs49', 410)" onmouseover="showTip(event, 'fs49', 410)" class="f">combine</span> (<span onmouseout="hideTip(event, 'fs46', 411)" onmouseover="showTip(event, 'fs46', 411)" class="f">smaller</span> <span onmouseout="hideTip(event, 'fs41', 412)" onmouseover="showTip(event, 'fs41', 412)" class="i">max</span>) (<span onmouseout="hideTip(event, 'fs47', 413)" onmouseover="showTip(event, 'fs47', 413)" class="f">greater</span> <span onmouseout="hideTip(event, 'fs35', 414)" onmouseover="showTip(event, 'fs35', 414)" class="i">min</span>))
+</code></pre></td>
+</tr>
+</table>
+<p>Some notes on the implementation. <code>Some</code> and <code>None</code> is an option type. In a language without
+<a href="{% post_url 2016-04-26-algebraic-data-types %}">Algebraic Data-Types</a> you have some problems to
+build this. But you can create a class that contains a bool and a data field. The bool contains
+the information if the data-field is valid or not. In the case it is invalid, the data-field
+is empty/null.</p>
+<p><code>combine</code> is a combinator, it expects two predicate functions as an argument and returns
+a new predicate that applies both checks on a value. In a language without automatic
+currying this should be a two-argument function (returning a function).</p>
+<p>You can use the functions above like this:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+<span class="l">7: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp">(<span onmouseout="hideTip(event, 'fs38', 415)" onmouseover="showTip(event, 'fs38', 415)" class="p">Some</span> <span class="n">3</span>)
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs86', 416)" onmouseover="showTip(event, 'fs86', 416)" class="f">is</span> (<span onmouseout="hideTip(event, 'fs53', 417)" onmouseover="showTip(event, 'fs53', 417)" class="f">between</span> <span class="n">0</span> <span class="n">10</span>)
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs86', 418)" onmouseover="showTip(event, 'fs86', 418)" class="f">is</span> <span onmouseout="hideTip(event, 'fs87', 419)" onmouseover="showTip(event, 'fs87', 419)" class="f">even</span> <span class="c">// None</span>
+
+(<span onmouseout="hideTip(event, 'fs38', 420)" onmouseover="showTip(event, 'fs38', 420)" class="p">Some</span> <span class="n">4</span>)
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs86', 421)" onmouseover="showTip(event, 'fs86', 421)" class="f">is</span> (<span onmouseout="hideTip(event, 'fs53', 422)" onmouseover="showTip(event, 'fs53', 422)" class="f">between</span> <span class="n">0</span> <span class="n">10</span>)
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs86', 423)" onmouseover="showTip(event, 'fs86', 423)" class="f">is</span> <span onmouseout="hideTip(event, 'fs87', 424)" onmouseover="showTip(event, 'fs87', 424)" class="f">even</span> <span class="c">// Some 4</span>
+</code></pre></td>
+</tr>
+</table>
+<p>When you get stuck writing it in such a sequential way, first try to write it in a nested style.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+<span class="l">7: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp">(<span onmouseout="hideTip(event, 'fs86', 425)" onmouseover="showTip(event, 'fs86', 425)" class="f">is</span> (<span onmouseout="hideTip(event, 'fs53', 426)" onmouseover="showTip(event, 'fs53', 426)" class="f">between</span> <span class="n">0</span> <span class="n">10</span>)
+  (<span onmouseout="hideTip(event, 'fs86', 427)" onmouseover="showTip(event, 'fs86', 427)" class="f">is</span> <span onmouseout="hideTip(event, 'fs87', 428)" onmouseover="showTip(event, 'fs87', 428)" class="f">even</span>
+    (<span onmouseout="hideTip(event, 'fs38', 429)" onmouseover="showTip(event, 'fs38', 429)" class="p">Some</span> <span class="n">3</span>))) <span class="c">// None</span>
+
+(<span onmouseout="hideTip(event, 'fs86', 430)" onmouseover="showTip(event, 'fs86', 430)" class="f">is</span> (<span onmouseout="hideTip(event, 'fs53', 431)" onmouseover="showTip(event, 'fs53', 431)" class="f">between</span> <span class="n">0</span> <span class="n">10</span>)
+  (<span onmouseout="hideTip(event, 'fs86', 432)" onmouseover="showTip(event, 'fs86', 432)" class="f">is</span> <span onmouseout="hideTip(event, 'fs87', 433)" onmouseover="showTip(event, 'fs87', 433)" class="f">even</span>
+    (<span onmouseout="hideTip(event, 'fs38', 434)" onmouseover="showTip(event, 'fs38', 434)" class="p">Some</span> <span class="n">4</span>))) <span class="c">// Some 4</span>
+</code></pre></td>
+</tr>
+</table>
+<p>When you have problems to understand the nested-style. The only difference in C-Style code is
+the position of the open-parenthesis. It is placed after the function name instead before.
+And often <code>,</code> is used to separate the arguments.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="csharp"><span class="k">is</span>(between(<span class="n">0</span>,<span class="n">10</span>),
+  <span class="k">is</span>(even,
+    Some(<span class="n">4</span>)))
+</code></pre></td></tr></table>
+<p>Writing it in a sequential style is possible in every language that also supports lambdas. In C#
+you want to look at <em>Extension Methods</em>, in Java look at <em>Default Methods</em>. In a language without
+such features. The <code>is</code> function will be part of your validation class. Your final code should
+then look similar to this:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="csharp"><span class="k">var</span> x <span class="o">=</span>
+    <span class="k">new</span> Validate(<span class="n">3</span>)
+    .<span class="k">is</span>(between(<span class="n">0</span>,<span class="n">10</span>))
+    .<span class="k">is</span>(even);
+x.IsValid() <span class="c">// False</span>
+</code></pre></td></tr></table>
+<p>But first try to write it only with functions/static methods. The predicates itself
+like <code>smaller</code>, <code>greater</code> and so on should never be part of the validation class you create.</p>
+<p>When you create a solution in your favourite language, you can leave a message in the Disqus
+chat, or sent me a notification via Twitter, I add a link to your solution here.</p>
+<a name="summary"></a>
+<h2>Summary</h2>
+<p>I started with the idea of functions as data and why it makes sense that we can pass functions
+as arguments or return functions from other functions. A lambda expression is a way to
+create a function on-the-fly, so we can easily pass functions as arguments or return them from
+functions without explicitly defining them. Then we learned that a language like F# basically
+treats all functions just as lambdas. We also have seen that multi-arguments functions didn't
+exists, they are just a chain of one argument functions. This on the other hand means we can easily
+partial apply any function. But not only that, it means every multi argument function is automatically
+a function that can generate other functions.</p>
+<p>When we looked at C# we basically re-implemented all the ideas and we have seen how those
+ideas translate to OO. You also should now know why Functional Programming is Orthogonal
+to Object-Oriented programming and why closures and objects are the same.</p>
+<p>I overall hope that this introduction helped you not only in understanding functional programming
+better, but also widen your view on object-oriented programming.</p>
+<a name="reading"></a>
+<h2>Further Reading</h2>
+<ul>
+<li><a href="http://www.lihaoyi.com/post/WhatsFunctionalProgrammingAllAbout.html">What's Functional Programming All About?</a></li>
+<li><a href="https://medium.com/@cscalfani/so-you-want-to-be-a-functional-programmer-part-1-1f15e387e536">So You Want to be a Functional Programmer (Part 1)</a></li>
+</ul>
+<a name="comments"></a>
+
+
+<div class="tip" id="fs1">module Main</div>
+<div class="tip" id="fs2">val square : x:int -&gt; int<br /><br />Full name: Main.square</div>
+<div class="tip" id="fs3">val x : int</div>
+<div class="tip" id="fs4">val squareM : x:int -&gt; int<br /><br />Full name: Main.squareM</div>
+<div class="tip" id="fs5">val output : Map&lt;int,int&gt;</div>
+<div class="tip" id="fs6">Multiple items<br />module Map<br /><br />from Microsoft.FSharp.Collections<br /><br />--------------------<br />type Map&lt;&#39;Key,&#39;Value (requires comparison)&gt; =<br />&#160;&#160;interface IEnumerable<br />&#160;&#160;interface IComparable<br />&#160;&#160;interface IEnumerable&lt;KeyValuePair&lt;&#39;Key,&#39;Value&gt;&gt;<br />&#160;&#160;interface ICollection&lt;KeyValuePair&lt;&#39;Key,&#39;Value&gt;&gt;<br />&#160;&#160;interface IDictionary&lt;&#39;Key,&#39;Value&gt;<br />&#160;&#160;new : elements:seq&lt;&#39;Key * &#39;Value&gt; -&gt; Map&lt;&#39;Key,&#39;Value&gt;<br />&#160;&#160;member Add : key:&#39;Key * value:&#39;Value -&gt; Map&lt;&#39;Key,&#39;Value&gt;<br />&#160;&#160;member ContainsKey : key:&#39;Key -&gt; bool<br />&#160;&#160;override Equals : obj -&gt; bool<br />&#160;&#160;member Remove : key:&#39;Key -&gt; Map&lt;&#39;Key,&#39;Value&gt;<br />&#160;&#160;...<br /><br />Full name: Microsoft.FSharp.Collections.Map&lt;_,_&gt;<br /><br />--------------------<br />new : elements:seq&lt;&#39;Key * &#39;Value&gt; -&gt; Map&lt;&#39;Key,&#39;Value&gt;</div>
+<div class="tip" id="fs7">val ofList : elements:(&#39;Key * &#39;T) list -&gt; Map&lt;&#39;Key,&#39;T&gt; (requires comparison)<br /><br />Full name: Microsoft.FSharp.Collections.Map.ofList</div>
+<div class="tip" id="fs8">val defaultArg : arg:&#39;T option -&gt; defaultValue:&#39;T -&gt; &#39;T<br /><br />Full name: Microsoft.FSharp.Core.Operators.defaultArg</div>
+<div class="tip" id="fs9">val tryFind : key:&#39;Key -&gt; table:Map&lt;&#39;Key,&#39;T&gt; -&gt; &#39;T option (requires comparison)<br /><br />Full name: Microsoft.FSharp.Collections.Map.tryFind</div>
+<div class="tip" id="fs10">Multiple items<br />module List<br /><br />from Microsoft.FSharp.Collections<br /><br />--------------------<br />type List&lt;&#39;T&gt; =<br />&#160;&#160;| ( [] )<br />&#160;&#160;| ( :: ) of Head: &#39;T * Tail: &#39;T list<br />&#160;&#160;interface IEnumerable<br />&#160;&#160;interface IEnumerable&lt;&#39;T&gt;<br />&#160;&#160;member GetSlice : startIndex:int option * endIndex:int option -&gt; &#39;T list<br />&#160;&#160;member Head : &#39;T<br />&#160;&#160;member IsEmpty : bool<br />&#160;&#160;member Item : index:int -&gt; &#39;T with get<br />&#160;&#160;member Length : int<br />&#160;&#160;member Tail : &#39;T list<br />&#160;&#160;static member Cons : head:&#39;T * tail:&#39;T list -&gt; &#39;T list<br />&#160;&#160;static member Empty : &#39;T list<br /><br />Full name: Microsoft.FSharp.Collections.List&lt;_&gt;</div>
+<div class="tip" id="fs11">val map : mapping:(&#39;T -&gt; &#39;U) -&gt; list:&#39;T list -&gt; &#39;U list<br /><br />Full name: Microsoft.FSharp.Collections.List.map</div>
+<div class="tip" id="fs12">val map : data:Map&lt;&#39;a,&#39;b&gt; -&gt; list:&#39;a list -&gt; &#39;b list (requires comparison)<br /><br />Full name: Main.map</div>
+<div class="tip" id="fs13">val data : Map&lt;&#39;a,&#39;b&gt; (requires comparison)</div>
+<div class="tip" id="fs14">Multiple items<br />val list : &#39;a list (requires comparison)<br /><br />--------------------<br />type &#39;T list = List&lt;&#39;T&gt;<br /><br />Full name: Microsoft.FSharp.Collections.list&lt;_&gt;</div>
+<div class="tip" id="fs15">val x : &#39;a (requires comparison)</div>
+<div class="tip" id="fs16">val find : key:&#39;Key -&gt; table:Map&lt;&#39;Key,&#39;T&gt; -&gt; &#39;T (requires comparison)<br /><br />Full name: Microsoft.FSharp.Collections.Map.find</div>
+<div class="tip" id="fs17">val squares : Map&lt;int,int&gt;<br /><br />Full name: Main.squares</div>
+<div class="tip" id="fs18">type &#39;T list = List&lt;&#39;T&gt;<br /><br />Full name: Microsoft.FSharp.Collections.list&lt;_&gt;</div>
+<div class="tip" id="fs19">val generateAdd : x:int -&gt; Map&lt;int,int&gt;<br /><br />Full name: Main.generateAdd</div>
+<div class="tip" id="fs20">val i : int</div>
+<div class="tip" id="fs21">val add10 : Map&lt;int,int&gt;<br /><br />Full name: Main.add10</div>
+<div class="tip" id="fs22">val generateAdd : x:int -&gt; i:int -&gt; int<br /><br />Full name: Main.generateAdd</div>
+<div class="tip" id="fs23">val add10 : (int -&gt; int)<br /><br />Full name: Main.add10</div>
+<div class="tip" id="fs24">val squareA : x:int -&gt; int<br /><br />Full name: Main.squareA</div>
+<div class="tip" id="fs25">val squareB : x:int -&gt; int<br /><br />Full name: Main.squareB</div>
+<div class="tip" id="fs26">val add : x:int -&gt; y:int -&gt; int<br /><br />Full name: Main.add</div>
+<div class="tip" id="fs27">val y : int</div>
+<div class="tip" id="fs28">val add&#39; : x:int -&gt; y:int -&gt; int<br /><br />Full name: Main.add&#39;</div>
+<div class="tip" id="fs29">val add&#39;&#39; : x:int -&gt; y:int -&gt; int<br /><br />Full name: Main.add&#39;&#39;</div>
+<div class="tip" id="fs30">val x : int ref<br /><br />Full name: Main.x</div>
+<div class="tip" id="fs31">Multiple items<br />val ref : value:&#39;T -&gt; &#39;T ref<br /><br />Full name: Microsoft.FSharp.Core.Operators.ref<br /><br />--------------------<br />type &#39;T ref = Ref&lt;&#39;T&gt;<br /><br />Full name: Microsoft.FSharp.Core.ref&lt;_&gt;</div>
+<div class="tip" id="fs32">val add : x:int ref -&gt; y:int -&gt; int<br /><br />Full name: Main.add</div>
+<div class="tip" id="fs33">val x : int ref</div>
+<div class="tip" id="fs34">val smaller : min:&#39;a -&gt; x:&#39;a option -&gt; &#39;a option (requires comparison)<br /><br />Full name: Main.smaller</div>
+<div class="tip" id="fs35">val min : &#39;a (requires comparison)</div>
+<div class="tip" id="fs36">val x : &#39;a option (requires comparison)</div>
+<div class="tip" id="fs37">union case Option.None: Option&lt;&#39;T&gt;</div>
+<div class="tip" id="fs38">union case Option.Some: Value: &#39;T -&gt; Option&lt;&#39;T&gt;</div>
+<div class="tip" id="fs39">val number : &#39;a (requires comparison)</div>
+<div class="tip" id="fs40">val greater : max:&#39;a -&gt; x:&#39;a option -&gt; &#39;a option (requires comparison)<br /><br />Full name: Main.greater</div>
+<div class="tip" id="fs41">val max : &#39;a (requires comparison)</div>
+<div class="tip" id="fs42">val is : predicate:(&#39;a -&gt; bool) -&gt; x:&#39;a option -&gt; &#39;a option<br /><br />Full name: Main.is</div>
+<div class="tip" id="fs43">val predicate : (&#39;a -&gt; bool)</div>
+<div class="tip" id="fs44">val x : &#39;a option</div>
+<div class="tip" id="fs45">val number : &#39;a</div>
+<div class="tip" id="fs46">val smaller : min:&#39;a -&gt; x:&#39;a -&gt; bool (requires comparison)<br /><br />Full name: Main.smaller</div>
+<div class="tip" id="fs47">val greater : max:&#39;a -&gt; x:&#39;a -&gt; bool (requires comparison)<br /><br />Full name: Main.greater</div>
+<div class="tip" id="fs48">val filter : predicate:(&#39;T -&gt; bool) -&gt; list:&#39;T list -&gt; &#39;T list<br /><br />Full name: Microsoft.FSharp.Collections.List.filter</div>
+<div class="tip" id="fs49">val combine : f:(&#39;a -&gt; bool) -&gt; g:(&#39;a -&gt; bool) -&gt; x:&#39;a -&gt; bool<br /><br />Full name: Main.combine</div>
+<div class="tip" id="fs50">val f : (&#39;a -&gt; bool)</div>
+<div class="tip" id="fs51">val g : (&#39;a -&gt; bool)</div>
+<div class="tip" id="fs52">val x : &#39;a</div>
+<div class="tip" id="fs53">val between : min:&#39;a -&gt; max:&#39;a -&gt; (&#39;a -&gt; bool) (requires comparison)<br /><br />Full name: Main.between</div>
+<div class="tip" id="fs54">val check : predicates:(&#39;a -&gt; bool) list -&gt; (&#39;a -&gt; bool)<br /><br />Full name: Main.check</div>
+<div class="tip" id="fs55">val predicates : (&#39;a -&gt; bool) list</div>
+<div class="tip" id="fs56">val reduce : reduction:(&#39;T -&gt; &#39;T -&gt; &#39;T) -&gt; list:&#39;T list -&gt; &#39;T<br /><br />Full name: Microsoft.FSharp.Collections.List.reduce</div>
+<div class="tip" id="fs57">val isEven : x:int -&gt; bool<br /><br />Full name: Main.isEven</div>
+<div class="tip" id="fs58">val evenAnd1To9 : (int -&gt; bool)<br /><br />Full name: Main.evenAnd1To9</div>
+<div class="tip" id="fs59">type Counter =<br />&#160;&#160;{Current: unit -&gt; int;<br />&#160;&#160;&#160;Increment: unit -&gt; unit;<br />&#160;&#160;&#160;Decrement: unit -&gt; unit;}<br /><br />Full name: Main.Counter</div>
+<div class="tip" id="fs60">Counter.Current: unit -&gt; int</div>
+<div class="tip" id="fs61">type unit = Unit<br /><br />Full name: Microsoft.FSharp.Core.unit</div>
+<div class="tip" id="fs62">Multiple items<br />val int : value:&#39;T -&gt; int (requires member op_Explicit)<br /><br />Full name: Microsoft.FSharp.Core.Operators.int<br /><br />--------------------<br />type int = int32<br /><br />Full name: Microsoft.FSharp.Core.int<br /><br />--------------------<br />type int&lt;&#39;Measure&gt; = int<br /><br />Full name: Microsoft.FSharp.Core.int&lt;_&gt;</div>
+<div class="tip" id="fs63">Counter.Increment: unit -&gt; unit</div>
+<div class="tip" id="fs64">Counter.Decrement: unit -&gt; unit</div>
+<div class="tip" id="fs65">val counter : init:int -&gt; Counter<br /><br />Full name: Main.counter</div>
+<div class="tip" id="fs66">val init : int</div>
+<div class="tip" id="fs67">val counter : int ref</div>
+<div class="tip" id="fs68">val count : Counter<br /><br />Full name: Main.count</div>
+<div class="tip" id="fs69">val printfn : format:Printf.TextWriterFormat&lt;&#39;T&gt; -&gt; &#39;T<br /><br />Full name: Microsoft.FSharp.Core.ExtraTopLevelOperators.printfn</div>
+<div class="tip" id="fs70">Multiple items<br />type CounterClass =<br />&#160;&#160;new : init:int -&gt; CounterClass<br />&#160;&#160;member Decrement : unit -&gt; unit<br />&#160;&#160;member Increment : unit -&gt; unit<br />&#160;&#160;member Current : int<br /><br />Full name: Main.CounterClass<br /><br />--------------------<br />new : init:int -&gt; CounterClass</div>
+<div class="tip" id="fs71">val mutable counter : int</div>
+<div class="tip" id="fs72">val this : CounterClass</div>
+<div class="tip" id="fs73">member CounterClass.Current : int<br /><br />Full name: Main.CounterClass.Current</div>
+<div class="tip" id="fs74">member CounterClass.Increment : unit -&gt; unit<br /><br />Full name: Main.CounterClass.Increment</div>
+<div class="tip" id="fs75">member CounterClass.Decrement : unit -&gt; unit<br /><br />Full name: Main.CounterClass.Decrement</div>
+<div class="tip" id="fs76">val count : CounterClass<br /><br />Full name: Main.count</div>
+<div class="tip" id="fs77">member CounterClass.Increment : unit -&gt; unit</div>
+<div class="tip" id="fs78">member CounterClass.Decrement : unit -&gt; unit</div>
+<div class="tip" id="fs79">property CounterClass.Current: int</div>
+<div class="tip" id="fs80">val add : x:int * y:int -&gt; int<br /><br />Full name: Main.add</div>
+<div class="tip" id="fs81">val curry : f:(&#39;a * &#39;b -&gt; &#39;c) -&gt; x:&#39;a -&gt; y:&#39;b -&gt; &#39;c<br /><br />Full name: Main.curry</div>
+<div class="tip" id="fs82">val f : (&#39;a * &#39;b -&gt; &#39;c)</div>
+<div class="tip" id="fs83">val y : &#39;b</div>
+<div class="tip" id="fs84">val addC : (int -&gt; int -&gt; int)<br /><br />Full name: Main.addC</div>
+<div class="tip" id="fs85">val addC10 : (int -&gt; int)<br /><br />Full name: Main.addC10</div>
+<div class="tip" id="fs86">val is : f:(&#39;a -&gt; bool) -&gt; x:&#39;a option -&gt; &#39;a option<br /><br />Full name: Main.is</div>
+<div class="tip" id="fs87">val even : x:int -&gt; bool<br /><br />Full name: Main.even</div>

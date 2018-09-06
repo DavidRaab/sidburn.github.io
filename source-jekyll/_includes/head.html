@@ -1,0 +1,60 @@
+﻿<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  {% if page.description %}
+  <meta name="description" content="{{ page.description}}" />
+  {% endif %}
+
+  {% if page.keywords %}
+  <meta name="keywords" content="{{ page.keywords }}" />
+  {% endif %}
+
+  <title>
+    {% if page.title == "Home" %}
+      {{ site.title }} &middot; {{ site.tagline }}
+    {% else %}
+      {{ page.title }} &middot; {{ site.title }}
+    {% endif %}
+  </title>
+
+  <!-- Twitter Card -->
+  {% if page.twitter-card == "summary" %}
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:site" content="@David_Raab" />
+  <meta name="twitter:title" content="{{ page.title }}" />
+  <meta name="twitter:description" content="{{ page.description }}" />
+  {% if page.twitter-image %}
+  <meta name="twitter:image" content="{{ site.url }}{{ page.twitter-image }}" />
+  {% endif %}
+  {% endif %}
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/public/css/styles.css">
+  <link rel="stylesheet" href="/public/css/poole.css">
+  <link rel="stylesheet" href="/public/css/syntax.css">
+  <link rel="stylesheet" href="/public/css/hyde.css">
+  <link rel="stylesheet" href="/public/css/tips.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  <!-- Favicons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/public/favicon/apple-touch-icon.png?v=XBr3BkNgXe">
+  <link rel="icon" type="image/png" href="/public/favicon/favicon-32x32.png?v=XBr3BkNgXe" sizes="32x32">
+  <link rel="icon" type="image/png" href="/public/favicon/favicon-16x16.png?v=XBr3BkNgXe" sizes="16x16">
+  <link rel="manifest" href="/public/favicon/manifest.json?v=XBr3BkNgXe">
+  <link rel="mask-icon" href="/public/favicon/safari-pinned-tab.svg?v=XBr3BkNgXe" color="#6699ff">
+  <link rel="shortcut icon" href="/public/favicon/favicon.ico?v=XBr3BkNgXe">
+  <meta name="apple-mobile-web-app-title" content="David Raab">
+  <meta name="application-name" content="David Raab">
+  <meta name="msapplication-config" content="/public/favicon/browserconfig.xml?v=XBr3BkNgXe">
+  <meta name="theme-color" content="#ff0000">
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
+
+  <!-- JS -->
+  <script type="text/javascript" src="/public/js/tips.js"></script>
+</head>
