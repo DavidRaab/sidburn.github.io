@@ -21,6 +21,7 @@ paginate:         10
 github:
   repo:           https://github.com/sidburn/sidburn.github.io
 
-gems:
+plugins:
   - jekyll-paginate
-
+  - jekyll-sitemap
+  - jekyll-feed
