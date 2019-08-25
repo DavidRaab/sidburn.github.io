@@ -51,7 +51,7 @@ geworden.
 Wir Menschen sind im Grunde alle Abhängig. Wir sind Abhängig nach Freude. Diese
 Freude kann etliches sein.
 
-* Sex mit einem geliebten Partner oder Fremden
+* Die Liebe eines Partners
 * Die Zeit mit Freunden verbringen
 * Im Restaurant Essen gehen (Ich liebe Griechisch...)
 * Zuckerkonsum durch Süßigkeiten (Tue ich auch gerade!)
