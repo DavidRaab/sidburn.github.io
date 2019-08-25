@@ -125,25 +125,27 @@ das macht unser Leben nunmal aus. Freude spüren und das auch auf Kosten der Ges
 
 ## Cannabis
 
-Und hier landen wir bei meinen Cannabis konsum. Ja, ich nehme Cannabis. Es hilft
-mir durch meine Depression. Ich bin wieder in der lage freude an dingen zu spüren.
-Das Computerspielen macht mir Spaß, ich werde Kontaktfreudiger und generell
-aktiver und verspüre den Antrieb meine Probleme anzugehen.
+Und hier landen wir bei meinen Cannabiskonsum.
 
-Die Gesundheitlichen Schäden? Nun ich bin alt genug so das der Cannabis Konsum keine
-langzeitlichen Schäden mehr auf mein Gehirn anrichtet (Bitte nicht unter 18
-besser noch 21 Kiffen!).
+Ja, ich nehme Cannabis. Es hilft mir durch meine Depression. Ich bin wieder
+in der Lage, Freude an dingen zu spüren. Das Computerspielen macht mir Spaß, ich
+werde Kontaktfreudiger und generell aktiver, außerdem verspüre ich den Antrieb
+meine Probleme anzugehen.
+
+Die Gesundheitlichen Schäden? Ich bin alt genug, so das der Cannabiskonsum keine
+langzeitlichen Schäden mehr auf mein Gehirn anrichtet (Bitte nicht kiffen, wenn 
+ihr jünger als 18, besser noch 21 Jahre alt seid!).
 
 Psychosen hat es bei mir nicht ausgelöst, und es ist immer noch umstritten ob es
 das überhaupt tut! 
 
-Naja ich habe jetzt zwei packungen zwiback mit kokos und Dunkler Schokolade gegessen,
-saure bonbons und Marzipan Schokolade. Dies war meiner Gesundheitlich wahrscheinlich
-mehr Schädlich als der Cannabis konsum. Aber hey, dafür habe ich ja das Fitness-Studio!
+Ich habe jetzt zwei packungen zwiback mit kokos und Dunkler Schokolade gegessen,
+saure bonbons und Marzipanschokolade. Dies war meiner gesundheit wahrscheinlich
+schädlicher, als der Cannabiskonsum. Aber hey, dafür habe ich ja das Fitness-Studio!
 
-Sind Drogen also schädlich? Ja und nein. Vieles was uns nunmal gut tut richtet
-auch schaden an. Dies gilt für alles in unserem Leben. Zu viel von etwas kann uns immer
-schaden. So kann man genauso Sexsüchtig sein, Fettsüchtig oder von jedem anderer
+Sind Drogen also schädlich? Ja und nein. Vieles was uns nunmal gut tut, richtet
+auch Schaden an. Dies gilt für alles in unserem Leben. Zu viel von etwas kann uns immer
+Schaden. So kann man genauso sexsüchtig sein, fettsüchtig oder von jeder anderer
 Sache die uns Spaß bereitet. Die Frage sollte also kein schwarz/weiß denken sein
 im Sinne von: Ist etwas gut oder schlecht.
 

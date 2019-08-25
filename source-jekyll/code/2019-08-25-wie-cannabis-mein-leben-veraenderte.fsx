@@ -259,9 +259,10 @@ Gefühlslage ist. Aus diesem Grund empfehlen etliche Menschen kein Cannabis bei 
 
 Warum habe ich es trotzdem getan? Warum hatte ich keine Angst?
 
-    Wenn man so wie ich schon als kleines Kind ständig über den Tod am grübeln ist. Und eine so lange Geschichte von Lebensmüden Gedanken hat, dann …
-	A) Ist man ohnehin irgendwann abgestumpft, und wenig Sachen können einen Schockieren.
-	B) Wäre es mir auch egal wenn ich gestorben wäre. (Was bei Cannabis ohnehin nicht passiert, es hätte aber meine Suizid Gedanken verstärken können, und das war mir egal)
+Wenn man so wie ich schon als kleines Kind ständig über den Tod am grübeln ist. Und eine so lange Geschichte von Lebensmüden Gedanken hat, dann …
+
+A) Ist man ohnehin irgendwann abgestumpft, und wenig Sachen können einen Schockieren.  
+B) Wäre es mir auch egal wenn ich gestorben wäre. (Was bei Cannabis ohnehin nicht passiert, es hätte aber meine Suizid Gedanken verstärken können, und das war mir egal)
 
 ## Der Umgang mit Cannabis
 
