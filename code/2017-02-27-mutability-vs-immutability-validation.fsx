@@ -166,7 +166,7 @@ this code example?
 
     [lang=csharp]
     var v = new MinMax(0, 100, 80);
-	
+
     try {
 	    v.SetMaximum(-100);
 	}
@@ -217,7 +217,7 @@ For example I could add the following logic to the `SetMinimum` and
 * If Minimum is bigger than Maximum, then set Maximum to the same value.
 * If Maximum is smaller than Minimum, then set Minimum to the same value.
 
-Every method (or say at least "a lot") could somehow fix an object. 
+Every method (or say at least "a lot") could somehow fix an object.
 If a string is restricted to 80 characters you could reset a string to
 the empty string, or maybe cut everything off after 80 characters. The
 problem with logic like these are they are very hard to remember.
@@ -376,10 +376,11 @@ of OO programming are connected to this idea. This rule alone deserves a
 whole article on its own to describe its evilness. Yes, I'm serious and this
 is not a joke!
 
-Currently I left it to he reader to figure out how many implications this has,
+Currently I left it to the reader to figure out how many implications this has,
 otherwise this article will get too long. You can start with the question:
 *When you cannot access the `Products` list of an `ProductsPriceOver` object.
-How do you implement new functionality?*
+How do you show all `Products` inside of `ProductsPriceOver`, or how do you
+implement new functionality without chaning `ProductsPriceOver`?
 
 Now that we have Rule Five and Six, lets talk about these. Actually you cannot
 freely decide if you either use events or defensive copies. Events are
@@ -803,7 +804,7 @@ But even that can be considered as good. We didn't need to create an `update`
 function with a mutable version because mutable Products already had this
 feature. In fact the problem is more that you can forget this feature, and this
 is the reason why an `ProductsPriceOver` in the mutable version can become
-invalid, because you can forget a feature that msomehow must be handled.
+invalid, because you can forget a feature that somehow must be handled.
 
 The rules to create either events or defensive copies forces you to think about
 this cases so you hopefully don't forget them. With immutability you cannot forget
@@ -822,11 +823,11 @@ change the Product and that's it.
 The problem is that those things often miss the bigger picture. As just mutating
 the price can cause problems in other code like we have seen previously. If we
 start adding `copy` functions for defensive copying or need to add event handling
-then this is not really simpler compared to immutability. 
+then this is not really simpler compared to immutability.
 
 It is sure possible that you can create mutable objects that are always valid,
-but doing so is a lot harder. Even now I'm still not 100% sure if I covered 
-ll possibilities how mutation can somehow lead to an invalid object.
+but doing so is a lot harder. Even now I'm still not 100% sure if I covered
+all possibilities how mutation can somehow lead to an invalid object.
 
 There are more reasons for immutability, advantages and techniques we didn't
 looked at. But there are also reasons against immutability. But in this article we
