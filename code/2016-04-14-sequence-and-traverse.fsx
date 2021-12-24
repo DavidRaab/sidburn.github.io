@@ -14,9 +14,9 @@ type Uri = System.Uri
 
 (**
 One problem that appears from time to time is that we we have some kind of
-collection (I use `list` here) and we want to `map` every element with a
-*monadic function* `'a -> M<'b>`. This then returns a `list<M<'a>>`. But
-often we want a `M<list<'a>>`.
+collection, for example a `list<'a>` and we want to `map` every element with a
+*monadic function* `'a -> M<'b>`. When we do this we get a `list<M<'b>>`. But
+often we want a `M<list<'b>>`.
 
 To be more concrete. Let's assume we want to turn a list of strings into integers. We could
 write a `tryParseInt` function that does `string -> option<int>`. But if we `map`
@@ -40,9 +40,10 @@ This generalization is what we think of the `sequence` and `traverse` functions.
 ## Sequence
 
 We first start with the *monadic* `tryParseInt` function we already mentioned.
+
 *)
 
-let tryParseInt str =
+let tryParseInt (str:string) =
     match System.Int32.TryParse(str) with
     | false,_ -> None
     | true,x  -> Some x
@@ -222,7 +223,7 @@ we get a `option<list<'b>>`.
 ## Sequence defined through traverse
 
 The primary reason why you less likely implement `sequence` is because `traverse` is
-basically the same implementation. You can enhance a `sequence` implementation easily
+basically the same implementation. You can extend a `sequence` implementation easily
 by just adding a function call to the element before you `apply` it.
 
 Once you have a `traverse` function, you can very easily create `sequence` by just
